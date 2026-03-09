@@ -35,6 +35,12 @@ type GuidelineConfig = {
   colorNotes5: string;
   typographyNotes: string;
   iconographyNotes: string;
+  iconStyleRule: string;
+  iconStrokeRule: string;
+  iconContrastRule: string;
+  iconDoNotes: string;
+  iconDontNotes: string;
+  iconTags: Record<string, string[]>;
   templatesNotes: string;
   doNotes: string;
   dontNotes: string;
@@ -56,6 +62,12 @@ const DEFAULT_CONFIG: GuidelineConfig = {
   colorNotes5: "Color 5\nPMS:\nRGB:\nCMYK:\nHEX:",
   typographyNotes: "List approved heading/body fonts and usage rules.",
   iconographyNotes: "Store approved icon packs and guidance for usage style.",
+  iconStyleRule: "Use one icon family only (outline or filled), not mixed styles.",
+  iconStrokeRule: "Use consistent stroke/weight across all icons in one interface.",
+  iconContrastRule: "Use approved brand colors and maintain strong contrast on all backgrounds.",
+  iconDoNotes: "Do: keep icon size, spacing, and style consistent.",
+  iconDontNotes: "Don't: mix line/filled sets, stretch icons, or use random colors.",
+  iconTags: {},
   templatesNotes: "Store social templates, print-ready files, and reference docs.",
   doNotes: "Use approved logo files, proper spacing, and official colors.",
   dontNotes: "Stretch logos, alter colors, or use outdated assets.",
@@ -173,6 +185,15 @@ export default function BrandGuidelinesPage() {
         colorNotes5: parsed.colorNotes5 ?? DEFAULT_CONFIG.colorNotes5,
         typographyNotes: parsed.typographyNotes ?? DEFAULT_CONFIG.typographyNotes,
         iconographyNotes: parsed.iconographyNotes ?? DEFAULT_CONFIG.iconographyNotes,
+        iconStyleRule: parsed.iconStyleRule ?? DEFAULT_CONFIG.iconStyleRule,
+        iconStrokeRule: parsed.iconStrokeRule ?? DEFAULT_CONFIG.iconStrokeRule,
+        iconContrastRule: parsed.iconContrastRule ?? DEFAULT_CONFIG.iconContrastRule,
+        iconDoNotes: parsed.iconDoNotes ?? DEFAULT_CONFIG.iconDoNotes,
+        iconDontNotes: parsed.iconDontNotes ?? DEFAULT_CONFIG.iconDontNotes,
+        iconTags:
+          parsed.iconTags && typeof parsed.iconTags === "object"
+            ? parsed.iconTags
+            : DEFAULT_CONFIG.iconTags,
         templatesNotes: parsed.templatesNotes ?? DEFAULT_CONFIG.templatesNotes,
         doNotes: parsed.doNotes ?? DEFAULT_CONFIG.doNotes,
         dontNotes: parsed.dontNotes ?? DEFAULT_CONFIG.dontNotes,
@@ -409,6 +430,59 @@ export default function BrandGuidelinesPage() {
     }
   }
 
+  function iconTagsForPath(path: string) {
+    return config.iconTags[path] ?? [];
+  }
+
+  function setIconTagsForPath(path: string, rawValue: string) {
+    const nextTags = rawValue
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    setConfig((prev) => ({
+      ...prev,
+      iconTags: {
+        ...prev.iconTags,
+        [path]: nextTags,
+      },
+    }));
+  }
+
+  async function downloadIconSet() {
+    if (icons.length === 0) {
+      setStatus("No icons available to download.");
+      return;
+    }
+
+    setStatus("Preparing icon downloads…");
+    let successCount = 0;
+    for (const icon of icons) {
+      if (!icon.signedUrl) continue;
+      try {
+        const response = await fetch(icon.signedUrl);
+        if (!response.ok) continue;
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = icon.name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objectUrl);
+        successCount += 1;
+      } catch {
+        // continue downloading other files
+      }
+    }
+
+    if (successCount === 0) {
+      setStatus("Unable to download icons. Try opening an icon and downloading manually.");
+      return;
+    }
+    setStatus(`Downloaded ${successCount} icon file${successCount === 1 ? "" : "s"}.`);
+  }
+
   return (
     <MediaWorkspaceShell
       title="Brand Portal"
@@ -427,14 +501,6 @@ export default function BrandGuidelinesPage() {
             ]
           : []),
         {
-          key: "appearance",
-          node: (
-            <Link href="/settings/branding" className={buttonClass("secondary")}>
-              Appearance
-            </Link>
-          ),
-        },
-        {
           key: "albums",
           node: (
             <Link href="/albums" className={buttonClass("secondary")}>
@@ -442,20 +508,6 @@ export default function BrandGuidelinesPage() {
             </Link>
           ),
         },
-      ]}
-      utilityActions={[
-        ...(isSuperAdmin
-          ? [
-              {
-                key: "super",
-                node: (
-                  <Link href="/super-admin" className={buttonClass("secondary", "sm")}>
-                    Super admin
-                  </Link>
-                ),
-              },
-            ]
-          : []),
       ]}
       sidebarLogoOnly
       sidebarContent={
@@ -733,6 +785,51 @@ export default function BrandGuidelinesPage() {
               value={config.iconographyNotes}
               onChange={(e) => setConfig((prev) => ({ ...prev, iconographyNotes: e.target.value }))}
             />
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">
+              <textarea
+                className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 outline-none focus:border-slate-900 disabled:bg-slate-50"
+                rows={3}
+                disabled={!canEdit}
+                value={config.iconStyleRule}
+                onChange={(e) => setConfig((prev) => ({ ...prev, iconStyleRule: e.target.value }))}
+              />
+              <textarea
+                className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 outline-none focus:border-slate-900 disabled:bg-slate-50"
+                rows={3}
+                disabled={!canEdit}
+                value={config.iconStrokeRule}
+                onChange={(e) => setConfig((prev) => ({ ...prev, iconStrokeRule: e.target.value }))}
+              />
+              <textarea
+                className="w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 outline-none focus:border-slate-900 disabled:bg-slate-50"
+                rows={3}
+                disabled={!canEdit}
+                value={config.iconContrastRule}
+                onChange={(e) => setConfig((prev) => ({ ...prev, iconContrastRule: e.target.value }))}
+              />
+            </div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3">
+                <p className="text-sm font-medium text-emerald-800">Do</p>
+                <textarea
+                  className="mt-2 w-full rounded-md border border-emerald-300 bg-emerald-100/70 p-2 text-xs text-emerald-900 outline-none disabled:bg-emerald-100/70"
+                  rows={2}
+                  disabled={!canEdit}
+                  value={config.iconDoNotes}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, iconDoNotes: e.target.value }))}
+                />
+              </div>
+              <div className="rounded-lg border border-rose-300 bg-rose-50 p-3">
+                <p className="text-sm font-medium text-rose-800">Don&apos;t</p>
+                <textarea
+                  className="mt-2 w-full rounded-md border border-rose-300 bg-rose-100/70 p-2 text-xs text-rose-900 outline-none disabled:bg-rose-100/70"
+                  rows={2}
+                  disabled={!canEdit}
+                  value={config.iconDontNotes}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, iconDontNotes: e.target.value }))}
+                />
+              </div>
+            </div>
             {icons.length === 0 ? (
               <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
                 No icons yet. Upload SVG/PNG icons for this school&apos;s Brand Portal library.
@@ -740,9 +837,9 @@ export default function BrandGuidelinesPage() {
             ) : (
               <>
                 <div className="mt-4 flex items-center gap-2">
-                  <a href={icons[0].signedUrl ?? "#"} target="_blank" rel="noreferrer" className={buttonClass("primary", "sm")}>
+                  <button type="button" className={buttonClass("primary", "sm")} onClick={downloadIconSet}>
                     Download icons
-                  </a>
+                  </button>
                   <p className="text-xs text-slate-500">Org-specific icon set for this school.</p>
                 </div>
                 <div className="mt-4 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 p-4">
@@ -762,6 +859,14 @@ export default function BrandGuidelinesPage() {
                         <p className="mt-2 truncate text-[11px] text-emerald-100" title={asset.name}>
                           {asset.name}
                         </p>
+                        <input
+                          type="text"
+                          className="mt-1 w-full rounded border border-emerald-200/40 bg-black/30 px-1.5 py-1 text-[11px] text-emerald-100 placeholder:text-emerald-200/70"
+                          placeholder="tags: ui, navigation, approved"
+                          value={iconTagsForPath(asset.path).join(", ")}
+                          disabled={!canEdit}
+                          onChange={(e) => setIconTagsForPath(asset.path, e.target.value)}
+                        />
                         {canEdit ? (
                           <button
                             type="button"

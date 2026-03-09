@@ -24,7 +24,7 @@ type StaffRow = {
 
 export default function StaffSettingsPage() {
   const router = useRouter();
-  const { activeOrgId, orgs, isSuperAdmin, loading: orgLoading } = useOrg();
+  const { activeOrgId, orgs, loading: orgLoading } = useOrg();
   const activeOrg = useMemo(() => orgs.find((org) => org.id === activeOrgId) ?? null, [orgs, activeOrgId]);
 
   const [loading, setLoading] = useState(true);
@@ -158,26 +158,6 @@ export default function StaffSettingsPage() {
             </Link>
           ),
         },
-        {
-          key: "appearance",
-          node: (
-            <Link href="/settings/branding" className={buttonClass("secondary")}>
-              Appearance
-            </Link>
-          ),
-        },
-        ...(isSuperAdmin
-          ? [
-              {
-                key: "super",
-                node: (
-                  <Link href="/super-admin" className={buttonClass("secondary")}>
-                    Super admin
-                  </Link>
-                ),
-              },
-            ]
-          : []),
       ]}
     >
       <Card className="space-y-4 p-4 sm:p-5">

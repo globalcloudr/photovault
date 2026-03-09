@@ -68,9 +68,12 @@ export default function MarketingHomepage() {
 
   const featureOne = content.features.items[0] ?? defaultMarketingHomepageContent.features.items[0];
   const featureTwo = content.features.items[1] ?? defaultMarketingHomepageContent.features.items[1];
+  const trustedLogos = content.trusted.logos.slice(0, 6);
+  const metrics = content.metrics.items.slice(0, 3);
   const whyCards = content.why.cards.slice(0, 3);
   const testimonials = content.testimonials.items.slice(0, 3);
   const securityItems = content.security.items.slice(0, 6);
+  const howSteps = content.howItWorks.steps.slice(0, 3);
 
   return (
     <main className="marketing-homepage">
@@ -109,9 +112,6 @@ export default function MarketingHomepage() {
                   <path d="M12 5l7 7-7 7" />
                 </svg>
               </a>
-              <Link href="/login" className="btn-secondary">
-                {content.hero.secondaryCta}
-              </Link>
             </div>
             <div className="hero-trust">
               <span className="trust-line" />
@@ -151,7 +151,7 @@ export default function MarketingHomepage() {
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                     </svg>
-                    Share Links
+                    Share Album
                   </div>
                   <div className="sidebar-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -185,6 +185,24 @@ export default function MarketingHomepage() {
                 <div className="float-value">100% on-brand</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="trust-strip" aria-label={content.trusted.label}>
+        <div className="container">
+          <p className="trusted-logos-label reveal">{content.trusted.label}</p>
+          <div className="trusted-logos-grid reveal">
+            {trustedLogos.map((logo, index) => (
+              <div key={`${logo.name}-${logo.logoUrl}-${index}`} className="trusted-logo-slot">
+                {logo.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={logo.logoUrl} alt={logo.name || "School logo"} className="trusted-logo-image" />
+                ) : (
+                  <span className="trusted-logo-wordmark">{logo.name}</span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -225,6 +243,20 @@ export default function MarketingHomepage() {
               <h3>{whyCards[2]?.title}</h3>
               <p>{whyCards[2]?.body}</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="metrics-band" id="metrics">
+        <div className="container">
+          <div className="metrics-grid">
+            {metrics.map((metric) => (
+              <div key={`${metric.value}-${metric.label}`} className="metric-card reveal">
+                <p className="metric-value">{metric.value}</p>
+                <p className="metric-label">{metric.label}</p>
+                <p className="metric-detail">{metric.detail}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -338,6 +370,21 @@ export default function MarketingHomepage() {
         </div>
       </section>
 
+      <section className="how-it-works" id="how-it-works">
+        <div className="container">
+          <div className="section-label reveal">{content.howItWorks.label}</div>
+          <h2 className="section-title reveal">{content.howItWorks.title}</h2>
+          <div className="how-grid">
+            {howSteps.map((step) => (
+              <div key={step.title} className="how-card reveal">
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="cta" id="cta">
         <div className="container">
           <div className="cta-box">
@@ -346,7 +393,6 @@ export default function MarketingHomepage() {
             <p>{content.cta.body}</p>
             <div className="cta-actions">
               <a href={`mailto:${content.footer.contactEmail}?subject=PhotoVault%20Pricing%20Request`} className="btn-teal">{content.cta.primaryCta}</a>
-              <Link href="/login" className="btn-outline-white">{content.cta.secondaryCta}</Link>
             </div>
           </div>
         </div>
@@ -426,6 +472,30 @@ export default function MarketingHomepage() {
         .marketing-homepage .btn-secondary:hover { border-color: var(--navy); background: var(--white); color: var(--navy); }
         .marketing-homepage .hero-trust { font-size: 15px; color: var(--slate); display: flex; align-items: center; gap: 10px; animation: fadeUp .6s ease .4s both; }
         .marketing-homepage .trust-line { width: 30px; height: 1px; background: var(--sand); }
+        .marketing-homepage .trust-strip { padding: 12px 0 72px; }
+        .marketing-homepage .trusted-logos-label { margin: 0 0 16px; font-size: 14px; font-weight: 600; color: var(--slate); text-align: center; }
+        .marketing-homepage .trusted-logos-grid { display: flex; flex-wrap: wrap; gap: 18px 34px; align-items: center; justify-content: center; }
+        .marketing-homepage .trusted-logo-slot {
+          min-height: 38px;
+          min-width: 170px;
+          display: flex;
+          align-items: center;
+        }
+        .marketing-homepage .trusted-logo-image {
+          max-height: 34px;
+          max-width: 190px;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+          filter: grayscale(100%);
+          opacity: 0.84;
+        }
+        .marketing-homepage .trusted-logo-wordmark {
+          font-size: 19px;
+          font-weight: 700;
+          color: rgba(26,35,50,.52);
+          letter-spacing: .01em;
+        }
         .marketing-homepage .hero-visual { position: relative; animation: fadeUp .8s ease .3s both; }
         .marketing-homepage .hero-mockup { background: var(--white); border-radius: var(--radius-lg); box-shadow: 0 2px 4px rgba(0,0,0,.02), 0 8px 24px rgba(0,0,0,.06), 0 24px 60px rgba(0,0,0,.08); padding: 16px; position: relative; z-index: 2; }
         .marketing-homepage .mockup-topbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--navy); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
@@ -471,6 +541,12 @@ export default function MarketingHomepage() {
         .marketing-homepage .why-icon svg { color: var(--teal-dim); }
         .marketing-homepage .why-card h3 { font-family: "DM Serif Display", serif; font-size: 28px; color: var(--navy); margin-bottom: 10px; }
         .marketing-homepage .why-card p { font-size: 18px; line-height: 1.65; color: var(--text-light); }
+        .marketing-homepage .metrics-band { padding: 8px 0 80px; }
+        .marketing-homepage .metrics-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+        .marketing-homepage .metric-card { background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%); border: 1px solid rgba(12,24,41,.08); border-radius: 16px; padding: 24px; }
+        .marketing-homepage .metric-value { margin: 0; font-family: "DM Serif Display", serif; font-size: 44px; line-height: 1; color: var(--navy); }
+        .marketing-homepage .metric-label { margin: 8px 0 8px; font-size: 17px; font-weight: 700; color: var(--navy-mid); }
+        .marketing-homepage .metric-detail { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text-light); }
         .marketing-homepage .features { padding: 80px 0 100px; }
         .marketing-homepage .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 80px; }
         .marketing-homepage .feature-row:last-child { margin-bottom: 0; }
@@ -508,6 +584,12 @@ export default function MarketingHomepage() {
         .marketing-homepage .security-item { background: #fff; border-radius: 14px; padding: 22px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
         .marketing-homepage .security-item h3 { font-size: 22px; font-family: "DM Serif Display", serif; color: var(--navy); margin: 0 0 10px; }
         .marketing-homepage .security-item p { margin: 0; font-size: 16px; line-height: 1.55; color: var(--text-light); }
+        .marketing-homepage .how-it-works { padding: 95px 0 35px; background: var(--cream); }
+        .marketing-homepage .how-it-works .section-title { max-width: 900px; margin-bottom: 34px; }
+        .marketing-homepage .how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .marketing-homepage .how-card { background: var(--white); border: 1px solid rgba(0,0,0,.06); border-radius: 16px; padding: 24px 22px; }
+        .marketing-homepage .how-card h3 { margin: 0 0 10px; font-size: 24px; font-family: "DM Serif Display", serif; color: var(--navy); }
+        .marketing-homepage .how-card p { margin: 0; font-size: 17px; line-height: 1.55; color: var(--text-light); }
         .marketing-homepage .cta { padding: 120px 0; position: relative; }
         .marketing-homepage .cta-box { background: var(--navy); border-radius: 24px; padding: 80px; text-align: center; position: relative; overflow: hidden; }
         .marketing-homepage .cta-box::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(45,212,168,.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 50%, rgba(45,212,168,.06) 0%, transparent 50%); pointer-events: none; }
@@ -541,8 +623,7 @@ export default function MarketingHomepage() {
           .marketing-homepage .hero .container { grid-template-columns: 1fr; gap: 50px; }
           .marketing-homepage h1 { font-size: 48px; }
           .marketing-homepage .hero-float-badge { left: 0; bottom: 16px; }
-          .marketing-homepage .why-grid, .marketing-homepage .testimonial-grid { grid-template-columns: 1fr; }
-          .marketing-homepage .security-grid { grid-template-columns: 1fr; }
+          .marketing-homepage .why-grid, .marketing-homepage .testimonial-grid, .marketing-homepage .metrics-grid, .marketing-homepage .security-grid, .marketing-homepage .how-grid { grid-template-columns: 1fr; }
           .marketing-homepage .feature-row { grid-template-columns: 1fr; gap: 30px; }
           .marketing-homepage .feature-row.reverse .feature-visual { order: 0; }
           .marketing-homepage .cta-box { padding: 50px 30px; }

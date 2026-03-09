@@ -69,7 +69,11 @@ Each client portal card includes an onboarding status badge:
 - `Admin accepted`: at least one owner has accepted and accessed the workspace
 
 ## Super Admin Page Layout
-- Top utility header for quick navigation/actions.
+- Top utility header with:
+  - Support link
+  - shared user profile menu (identity/actions)
+  - profile menu includes `Settings (Profile)`, `Logout`, and `Super Admin` shortcut
+  - `Billing` is intentionally disabled/coming soon
 - Dedicated super-admin sidebar (not client-org sidebar) with:
   - admin nav
   - platform snapshot
@@ -104,6 +108,10 @@ Versioning:
 4. Click `Save appearance`.
 5. Refresh page if needed to confirm visual updates.
 
+Important:
+- `Appearance` (`/settings/branding`) is org-level branding.
+- `Settings (Profile)` in the profile menu opens `/settings/profile` for account-level name updates.
+
 ## Configure Brand Portal Collection
 1. Switch to the target org.
 2. Open `/collections/brand-guidelines`.
@@ -134,5 +142,6 @@ When reporting a problem, capture:
 - user email
 - school/org name and org ID
 - action attempted (create org, invite, appearance save, guideline upload, etc.)
+- action attempted (create org, invite, appearance save, brand portal upload, etc.)
 - exact error message
 - timestamp and timezone

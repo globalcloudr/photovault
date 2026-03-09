@@ -254,18 +254,6 @@ export default function BrandingSettingsPage() {
             </Link>
           ),
         },
-        ...(isSuperAdmin
-          ? [
-              {
-                key: "super",
-                node: (
-                  <Link href="/super-admin" className={buttonClass("secondary")}>
-                    Super admin
-                  </Link>
-                ),
-              },
-            ]
-          : []),
       ]}
       sidebarContent={
         <div className="space-y-3">

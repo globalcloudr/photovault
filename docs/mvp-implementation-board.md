@@ -152,7 +152,7 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - new admin view page
 - Acceptance:
   - events captured for invites, uploads, deletes, share actions
-  - events captured for appearance and brand guideline changes
+  - events captured for appearance and Brand Portal changes
   - org owner can review logs
 - Status:
   - `Completed in app`
@@ -164,7 +164,7 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
     - share link create/access/revoke
     - photo upload batches + delete actions
     - appearance save + logo upload
-    - brand guideline uploads/deletes/notes/hero updates
+    - Brand Portal uploads/deletes/notes/hero updates
   - added org-owner/super-admin audit review page: `/audit`
   - added super-admin quick actions to open active/per-org audit views
 
@@ -179,7 +179,7 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - `/Users/zylstra/Documents/photovault/src/lib/theme.ts`
 - Acceptance:
   - logo upload button in appearance page
-  - brand guideline collection supports org-level logo/doc references
+  - Brand Portal collection supports org-level logo/doc references
   - lockup updates immediately
 - Status:
   - `Completed in app`
@@ -200,7 +200,7 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
 - Acceptance:
   - shared shell pattern documented and followed by all collection pages
   - usability feedback captured with prioritized fixes list
-  - no layout drift between Albums, Photos, Appearance, Brand Guidelines, Super Admin
+  - no layout drift between Albums, Photos, Appearance, Brand Portal, Super Admin
 
 ### PV-020: Multi-View Modes (Collection/Grid/Table/Compact)
 - Goal: Support alternate viewing modes for albums/assets while preserving current default collection view.
@@ -220,10 +220,11 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - switching views does not break existing actions (open, upload, metadata, download)
   - preference persists on refresh
 - Status:
-  - `In Progress`
+  - `Completed in app (MVP scope)`
   - implemented on `/albums`: working `Grid` and `List` toggle + sort controls in top toolbar
-  - implemented on `/albums`: icon+text view controls for consistency
-  - pending: extend multi-view support to `/albums/[id]` and persist preference
+  - implemented on `/albums/[id]`: working `Grid` and `List` toggle + search + sort controls
+  - implemented: view mode and sort preference persistence via local storage on both pages
+  - note: `Compact` view remains a future enhancement (optional, not required for MVP acceptance)
 
 ### PV-022: Content Reordering + Move Operations
 - Goal: Let users organize content manually by reordering and moving items.
@@ -322,13 +323,18 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - `Completed in app (v2 CMS + versioning)`
   - implemented new public-facing homepage on `/` with:
     - large hero + open spacing
+    - metrics band between Why and Features
     - Why/Features/Testimonials/CTA sections
+    - `How it works` 3-step row near CTA
     - adult-school focused DAM messaging and USP callout
   - preserved invite/session setup behavior for authenticated invite acceptance flows
   - migrated from iframe/static handoff to native Next.js marketing component
   - added Super Admin `Homepage CMS` editor for copy + image control
   - added image upload endpoint for feature media
   - added `marketing_pages` + `marketing_page_versions` with restore workflow
+  - homepage CMS now includes editable fields for:
+    - metrics band values/details
+    - how-it-works step titles/bodies
   - SQL migration added: `2026-03-08-pv-024-marketing-homepage-cms.sql`
 
 ### PV-010: Org Admin Staff Management
@@ -362,13 +368,17 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - for school-level pricing, meter usage per `org_id` inside PhotoVault (storage bytes, uploads, downloads/shares, active users as needed)
   - Supabase and Vercel usage/cost data should be treated as provider-level baseline costs
   - if multiple schools share one Supabase project, provider invoices are mixed and cannot be used directly as per-school line items
+- Status:
+  - `Completed in app`
+  - `/super-admin` shows per-org storage bytes and platform total storage
+  - `/albums` shows active-org storage usage in the header stats
 
 ### PV-017: Strict Org-Scoped Asset Paths + Policies
 - Goal: Ensure all school-config assets are isolated by organization and enforced by policy.
 - Scope:
   - confirm/standardize org-scoped storage prefixes for:
     - appearance assets
-    - brand guideline assets (hero/logos/icons/documents)
+    - Brand Portal assets (hero/logos/icons/documents)
   - add/update storage/object policies to block cross-org access
 - Files:
   - storage policy SQL migration (new)
@@ -419,8 +429,17 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
 - Acceptance:
   - icon guidance block present and editable by owner/super admin
   - icon preview grid consistently rendered from org-scoped files
-  - zip download available for approved icon set
+  - downloadable approved icon set available from section action
   - tags available and searchable in icon library
+- Status:
+  - `Completed in app (MVP)`
+  - implemented on `/collections/brand-guidelines`:
+    - editable icon rules block (style, stroke/weight, contrast)
+    - icon-specific do/don't guidance notes
+    - org-scoped icon upload + preview grid
+    - per-icon metadata tags persisted in portal config
+    - `Download icons` action for approved icon library files
+  - follow-up enhancement: optional single zip export endpoint for one-click packaged download
 
 ## Phase 3: Later (Scale + Governance)
 
@@ -546,6 +565,25 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - non-technical school users can complete common tasks using only guide steps
   - role permissions and limits are clearly documented
 
+### PV-029: Private Beta Deployment + School Testing Cycle
+- Goal: Run real-school validation on a live but controlled environment before full launch.
+- Scope:
+  - deploy PhotoVault to a private Vercel beta URL
+  - configure Supabase auth redirect/callback URLs for beta domain
+  - invite 2-5 pilot schools to test core workflows
+  - collect structured feedback using beta checklist
+  - triage issues and define go/no-go criteria for production launch
+- Files/Systems:
+  - Vercel project settings
+  - Supabase Auth URL settings
+  - `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+- Acceptance:
+  - beta URL is stable and accessible to invited schools
+  - invite/login/reset flows work against beta URL
+  - feedback collected from at least 2 pilot schools
+  - top beta issues are prioritized before production cutover
+
 ## Sequential Delivery Order (Lockstep)
 Follow this order sequentially. Do not skip ahead.
 
@@ -561,22 +599,39 @@ Follow this order sequentially. Do not skip ahead.
 10. PV-023 Personalized Invite Acceptance + Workspace Setup UX
 11. PV-024 Marketing Homepage for Adult Schools
 12. PV-011 Storage Usage Dashboard
-13. PV-018 Billing + Plan Boundaries (must complete before onboarding schools)
-14. PV-026 Mobile Sidebar Drawer Navigation
-15. PV-020 Multi-View Modes (Collection/Grid/Table/Compact)
-16. PV-022 Content Reordering + Move Operations
-17. PV-019 Iconography Section Completion (MVP)
-18. PV-016 UI Stabilization + Usability Validation
-19. PV-027 UI Consistency QA Checklist + Audit Pass
-20. PV-028 End-User Guide (PhotoVault Navigation + Tasks)
+13. PV-026 Mobile Sidebar Drawer Navigation
+14. PV-020 Multi-View Modes (Collection/Grid/Table/Compact)
+15. PV-022 Content Reordering + Move Operations
+16. PV-019 Iconography Section Completion (MVP)
+17. PV-016 UI Stabilization + Usability Validation
+18. PV-027 UI Consistency QA Checklist + Audit Pass
+19. PV-028 End-User Guide (PhotoVault Navigation + Tasks)
+20. PV-029 Private Beta Deployment + School Testing Cycle
 21. PV-025 Vercel Deployment + Production Readiness
+22. PV-018 Billing + Plan Boundaries (pre-paid onboarding gate)
+
+### Temporary Execution Note (Approved)
+- Before starting PV-018, run a short beta validation cycle with selected schools.
+- Purpose: gather real-world UX/workflow feedback and fix high-priority issues before enforcing billing/plan boundaries.
+- PV-018 remains a hard gate before paid onboarding at scale.
 
 ## Current Position
-- Completed: PV-000, PV-001, PV-002, PV-003, PV-004, PV-005, PV-006, PV-007, PV-008, PV-009, PV-010, PV-017, PV-023, PV-024
+- Completed: PV-000, PV-001, PV-002, PV-003, PV-004, PV-005, PV-006, PV-007, PV-008, PV-009, PV-010, PV-011, PV-017, PV-019, PV-020 (MVP scope), PV-023, PV-024
 - In Progress: none
-- Next active step: PV-011
+- Deferred (intentional): PV-018 until beta feedback pass is complete
+- Next active step: Beta School Testing Pass (pre-PV-025/PV-018)
+- Remaining steps in lockstep sequence: 8
+- Beta checklist template: `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
 
 ## Recent Completed Enhancements (Implemented)
+- Global workspace shell:
+  - added shared top-right profile menu for all users/pages
+  - menu includes: user identity + role, Help, Questions/feedback, Billing (disabled/coming soon), `Settings (Profile)`, Logout
+  - Super Admin quick access moved into profile menu (super-admin users only)
+  - centralized header actions by moving duplicated `Appearance`, `Super admin`, and `Sign out` links into profile menu
+  - improved profile header layout for long emails/names (clean truncation + role badge alignment)
+  - added `/settings/profile` page for account-level profile edits (display name)
+  - profile save writes to Supabase auth user metadata (`full_name` + `name`)
 - Photos page:
   - explicit empty-state upload CTA in drop zone
   - drag-and-drop hover flicker fix (stable drag state)
@@ -629,6 +684,9 @@ Follow this order sequentially. Do not skip ahead.
 - Public homepage:
   - added `Security Highlights` section aligned to school buyer concerns
   - includes encryption, role-based access, secure sharing controls, audit visibility, backups/PITR, and compliance notes
+  - normalized buyer-facing copy to match in-app terms (`Brand Portal`, `Appearance`, `Share Album links`)
+  - updated homepage CMS helper text for clearer non-technical editing workflow
+  - added one-click `Apply recommended defaults` action in `/super-admin/homepage` to reset editor state to the latest optimized copy baseline before saving
 
 ## Notes
 - Use migration files for every DB change.

@@ -13,6 +13,8 @@ import { IconGrid, IconList } from "@/components/ui/icons";
 import { formatDateMDY } from "@/lib/date-format";
 
 const COVER_PREFS_KEY = "album_cover_storage_paths_v1";
+const ALBUMS_VIEW_MODE_KEY = "albums_view_mode_v1";
+const ALBUMS_SORT_MODE_KEY = "albums_sort_mode_v1";
 
 type Album = {
   id: string;
@@ -28,6 +30,7 @@ type AssetThumb = {
   storage_path: string;
   canonical_filename: string;
   sequence_number: number;
+  size_bytes: number;
   thumbUrl?: string | null;
 };
 
@@ -64,6 +67,33 @@ function saveStoredCoverPaths(pathsByAlbumId: Record<string, string>) {
   }
 }
 
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+function readInitialAlbumsViewMode(): "grid" | "list" {
+  if (typeof window === "undefined") return "grid";
+  const stored = window.localStorage.getItem(ALBUMS_VIEW_MODE_KEY);
+  return stored === "list" ? "list" : "grid";
+}
+
+function readInitialAlbumsSortMode(): "newest" | "oldest" | "name_asc" | "name_desc" {
+  if (typeof window === "undefined") return "newest";
+  const stored = window.localStorage.getItem(ALBUMS_SORT_MODE_KEY);
+  if (
+    stored === "newest" ||
+    stored === "oldest" ||
+    stored === "name_asc" ||
+    stored === "name_desc"
+  ) {
+    return stored;
+  }
+  return "newest";
+}
+
 export default function AlbumsPage() {
   const { activeOrgId, loading: orgLoading, isSuperAdmin, orgs } = useOrg();
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -72,9 +102,25 @@ export default function AlbumsPage() {
   const [pickerAlbumId, setPickerAlbumId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">("newest");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">(readInitialAlbumsSortMode);
+  const [viewMode, setViewMode] = useState<"grid" | "list">(readInitialAlbumsViewMode);
   const [rightsFilter, setRightsFilter] = useState<"all" | "ok_for_marketing" | "internal_only" | "do_not_use" | "unknown">("all");
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(ALBUMS_VIEW_MODE_KEY, viewMode);
+    } catch {
+      // ignore localStorage write errors
+    }
+  }, [viewMode]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(ALBUMS_SORT_MODE_KEY, sortBy);
+    } catch {
+      // ignore localStorage write errors
+    }
+  }, [sortBy]);
 
   useEffect(() => {
     if (orgLoading) return;
@@ -113,7 +159,7 @@ export default function AlbumsPage() {
       const albumIds = albumRows.map((a) => a.id);
       const { data: assetsData, error: assetsError } = await supabase
         .from("assets")
-        .select("id,album_id,storage_path,canonical_filename,sequence_number")
+        .select("id,album_id,storage_path,canonical_filename,sequence_number,size_bytes")
         .in("album_id", albumIds)
         .order("sequence_number", { ascending: true });
 
@@ -210,6 +256,14 @@ export default function AlbumsPage() {
     const covers = Object.values(coverByAlbumId).filter((c): c is AssetThumb => Boolean(c?.thumbUrl));
     return covers[0]?.thumbUrl ?? null;
   }, [coverByAlbumId]);
+  const totalStorageBytes = useMemo(
+    () =>
+      Object.values(assetsByAlbumId).reduce(
+        (sum, items) => sum + items.reduce((innerSum, item) => innerSum + (item.size_bytes ?? 0), 0),
+        0
+      ),
+    [assetsByAlbumId]
+  );
 
   return (
     <MediaWorkspaceShell
@@ -222,43 +276,6 @@ export default function AlbumsPage() {
             <Link href="/albums/new" className={buttonClass("primary")}>
               New album
             </Link>
-          ),
-        },
-      ]}
-      utilityActions={[
-        ...(isSuperAdmin
-          ? [
-              {
-                key: "super",
-                node: (
-                  <Link href="/super-admin" className={buttonClass("secondary", "sm")}>
-                    Super admin
-                  </Link>
-                ),
-              },
-            ]
-          : []),
-        {
-          key: "brand",
-          node: (
-            <Link href="/settings/branding" className={buttonClass("secondary", "sm")}>
-              Appearance
-            </Link>
-          ),
-        },
-        {
-          key: "signout",
-          node: (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = "/login";
-              }}
-            >
-              Sign out
-            </Button>
           ),
         },
       ]}
@@ -317,6 +334,7 @@ export default function AlbumsPage() {
           <Badge>{albums.length} albums</Badge>
           <Badge>{rightsCounts.ok_for_marketing} marketing ready</Badge>
           <Badge>{Object.values(assetsByAlbumId).reduce((sum, items) => sum + items.length, 0)} photos</Badge>
+          <Badge>{formatBytes(totalStorageBytes)} used</Badge>
         </div>
       </Card>
 

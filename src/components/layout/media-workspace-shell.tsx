@@ -1,14 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useOrg } from "@/components/org/org-provider";
 import { OrgBrandLockup } from "@/components/layout/org-brand-lockup";
 import { cn } from "@/lib/cn";
 import { parseStorageRef } from "@/lib/theme";
-import { IconAlbums, IconAppearance, IconAudit, IconGuidelines, IconSuperAdmin, IconUsers } from "@/components/ui/icons";
+import {
+  IconAlbums,
+  IconAppearance,
+  IconAudit,
+  IconBilling,
+  IconFeedback,
+  IconGuidelines,
+  IconHelp,
+  IconLogout,
+  IconSuperAdmin,
+  IconUsers,
+} from "@/components/ui/icons";
 
 type WorkspaceAction = {
   key: string;
@@ -47,11 +58,34 @@ export function MediaWorkspaceShell({
   hidePageHeader = false,
   sidebarLogoOnly = true,
 }: MediaWorkspaceShellProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const { activeOrgId, isSuperAdmin, orgs } = useOrg();
   const activeOrg = useMemo(() => orgs.find((o) => o.id === activeOrgId) ?? null, [orgs, activeOrgId]);
   const [orgLogoUrl, setOrgLogoUrl] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("viewer");
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const displayedLogoUrl = activeOrgId ? orgLogoUrl : null;
+  const initials = useMemo(() => {
+    if (userName.trim()) {
+      return userName
+        .split(" ")
+        .map((part) => part[0] ?? "")
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
+    }
+    return (userEmail[0] ?? "U").toUpperCase();
+  }, [userEmail, userName]);
+  const displayName = userName.trim() || userEmail || "User";
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    router.replace("/login");
+  }
 
   useEffect(() => {
     if (!activeOrgId) return;
@@ -89,19 +123,174 @@ export function MediaWorkspaceShell({
     })();
   }, [activeOrgId]);
 
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!user) return;
+      setUserEmail(user.email ?? "");
+      const fullName =
+        (typeof user.user_metadata?.full_name === "string" && user.user_metadata.full_name) ||
+        (typeof user.user_metadata?.name === "string" && user.user_metadata.name) ||
+        "";
+      setUserName(fullName);
+    })();
+  }, []);
+
+  useEffect(() => {
+    async function loadUserRole() {
+      if (!activeOrgId) {
+        setUserRole(isSuperAdmin ? "super admin" : "viewer");
+        return;
+      }
+
+      if (isSuperAdmin) {
+        setUserRole("super admin");
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user.id;
+      if (!userId) {
+        setUserRole("viewer");
+        return;
+      }
+
+      const { data: membership } = await supabase
+        .from("memberships")
+        .select("role")
+        .eq("org_id", activeOrgId)
+        .eq("user_id", userId)
+        .single();
+
+      setUserRole((membership?.role as string) ?? "viewer");
+    }
+
+    void loadUserRole();
+  }, [activeOrgId, isSuperAdmin]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onClickOutside = (event: MouseEvent) => {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", onClickOutside);
+    window.addEventListener("keydown", onEscape);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [menuOpen]);
+
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-6">
           <p className="text-sm font-semibold tracking-tight text-slate-800">PhotoVault</p>
-          <div className="flex items-center gap-2">
-            {utilityActions.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-2">
-                {utilityActions.map((action) => (
-                  <div key={action.key}>{action.node}</div>
-                ))}
-              </div>
-            ) : null}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {utilityActions.length > 0 &&
+              utilityActions.map((action) => <div key={action.key}>{action.node}</div>)}
+            <a
+              href="mailto:support@photovault.app"
+              className="text-sm font-medium text-slate-500 transition hover:text-slate-800"
+            >
+              Support
+            </a>
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                onClick={() => setMenuOpen((prev) => !prev)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-label="Open profile menu"
+              >
+                {initials}
+              </button>
+
+              {menuOpen ? (
+                <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                  <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-semibold text-slate-800">{displayName}</p>
+                      {userName ? (
+                        <p className="truncate text-xs text-slate-500">{userEmail}</p>
+                      ) : null}
+                    </div>
+                    <p className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
+                      {userRole}
+                    </p>
+                  </div>
+
+                  <div className="space-y-0.5 px-2 py-2">
+                    <a
+                      href="mailto:support@photovault.app"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                    >
+                      <IconHelp className="h-4 w-4" />
+                      Help
+                    </a>
+                    <a
+                      href="mailto:support@photovault.app?subject=PhotoVault%20Question%20%2F%20Feedback"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                    >
+                      <IconFeedback className="h-4 w-4" />
+                      Questions / feedback
+                    </a>
+                    <button
+                      type="button"
+                      disabled
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-400"
+                      title="Billing dashboard coming soon"
+                    >
+                      <IconBilling className="h-4 w-4" />
+                      Billing
+                    </button>
+                    <Link
+                      href="/settings/profile"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <IconAppearance className="h-4 w-4" />
+                      Settings (Profile)
+                    </Link>
+                    {isSuperAdmin ? (
+                      <Link
+                        href="/super-admin"
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <IconSuperAdmin className="h-4 w-4" />
+                        Super Admin
+                      </Link>
+                    ) : null}
+                  </div>
+
+                  <div className="border-t border-slate-200 p-2">
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-100"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        void signOut();
+                      }}
+                    >
+                      <IconLogout className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

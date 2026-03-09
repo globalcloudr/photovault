@@ -23,6 +23,22 @@ export type MarketingSecurityItem = {
   body: string;
 };
 
+export type MarketingMetric = {
+  value: string;
+  label: string;
+  detail: string;
+};
+
+export type MarketingHowStep = {
+  title: string;
+  body: string;
+};
+
+export type MarketingTrustedLogo = {
+  name: string;
+  logoUrl: string;
+};
+
 export type MarketingHomepageContent = {
   nav: {
     featuresText: string;
@@ -38,6 +54,13 @@ export type MarketingHomepageContent = {
     primaryCta: string;
     secondaryCta: string;
     trust: string;
+  };
+  trusted: {
+    label: string;
+    logos: MarketingTrustedLogo[];
+  };
+  metrics: {
+    items: MarketingMetric[];
   };
   why: {
     label: string;
@@ -56,6 +79,11 @@ export type MarketingHomepageContent = {
     label: string;
     title: string;
     items: MarketingSecurityItem[];
+  };
+  howItWorks: {
+    label: string;
+    title: string;
+    steps: MarketingHowStep[];
   };
   cta: {
     label: string;
@@ -80,54 +108,84 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
     featuresText: "Features",
     testimonialsText: "Testimonials",
     signInText: "Sign in",
-    bookDemoText: "Book demo",
+    bookDemoText: "Book a demo",
   },
   hero: {
-    badge: "Built for Adult Education Teams",
-    title: "Photo & brand assets for adult schools,",
-    emphasis: "in one place.",
+    badge: "Built Specifically for Adult Education",
+    title: "The secure DAM for adult schools,",
+    emphasis: "ready for daily team use.",
     subtitle:
-      "PhotoVault gives adult schools a secure, colorful DAM to organize event photos, protect brand consistency, and share media with confidence.",
-    primaryCta: "Request demo",
-    secondaryCta: "Sign in",
-    trust: "Trusted for school communications, enrollment campaigns, and district reporting.",
+      "PhotoVault helps adult schools organize event media, protect brand consistency, and share approved assets faster across communications, enrollment, and district teams.",
+    primaryCta: "Book a 20-minute demo",
+    secondaryCta: "Client sign in",
+    trust: "Designed for school communications, enrollment campaigns, and district reporting workflows.",
+  },
+  trusted: {
+    label: "Trusted by adult education teams including",
+    logos: [
+      { name: "Berkeley Adult School", logoUrl: "" },
+      { name: "San Mateo Adult & Career Education", logoUrl: "" },
+      { name: "San Jose Dance Theatre", logoUrl: "" },
+      { name: "Mountain View Adult School", logoUrl: "" },
+      { name: "Ventura County Adult Education", logoUrl: "" },
+      { name: "Santa Clara Adult Education", logoUrl: "" },
+    ],
+  },
+  metrics: {
+    items: [
+      {
+        value: "3x",
+        label: "Faster asset retrieval",
+        detail: "Teams find approved photos and files in seconds, not hours.",
+      },
+      {
+        value: "100%",
+        label: "On-brand asset usage",
+        detail: "Brand Portal and Appearance controls reduce off-brand publishing.",
+      },
+      {
+        value: "<5 min",
+        label: "Secure sharing setup",
+        detail: "Create password-protected Share Album links with expiration dates quickly.",
+      },
+    ],
   },
   why: {
     label: "Why PhotoVault",
-    title: "Everything your school media team needs, nothing it doesn't.",
+    title: "Built for the way adult schools actually manage media.",
     cards: [
       {
-        title: "One Source of Truth",
-        body: "One organized home for school photos, logos, templates, and brand files. No more scattered Google Drives.",
+        title: "One Trusted Source",
+        body: "Keep school photos, logos, templates, and brand assets in one organized workspace instead of scattered drives.",
       },
       {
         title: "Role-Safe Permissions",
-        body: "Owner, uploader, and viewer permissions protect privacy and reduce mistakes across staff and partners.",
+        body: "Owner, uploader, and viewer roles help protect privacy and reduce mistakes across staff, partners, and vendors.",
       },
       {
         title: "Audit-Ready Logs",
-        body: "Track invites, uploads, deletes, and shares with organization-level audit logs for compliance peace of mind.",
+        body: "Track invites, uploads, deletes, and shares with organization-level audit logs that support operational accountability.",
       },
     ],
   },
   features: {
     items: [
       {
-        label: "Core Feature",
+        label: "Daily Workflow",
         title: "Upload, Tag, Search, Share",
-        body: "Build event albums, upload fast, apply metadata in bulk, and publish secure share links with expiry and password controls.",
+        body: "Create event albums, upload quickly, apply metadata in bulk, and publish secure Share Album links with expiration dates and password controls.",
         bullets: [
           "Duplicate checks and upload queue visibility",
           "Metadata fields for campus, event type, photographer",
-          "Grid and list views with quick actions for busy teams",
+          "Grid and list views with quick actions for busy school teams",
         ],
         imageUrl: "",
         theme: "teal",
       },
       {
-        label: "Brand Control",
+        label: "Brand Consistency",
         title: "Brand Portal + Appearance Controls",
-        body: "Keep branding consistent with a centralized portal for logos, iconography, docs, and school-specific appearance settings.",
+        body: "Keep branding consistent with a centralized Brand Portal for logos, iconography, documents, and school-specific Appearance settings.",
         bullets: [
           "Per-school logo and color system",
           "Brand files accessible for staff and partners",
@@ -140,27 +198,27 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
   },
   testimonials: {
     label: "Testimonials",
-    title: "Loved by adult education teams across California.",
+    title: "Trusted by adult education teams.",
     items: [
       {
-        quote: "Our school team stopped hunting for files. PhotoVault gave us one clean system for every event.",
+        quote: "Our team stopped hunting for files. PhotoVault gave us one clean system for every event and campaign.",
         author: "Communications Coordinator",
         role: "Adult School District",
       },
       {
-        quote: "Share links with expiry and audit logs are exactly what we needed for safer external sharing.",
+        quote: "Share Album links with expiration dates and audit logs gave us the control we were missing.",
         author: "Program Manager",
         role: "Career Pathways Division",
       },
       {
-        quote: "The Brand Portal made staff onboarding simple. Everyone now uses approved assets from day one.",
+        quote: "The Brand Portal made onboarding simple. Staff now use approved assets from day one.",
         author: "District Marketing Lead",
         role: "Multi-School Consortium",
       },
     ],
   },
   security: {
-    label: "Security Highlights",
+    label: "Security and Governance",
     title: "Built for school trust, privacy, and operational control.",
     items: [
       {
@@ -173,11 +231,11 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
       },
       {
         title: "Secure sharing controls",
-        body: "Password-protected and expiring share links help reduce unintended distribution.",
+        body: "Password-protected Share Album links with expiration dates help reduce unintended distribution.",
       },
       {
         title: "Audit visibility",
-        body: "Track invites, uploads, deletes, and share actions in organization-level audit logs.",
+        body: "Track invites, uploads, deletes, and sharing actions in organization-level audit logs.",
       },
       {
         title: "Backups and recovery",
@@ -189,10 +247,28 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
       },
     ],
   },
+  howItWorks: {
+    label: "How It Works",
+    title: "From upload to approved sharing in three simple steps.",
+    steps: [
+      {
+        title: "1. Organize your media",
+        body: "Create albums by event, upload photos in batches, and apply metadata so teams can find files fast.",
+      },
+      {
+        title: "2. Control brand and access",
+        body: "Set school Appearance, maintain a Brand Portal, and use role-based permissions for staff and partners.",
+      },
+      {
+        title: "3. Share with confidence",
+        body: "Generate Share Album links with expiration dates, optional passwords, and audit visibility for every action.",
+      },
+    ],
+  },
   cta: {
-    label: "Your School DAM Advantage",
+    label: "Ready for a better school DAM?",
     title: "The only enterprise-grade DAM built specifically for adult education.",
-    body: "Launch a private, branded PhotoVault for each school while maintaining operational control from one Super Admin workspace.",
+    body: "Give every school a private, branded PhotoVault to organize, govern, and share approved media with confidence.",
     primaryCta: "Request pricing",
     secondaryCta: "Existing client sign in",
   },
@@ -208,7 +284,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
 };
 
 function asString(value: unknown, fallback: string) {
-  return typeof value === "string" && value.trim().length > 0 ? value : fallback;
+  return typeof value === "string" ? value : fallback;
 }
 
 function asArray(value: unknown) {
@@ -219,12 +295,46 @@ export function normalizeMarketingHomepageContent(input: unknown): MarketingHome
   const source = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
   const nav = (source.nav as Record<string, unknown>) ?? {};
   const hero = (source.hero as Record<string, unknown>) ?? {};
+  const trusted = (source.trusted as Record<string, unknown>) ?? {};
+  const metrics = (source.metrics as Record<string, unknown>) ?? {};
   const why = (source.why as Record<string, unknown>) ?? {};
   const features = (source.features as Record<string, unknown>) ?? {};
   const testimonials = (source.testimonials as Record<string, unknown>) ?? {};
   const security = (source.security as Record<string, unknown>) ?? {};
+  const howItWorks = (source.howItWorks as Record<string, unknown>) ?? {};
   const cta = (source.cta as Record<string, unknown>) ?? {};
   const footer = (source.footer as Record<string, unknown>) ?? {};
+
+  const normalizedTrustedLogos = asArray(trusted.logos)
+    .map((logo, index) => {
+      const fallback =
+        defaultMarketingHomepageContent.trusted.logos[index] ?? defaultMarketingHomepageContent.trusted.logos[0];
+      if (typeof logo === "string") {
+        const legacyName = logo.trim();
+        return {
+          name: legacyName || fallback.name,
+          logoUrl: "",
+        };
+      }
+      const row = (logo as Record<string, unknown>) ?? {};
+      return {
+        name: asString(row.name, fallback.name),
+        logoUrl: typeof row.logoUrl === "string" ? row.logoUrl.trim() : fallback.logoUrl,
+      };
+    })
+    .filter((logo) => logo.name.length > 0 || logo.logoUrl.length > 0)
+    .slice(0, 8);
+
+  const normalizedMetrics = asArray(metrics.items).map((item, index) => {
+    const fallback =
+      defaultMarketingHomepageContent.metrics.items[index] ?? defaultMarketingHomepageContent.metrics.items[0];
+    const row = (item as Record<string, unknown>) ?? {};
+    return {
+      value: asString(row.value, fallback.value),
+      label: asString(row.label, fallback.label),
+      detail: asString(row.detail, fallback.detail),
+    };
+  });
 
   const normalizedWhyCards = asArray(why.cards).map((card, index) => {
     const fallback = defaultMarketingHomepageContent.why.cards[index] ?? defaultMarketingHomepageContent.why.cards[0];
@@ -274,6 +384,16 @@ export function normalizeMarketingHomepageContent(input: unknown): MarketingHome
     };
   });
 
+  const normalizedHowSteps = asArray(howItWorks.steps).map((step, index) => {
+    const fallback =
+      defaultMarketingHomepageContent.howItWorks.steps[index] ?? defaultMarketingHomepageContent.howItWorks.steps[0];
+    const row = (step as Record<string, unknown>) ?? {};
+    return {
+      title: asString(row.title, fallback.title),
+      body: asString(row.body, fallback.body),
+    };
+  });
+
   return {
     nav: {
       featuresText: asString(nav.featuresText, defaultMarketingHomepageContent.nav.featuresText),
@@ -289,6 +409,13 @@ export function normalizeMarketingHomepageContent(input: unknown): MarketingHome
       primaryCta: asString(hero.primaryCta, defaultMarketingHomepageContent.hero.primaryCta),
       secondaryCta: asString(hero.secondaryCta, defaultMarketingHomepageContent.hero.secondaryCta),
       trust: asString(hero.trust, defaultMarketingHomepageContent.hero.trust),
+    },
+    trusted: {
+      label: asString(trusted.label, defaultMarketingHomepageContent.trusted.label),
+      logos: normalizedTrustedLogos.length > 0 ? normalizedTrustedLogos : defaultMarketingHomepageContent.trusted.logos,
+    },
+    metrics: {
+      items: normalizedMetrics.length > 0 ? normalizedMetrics : defaultMarketingHomepageContent.metrics.items,
     },
     why: {
       label: asString(why.label, defaultMarketingHomepageContent.why.label),
@@ -308,6 +435,11 @@ export function normalizeMarketingHomepageContent(input: unknown): MarketingHome
       label: asString(security.label, defaultMarketingHomepageContent.security.label),
       title: asString(security.title, defaultMarketingHomepageContent.security.title),
       items: normalizedSecurityItems.length > 0 ? normalizedSecurityItems : defaultMarketingHomepageContent.security.items,
+    },
+    howItWorks: {
+      label: asString(howItWorks.label, defaultMarketingHomepageContent.howItWorks.label),
+      title: asString(howItWorks.title, defaultMarketingHomepageContent.howItWorks.title),
+      steps: normalizedHowSteps.length > 0 ? normalizedHowSteps : defaultMarketingHomepageContent.howItWorks.steps,
     },
     cta: {
       label: asString(cta.label, defaultMarketingHomepageContent.cta.label),

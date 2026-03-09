@@ -17,6 +17,23 @@ Use this guide to keep all pages visually consistent and predictable.
   - `/collections/brand-guidelines`
   - `/super-admin`
 
+## Utility Header Standard
+- Left: product label (`PhotoVault`).
+- Right:
+  - optional page utility actions
+  - `Support` link
+  - profile avatar trigger
+- Profile dropdown is the canonical location for user/account actions:
+  - Help
+  - Questions/feedback
+  - Billing (disabled until billing module is implemented)
+  - Settings (Profile)
+  - Logout
+  - Super Admin link (super-admin users only)
+- Distinguish clearly:
+  - `Settings (Profile)` = user-level account details (name/email display)
+  - `Appearance` = organization-level brand settings
+
 ## Auth Surface
 - Login screen uses a light card on neutral background with clear action hierarchy.
 - All auth actions must use button-like affordance:
@@ -63,7 +80,7 @@ Use shared primitives instead of hand-writing new utility strings:
 - [OrgBrandLockup](/Users/zylstra/Documents/photovault/src/components/layout/org-brand-lockup.tsx)
   - Sidebar org identity with configurable logo-only mode.
 - [Icons](/Users/zylstra/Documents/photovault/src/components/ui/icons.tsx)
-  - Shared icon set for nav/actions (`Albums`, `Appearance`, `Guidelines`, `View`, `Download`, `Delete`, etc.).
+  - Shared icon set for nav/actions (`Albums`, `Appearance`, `Brand Portal`, `View`, `Download`, `Delete`, etc.).
 
 ## Icon Rules
 - Default to `icon + text` for most controls.
@@ -84,6 +101,7 @@ Use shared primitives instead of hand-writing new utility strings:
 - All interactive controls must show hover + focus states.
 - Disabled controls use reduced contrast and `not-allowed` cursor.
 - Keep primary actions visually dominant, secondary actions neutral.
+- Avoid duplicating global account actions (`Appearance`, `Settings (Profile)`, `Super admin`, `Sign out`) in page-level headers; keep them in the profile menu.
 
 ## Adoption Workflow
 When building or editing a page:

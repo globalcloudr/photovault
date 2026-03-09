@@ -116,7 +116,7 @@ async function signUrls(rows: AssetRow[]) {
 export default function AlbumDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { activeOrgId, loading: orgLoading, isSuperAdmin } = useOrg();
+  const { activeOrgId, loading: orgLoading } = useOrg();
 
   const albumId = useMemo(() => {
     const id = params?.id;
@@ -128,6 +128,8 @@ export default function AlbumDetailPage() {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const viewPrefKey = useMemo(() => `photos_view_mode_v1:${albumId}`, [albumId]);
+  const sortPrefKey = useMemo(() => `photos_sort_mode_v1:${albumId}`, [albumId]);
 
   const filteredAssets = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -516,6 +518,45 @@ async function load() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [albumId, activeOrgId, orgLoading]);
+
+  useEffect(() => {
+    if (!albumId) return;
+    try {
+      const storedViewMode = window.localStorage.getItem(viewPrefKey);
+      if (storedViewMode === "grid" || storedViewMode === "list") {
+        setViewMode(storedViewMode);
+      }
+      const storedSortMode = window.localStorage.getItem(sortPrefKey);
+      if (
+        storedSortMode === "newest" ||
+        storedSortMode === "oldest" ||
+        storedSortMode === "name_asc" ||
+        storedSortMode === "name_desc"
+      ) {
+        setSortBy(storedSortMode);
+      }
+    } catch {
+      // ignore localStorage read errors
+    }
+  }, [albumId, viewPrefKey, sortPrefKey]);
+
+  useEffect(() => {
+    if (!albumId) return;
+    try {
+      window.localStorage.setItem(viewPrefKey, viewMode);
+    } catch {
+      // ignore localStorage write errors
+    }
+  }, [albumId, viewMode, viewPrefKey]);
+
+  useEffect(() => {
+    if (!albumId) return;
+    try {
+      window.localStorage.setItem(sortPrefKey, sortBy);
+    } catch {
+      // ignore localStorage write errors
+    }
+  }, [albumId, sortBy, sortPrefKey]);
 
   async function applyBulkMetadata() {
     if (!activeOrgId) return;
@@ -1030,40 +1071,6 @@ async function load() {
             <Link href="/albums" className={buttonClass("secondary")}>
               Back to albums
             </Link>
-          ),
-        },
-        {
-          key: "branding",
-          node: (
-            <Link href="/settings/branding" className={buttonClass("secondary")}>
-              Appearance
-            </Link>
-          ),
-        },
-        ...(isSuperAdmin
-          ? [
-              {
-                key: "super",
-                node: (
-                  <Link href="/super-admin" className={buttonClass("secondary")}>
-                    Super admin
-                  </Link>
-                ),
-              },
-            ]
-          : []),
-        {
-          key: "signout",
-          node: (
-            <Button
-              variant="secondary"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                router.replace("/login");
-              }}
-            >
-              Sign out
-            </Button>
           ),
         },
       ]}

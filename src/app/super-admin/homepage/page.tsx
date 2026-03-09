@@ -102,6 +102,11 @@ export default function SuperAdminHomepageCmsPage() {
     });
   }
 
+  function applyLatestDefaults() {
+    setContent(structuredClone(defaultMarketingHomepageContent));
+    setStatus("Loaded latest recommended homepage copy and structure. Click Save changes to publish.");
+  }
+
   async function save() {
     setStatus(null);
     setBusy(true);
@@ -228,8 +233,16 @@ export default function SuperAdminHomepageCmsPage() {
   return (
     <MediaWorkspaceShell
       title="Homepage CMS"
-      subtitle="Edit marketing homepage copy and image URLs without touching code."
+      subtitle="Edit public homepage copy and imagery without touching code."
       actions={[
+        {
+          key: "defaults",
+          node: (
+            <Button type="button" variant="secondary" onClick={applyLatestDefaults}>
+              Apply recommended defaults
+            </Button>
+          ),
+        },
         {
           key: "preview",
           node: (
@@ -279,6 +292,97 @@ export default function SuperAdminHomepageCmsPage() {
             <label className="block text-sm font-medium text-slate-800">Secondary CTA</label>
             <Input className="mt-1.5" value={content.hero.secondaryCta} onChange={(e) => setPath("hero.secondaryCta", e.target.value)} />
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-5 sm:p-6">
+        <h2 className="text-lg font-semibold text-slate-900">Trusted Logos + Metrics + How It Works</h2>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-slate-800">Trusted by label</label>
+            <Input className="mt-1.5" value={content.trusted.label} onChange={(e) => setPath("trusted.label", e.target.value)} />
+          </div>
+          {content.trusted.logos.slice(0, 6).map((logo, index) => (
+            <div key={`trusted-logo-${index}`} className="rounded-lg border border-slate-200 p-3 sm:col-span-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Trusted logo {index + 1}</p>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-800">Name (alt text)</label>
+                  <Input className="mt-1.5" value={logo.name} onChange={(e) => setPath(`trusted.logos.${index}.name`, e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-800">Logo URL</label>
+                  <Input
+                    className="mt-1.5"
+                    value={logo.logoUrl}
+                    onChange={(e) => setPath(`trusted.logos.${index}.logoUrl`, e.target.value)}
+                    placeholder="https://... or /images/..."
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-4">
+          {content.metrics.items.slice(0, 3).map((metric, index) => (
+            <div key={`metric-${index}`} className="rounded-lg border border-slate-200 p-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Metric {index + 1}</p>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium text-slate-800">Value</label>
+                  <Input className="mt-1.5" value={metric.value} onChange={(e) => setPath(`metrics.items.${index}.value`, e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-800">Label</label>
+                  <Input className="mt-1.5" value={metric.label} onChange={(e) => setPath(`metrics.items.${index}.label`, e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-800">Detail</label>
+                  <textarea
+                    className={`${textAreaClass()} mt-1.5`}
+                    rows={2}
+                    value={metric.detail}
+                    onChange={(e) => setPath(`metrics.items.${index}.detail`, e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-slate-800">How it works label</label>
+            <Input className="mt-1.5" value={content.howItWorks.label} onChange={(e) => setPath("howItWorks.label", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-slate-800">How it works title</label>
+            <Input className="mt-1.5" value={content.howItWorks.title} onChange={(e) => setPath("howItWorks.title", e.target.value)} />
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4">
+          {content.howItWorks.steps.slice(0, 3).map((step, index) => (
+            <div key={`how-step-${index}`} className="rounded-lg border border-slate-200 p-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Step {index + 1}</p>
+              <div className="mt-2 grid gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-800">Title</label>
+                  <Input className="mt-1.5" value={step.title} onChange={(e) => setPath(`howItWorks.steps.${index}.title`, e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-800">Body</label>
+                  <textarea
+                    className={`${textAreaClass()} mt-1.5`}
+                    rows={2}
+                    value={step.body}
+                    onChange={(e) => setPath(`howItWorks.steps.${index}.body`, e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
 
@@ -346,7 +450,7 @@ export default function SuperAdminHomepageCmsPage() {
 
       <Card className="p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Feature Sections</h2>
-        <p className="mt-1 text-sm text-slate-600">Paste an image URL or upload directly from your computer.</p>
+        <p className="mt-1 text-sm text-slate-600">Add an image URL or upload directly from your computer.</p>
         <div className="mt-4 grid gap-6">
           {content.features.items.slice(0, 2).map((feature, featureIndex) => (
             <div key={featureIndex} className="rounded-lg border border-slate-200 p-4">
@@ -445,10 +549,6 @@ export default function SuperAdminHomepageCmsPage() {
           <div>
             <label className="block text-sm font-medium text-slate-800">CTA primary button</label>
             <Input className="mt-1.5" value={content.cta.primaryCta} onChange={(e) => setPath("cta.primaryCta", e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-800">CTA secondary button</label>
-            <Input className="mt-1.5" value={content.cta.secondaryCta} onChange={(e) => setPath("cta.secondaryCta", e.target.value)} />
           </div>
         </div>
       </Card>

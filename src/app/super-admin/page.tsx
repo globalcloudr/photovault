@@ -27,7 +27,15 @@ type OrgPortalSummary = {
   albumsCount: number;
   photosCount: number;
   guidelinesCount: number;
+  storageBytes: number;
 };
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
 
 export default function SuperAdminPage() {
   const router = useRouter();
@@ -51,6 +59,15 @@ export default function SuperAdminPage() {
   const [orgPortalData, setOrgPortalData] = useState<Record<string, OrgPortalSummary>>({});
   const [portalLoading, setPortalLoading] = useState(false);
   const [openActionsOrgId, setOpenActionsOrgId] = useState<string | null>(null);
+  const platformTotals = Object.values(orgPortalData).reduce(
+    (acc, item) => {
+      acc.albums += item.albumsCount;
+      acc.photos += item.photosCount;
+      acc.storageBytes += item.storageBytes;
+      return acc;
+    },
+    { albums: 0, photos: 0, storageBytes: 0 }
+  );
 
   useEffect(() => {
     if (!loading && !isSuperAdmin) {
@@ -141,9 +158,10 @@ export default function SuperAdminPage() {
 
         const summaryRows = await Promise.all(
           orgIds.map(async (orgId) => {
-            const [{ count: albumsCount }, { count: photosCount }] = await Promise.all([
+            const [{ count: albumsCount }, { count: photosCount }, { data: storageRows, error: storageError }] = await Promise.all([
               supabase.from("albums").select("id", { count: "exact", head: true }).eq("org_id", orgId),
               supabase.from("assets").select("id", { count: "exact", head: true }).eq("org_id", orgId),
+              supabase.from("assets").select("size_bytes").eq("org_id", orgId),
             ]);
 
             const theme = themeByOrgId.get(orgId);
@@ -156,6 +174,14 @@ export default function SuperAdminPage() {
               logoUrl = signedData?.signedUrl ?? null;
             }
 
+            if (storageError) {
+              console.error(`Failed to load storage usage for org ${orgId}:`, storageError.message);
+            }
+            const storageBytes = ((storageRows ?? []) as { size_bytes: number | null }[]).reduce(
+              (sum, row) => sum + (row.size_bytes ?? 0),
+              0
+            );
+
             return [
               orgId,
               {
@@ -164,6 +190,7 @@ export default function SuperAdminPage() {
                 albumsCount: albumsCount ?? 0,
                 photosCount: photosCount ?? 0,
                 guidelinesCount: 1,
+                storageBytes,
               } satisfies OrgPortalSummary,
             ] as const;
           })
@@ -425,14 +452,6 @@ export default function SuperAdminPage() {
             </Link>
           ),
         },
-        {
-          key: "branding",
-          node: (
-            <Link href="/settings/branding" className={buttonClass("secondary")}>
-              Appearance
-            </Link>
-          ),
-        },
       ]}
       customSidebar={
         <div className="flex h-full flex-col">
@@ -469,6 +488,9 @@ export default function SuperAdminPage() {
           <section className="mt-4 border-t border-slate-200 pt-4">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Platform Snapshot</p>
             <p className="mt-1.5 text-sm text-slate-700">{orgs.length} organizations</p>
+            <p className="text-sm text-slate-700">{platformTotals.albums} albums</p>
+            <p className="text-sm text-slate-700">{platformTotals.photos} photos</p>
+            <p className="text-sm text-slate-700">{formatBytes(platformTotals.storageBytes)} storage used</p>
             <p className="text-xs text-slate-500">
               Current org: {activeOrg ? `${activeOrg.name} (${activeOrg.slug})` : activeOrgId ?? "none"}
             </p>
@@ -600,7 +622,7 @@ export default function SuperAdminPage() {
                       <p className="mt-1 text-xs text-slate-500">{org.id}</p>
                     </div>
 
-                    <div className="grid grid-cols-3 border-t border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs text-slate-600">
+                    <div className="grid grid-cols-4 border-t border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs text-slate-600">
                       <div>
                         <p className="font-semibold text-slate-900">{summary?.guidelinesCount ?? 1}</p>
                         <p>portal</p>
@@ -612,6 +634,10 @@ export default function SuperAdminPage() {
                       <div>
                         <p className="font-semibold text-slate-900">{summary?.photosCount ?? 0}</p>
                         <p>photos</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{formatBytes(summary?.storageBytes ?? 0)}</p>
+                        <p>storage</p>
                       </div>
                     </div>
 

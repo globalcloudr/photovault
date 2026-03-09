@@ -91,9 +91,33 @@ Use it to store:
 - approved brand reference files for staff
 
 ## Page Layout (What You See)
-- Top utility header: quick actions like sign out and admin links.
+- Top utility header:
+  - Support link
+  - user profile menu (top-right initials/avatar)
+  - profile menu includes Help, Questions/feedback, Settings (Profile), and Logout
+  - Billing appears in menu as disabled/coming soon
 - Left sidebar: navigation and page-specific tools.
 - Right content area: page title, hero section, and cards/data.
+
+## Profile Menu (Top-Right)
+Open the avatar/initials button to access personal and account actions:
+- Help
+- Questions / feedback
+- Settings (Profile)
+- Logout
+
+If your account is super admin, the menu also includes a `Super Admin` shortcut.
+
+## Profile Settings (Name)
+To update your displayed name:
+1. Open the profile menu (top-right avatar/initials).
+2. Click `Settings (Profile)`.
+3. Update `Display name`.
+4. Click `Save profile`.
+
+Note:
+- Name changes are account-level (user profile), not organization appearance settings.
+- `Appearance` is for school branding (colors, logos, fonts).
 
 ## Switching Organizations
 If you have access to multiple organizations, use the active org controls in the app (Super Admin flow) before creating albums or editing appearance settings.
