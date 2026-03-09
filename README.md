@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PhotoVault
 
-## Getting Started
+PhotoVault is a multi-organization photo vault / DAM for adult schools, built with Next.js + Supabase.
 
-First, run the development server:
+## Current Product Scope
+- School organizations with org-scoped albums and assets
+- Upload, browse, open, and download photos
+- Album cover selection from album photos
+- Per-organization appearance settings (theme tokens + logo URL)
+- Brand Guidelines collection for logos and reference documents
+- Super Admin workflows for school/org creation and owner invite
+- Shared Media Workspace UI shell (top header + left sidebar + right content area)
 
+## App Routes
+- `/albums` - albums dashboard
+- `/albums/[id]` - album photos workspace
+- `/settings/branding` - org appearance settings
+- `/collections/brand-guidelines` - brand guidelines library
+- `/super-admin` - platform org management (super admin only)
+
+## Local Development
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
+Use `.env.local` for Supabase project keys and app settings.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentation
+- [UI Concept Brief](/Users/zylstra/Documents/photovault/docs/ui-concept-brief.md)
+- [MVP Implementation Board](/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md)
+- [Style Guide](/Users/zylstra/Documents/photovault/docs/style-guide.md)
+- [User Guide](/Users/zylstra/Documents/photovault/docs/user-guide.md)
+- [Super Admin Guide](/Users/zylstra/Documents/photovault/docs/super-admin-guide.md)
+- [Design Resources](/Users/zylstra/Documents/photovault/docs/design-resources.md)
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Next Priorities
+- Role and RLS hardening (`owner`, `uploader`, `viewer`)
+- Metadata + filters improvements for asset findability
+- Appearance upload UX (replace manual logo URL entry)
+- Usability validation pass with school users

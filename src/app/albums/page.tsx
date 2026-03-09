@@ -1,0 +1,596 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
+import { MediaWorkspaceShell } from "@/components/layout/media-workspace-shell";
+import { buttonClass, Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { useOrg } from "@/components/org/org-provider";
+import { IconGrid, IconList } from "@/components/ui/icons";
+import { formatDateMDY } from "@/lib/date-format";
+
+const COVER_PREFS_KEY = "album_cover_storage_paths_v1";
+
+type Album = {
+  id: string;
+  event_name: string;
+  event_date: string;
+  rights_status: string;
+  created_at: string;
+};
+
+type AssetThumb = {
+  id: string;
+  album_id: string;
+  storage_path: string;
+  canonical_filename: string;
+  sequence_number: number;
+  thumbUrl?: string | null;
+};
+
+function formatRightsLabel(rightsStatus: string) {
+  switch (rightsStatus) {
+    case "ok_for_marketing":
+      return "OK for marketing";
+    case "internal_only":
+      return "Internal only";
+    case "do_not_use":
+      return "Do not use";
+    default:
+      return "Unknown";
+  }
+}
+
+function readStoredCoverPaths(): Record<string, string> {
+  try {
+    const raw = window.localStorage.getItem(COVER_PREFS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+function saveStoredCoverPaths(pathsByAlbumId: Record<string, string>) {
+  try {
+    window.localStorage.setItem(COVER_PREFS_KEY, JSON.stringify(pathsByAlbumId));
+  } catch {
+    // ignore localStorage errors
+  }
+}
+
+export default function AlbumsPage() {
+  const { activeOrgId, loading: orgLoading, isSuperAdmin, orgs } = useOrg();
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const [assetsByAlbumId, setAssetsByAlbumId] = useState<Record<string, AssetThumb[]>>({});
+  const [coverByAlbumId, setCoverByAlbumId] = useState<Record<string, AssetThumb | null>>({});
+  const [pickerAlbumId, setPickerAlbumId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">("newest");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [rightsFilter, setRightsFilter] = useState<"all" | "ok_for_marketing" | "internal_only" | "do_not_use" | "unknown">("all");
+
+  useEffect(() => {
+    if (orgLoading) return;
+    if (!activeOrgId) return;
+
+    (async () => {
+      setLoading(true);
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("albums")
+        .select("id,event_name,event_date,rights_status,created_at")
+        .eq("org_id", activeOrgId)
+        .order("event_date", { ascending: false });
+
+      if (error) {
+        alert(error.message);
+        setLoading(false);
+        return;
+      }
+
+      const albumRows = (data ?? []) as Album[];
+      setAlbums(albumRows);
+
+      if (albumRows.length === 0) {
+        setAssetsByAlbumId({});
+        setCoverByAlbumId({});
+        setLoading(false);
+        return;
+      }
+
+      const albumIds = albumRows.map((a) => a.id);
+      const { data: assetsData, error: assetsError } = await supabase
+        .from("assets")
+        .select("id,album_id,storage_path,canonical_filename,sequence_number")
+        .in("album_id", albumIds)
+        .order("sequence_number", { ascending: true });
+
+      if (assetsError) {
+        alert(assetsError.message);
+        setLoading(false);
+        return;
+      }
+
+      const assetRows = (assetsData ?? []) as AssetThumb[];
+      const signedAssets = await Promise.all(
+        assetRows.map(async (a) => {
+          const { data: signedData, error: signedError } = await supabase.storage
+            .from("originals")
+            .createSignedUrl(a.storage_path, 60 * 60 * 24);
+
+          if (signedError) return { ...a, thumbUrl: null };
+          return { ...a, thumbUrl: signedData?.signedUrl ?? null };
+        })
+      );
+
+      const grouped: Record<string, AssetThumb[]> = {};
+      for (const a of signedAssets) {
+        if (!grouped[a.album_id]) grouped[a.album_id] = [];
+        grouped[a.album_id].push(a);
+      }
+
+      const storedCoverPaths = readStoredCoverPaths();
+      const initialCovers: Record<string, AssetThumb | null> = {};
+      for (const album of albumRows) {
+        const albumAssets = grouped[album.id] ?? [];
+        const storedPath = storedCoverPaths[album.id];
+        const storedAsset = storedPath
+          ? albumAssets.find((asset) => asset.storage_path === storedPath) ?? null
+          : null;
+        initialCovers[album.id] = storedAsset ?? albumAssets[0] ?? null;
+      }
+
+      setAssetsByAlbumId(grouped);
+      setCoverByAlbumId(initialCovers);
+      setLoading(false);
+    })();
+  }, [activeOrgId, orgLoading]);
+
+  function pickCover(albumId: string, asset: AssetThumb) {
+    const next = { ...coverByAlbumId, [albumId]: asset };
+    setCoverByAlbumId(next);
+
+    const storedPaths = readStoredCoverPaths();
+    storedPaths[albumId] = asset.storage_path;
+    saveStoredCoverPaths(storedPaths);
+  }
+
+  const pickerAssets = pickerAlbumId ? assetsByAlbumId[pickerAlbumId] ?? [] : [];
+  const selectedPickerCoverId = pickerAlbumId ? coverByAlbumId[pickerAlbumId]?.id ?? null : null;
+  const noActiveOrg = !orgLoading && !activeOrgId;
+  const filteredAlbums = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return albums.filter((album) => {
+      if (rightsFilter !== "all" && album.rights_status !== rightsFilter) return false;
+      if (!q) return true;
+      return album.event_name.toLowerCase().includes(q) || album.event_date.toLowerCase().includes(q);
+    });
+  }, [albums, rightsFilter, search]);
+  const sortedAlbums = useMemo(() => {
+    const items = [...filteredAlbums];
+    if (sortBy === "oldest") {
+      items.sort((a, b) => a.event_date.localeCompare(b.event_date));
+      return items;
+    }
+    if (sortBy === "name_asc") {
+      items.sort((a, b) => a.event_name.localeCompare(b.event_name));
+      return items;
+    }
+    if (sortBy === "name_desc") {
+      items.sort((a, b) => b.event_name.localeCompare(a.event_name));
+      return items;
+    }
+    items.sort((a, b) => b.event_date.localeCompare(a.event_date));
+    return items;
+  }, [filteredAlbums, sortBy]);
+
+  const rightsCounts = useMemo(() => {
+    return {
+      all: albums.length,
+      ok_for_marketing: albums.filter((a) => a.rights_status === "ok_for_marketing").length,
+      internal_only: albums.filter((a) => a.rights_status === "internal_only").length,
+      do_not_use: albums.filter((a) => a.rights_status === "do_not_use").length,
+      unknown: albums.filter((a) => a.rights_status === "unknown").length,
+    };
+  }, [albums]);
+  const activeOrg = useMemo(() => orgs.find((o) => o.id === activeOrgId) ?? null, [orgs, activeOrgId]);
+  const heroCoverUrl = useMemo(() => {
+    const covers = Object.values(coverByAlbumId).filter((c): c is AssetThumb => Boolean(c?.thumbUrl));
+    return covers[0]?.thumbUrl ?? null;
+  }, [coverByAlbumId]);
+
+  return (
+    <MediaWorkspaceShell
+      title="Albums"
+      subtitle="Find, organize, and share school photos."
+      actions={[
+        {
+          key: "new",
+          node: (
+            <Link href="/albums/new" className={buttonClass("primary")}>
+              New album
+            </Link>
+          ),
+        },
+      ]}
+      utilityActions={[
+        ...(isSuperAdmin
+          ? [
+              {
+                key: "super",
+                node: (
+                  <Link href="/super-admin" className={buttonClass("secondary", "sm")}>
+                    Super admin
+                  </Link>
+                ),
+              },
+            ]
+          : []),
+        {
+          key: "brand",
+          node: (
+            <Link href="/settings/branding" className={buttonClass("secondary", "sm")}>
+              Appearance
+            </Link>
+          ),
+        },
+        {
+          key: "signout",
+          node: (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = "/login";
+              }}
+            >
+              Sign out
+            </Button>
+          ),
+        },
+      ]}
+      sidebarLogoOnly
+      sidebarContent={
+        <div className="space-y-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Rights Filter</p>
+            <div className="mt-1.5 space-y-1">
+              {(
+                [
+                  ["all", `All (${rightsCounts.all})`],
+                  ["ok_for_marketing", `OK (${rightsCounts.ok_for_marketing})`],
+                  ["internal_only", `Internal (${rightsCounts.internal_only})`],
+                  ["do_not_use", `Do not use (${rightsCounts.do_not_use})`],
+                  ["unknown", `Unknown (${rightsCounts.unknown})`],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`w-full rounded-md px-2 py-1 text-left text-sm transition ${
+                    rightsFilter === value
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-700 hover:bg-slate-100"
+                  }`}
+                  onClick={() => setRightsFilter(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <Card className="overflow-hidden">
+        <div className="relative h-36 overflow-hidden border-b border-slate-200 sm:h-44">
+          {heroCoverUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={heroCoverUrl}
+              alt="School cover"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : null}
+          <div className={`absolute inset-0 ${heroCoverUrl ? "bg-slate-900/45" : "bg-gradient-to-r from-slate-900 to-slate-700"}`} />
+          <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">School Library</p>
+            <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+              {activeOrg?.name ?? "Organization"}
+            </h2>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 px-4 py-3">
+          <Badge>{albums.length} albums</Badge>
+          <Badge>{rightsCounts.ok_for_marketing} marketing ready</Badge>
+          <Badge>{Object.values(assetsByAlbumId).reduce((sum, items) => sum + items.length, 0)} photos</Badge>
+        </div>
+      </Card>
+
+      <Card className="p-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:max-w-md">
+            <Input
+              placeholder="Search albums"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <label className="sr-only" htmlFor="album-sort">Sort albums</label>
+            <select
+              id="album-sort"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            >
+              <option value="newest">Sort by Newest</option>
+              <option value="oldest">Sort by Oldest</option>
+              <option value="name_asc">Sort by Name (A-Z)</option>
+              <option value="name_desc">Sort by Name (Z-A)</option>
+            </select>
+            <button
+              type="button"
+              className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
+                viewMode === "grid"
+                  ? "border-slate-300 bg-slate-100 text-slate-900"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+              title="Grid view"
+              aria-label="Grid view"
+              onClick={() => setViewMode("grid")}
+            >
+              <IconGrid className="h-3.5 w-3.5" />
+              Grid
+            </button>
+            <button
+              type="button"
+              className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
+                viewMode === "list"
+                  ? "border-slate-300 bg-slate-100 text-slate-900"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+              title="List view"
+              aria-label="List view"
+              onClick={() => setViewMode("list")}
+            >
+              <IconList className="h-3.5 w-3.5" />
+              List
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      <section>
+        {orgLoading || loading ? (
+          <p className="mt-6 text-slate-600">Loading albums…</p>
+        ) : noActiveOrg ? (
+          <section className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center">
+            <h2 className="text-xl font-semibold text-slate-900">No active organization selected</h2>
+            <p className="mt-2 text-sm text-slate-600">Choose an organization in Super Admin to load albums.</p>
+            {isSuperAdmin && (
+              <Link className={`${buttonClass("secondary")} mt-5`} href="/super-admin">
+                Open Super Admin
+              </Link>
+            )}
+          </section>
+        ) : sortedAlbums.length === 0 ? (
+          <section className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center">
+            <h2 className="text-xl font-semibold text-slate-900">{albums.length === 0 ? "No albums yet" : "No albums match filters"}</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              {albums.length === 0
+                ? "Create your first album to start uploading and organizing photos."
+                : "Try a different search term or rights filter."}
+            </p>
+            <Link className={`${buttonClass("primary")} mt-5`} href="/albums/new">
+              {albums.length === 0 ? "Create first album" : "Create new album"}
+            </Link>
+          </section>
+        ) : viewMode === "grid" ? (
+          <ul className="mt-3 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {sortedAlbums.map((a) => {
+              const photoCount = (assetsByAlbumId[a.id] ?? []).length;
+              const cover = coverByAlbumId[a.id];
+
+              return (
+                <Card key={a.id} className="overflow-hidden border-slate-200 bg-white">
+                  <div className="relative border-b border-slate-200 bg-slate-100">
+                    <div className="aspect-video w-full">
+                      {cover?.thumbUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={cover.thumbUrl}
+                          alt={`${a.event_name} cover`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-sm text-slate-500">
+                          No cover photo
+                        </div>
+                      )}
+                    </div>
+                    <Badge tone="dark" className="absolute right-3 top-3">
+                      {photoCount} {photoCount === 1 ? "photo" : "photos"}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2.5 p-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{formatDateMDY(a.event_date)}</p>
+                      <p className="text-xs text-slate-500">
+                        Updated {formatDateMDY(a.created_at)}
+                      </p>
+                    </div>
+                    <h2 className="line-clamp-2 text-lg font-semibold text-slate-900">{a.event_name}</h2>
+                    <p className="text-xs text-slate-600">
+                      Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
+                    </p>
+
+                    <div className="flex items-center gap-2 border-t border-slate-200 pt-2">
+                      <Link className={buttonClass("secondary", "sm")} href={`/albums/${a.id}`}>
+                        Open
+                      </Link>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="cursor-pointer"
+                        disabled={photoCount === 0}
+                        onClick={() => setPickerAlbumId(a.id)}
+                      >
+                        Choose cover
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </ul>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {sortedAlbums.map((a) => {
+              const photoCount = (assetsByAlbumId[a.id] ?? []).length;
+              const cover = coverByAlbumId[a.id];
+
+              return (
+                <Card key={a.id} className="border-slate-200 bg-white p-3 sm:p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="h-20 w-28 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+                      {cover?.thumbUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={cover.thumbUrl}
+                          alt={`${a.event_name} cover`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+                          No cover
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <h2 className="truncate text-base font-semibold text-slate-900">{a.event_name}</h2>
+                        <Badge tone="light">{photoCount} {photoCount === 1 ? "photo" : "photos"}</Badge>
+                      </div>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {formatDateMDY(a.event_date)} • Updated {formatDateMDY(a.created_at)}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-600">
+                        Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link className={buttonClass("secondary", "sm")} href={`/albums/${a.id}`}>
+                        Open
+                      </Link>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="cursor-pointer"
+                        disabled={photoCount === 0}
+                        onClick={() => setPickerAlbumId(a.id)}
+                      >
+                        Choose cover
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      {pickerAlbumId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75 p-6"
+          onClick={() => setPickerAlbumId(null)}
+        >
+          <div
+            className="max-h-[85vh] w-full max-w-5xl overflow-auto rounded-2xl border border-slate-300 bg-white p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Choose cover photo</h2>
+                <p className="text-sm text-slate-600">Pick one image to represent this album in the grid.</p>
+              </div>
+              <Button size="sm" variant="secondary" onClick={() => setPickerAlbumId(null)}>
+                Close
+              </Button>
+            </div>
+
+            {pickerAssets.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+                No photos in this album yet.
+              </p>
+            ) : (
+              <div
+                className="grid gap-3"
+                style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}
+              >
+                {pickerAssets.map((asset) => {
+                  const isSelected = asset.id === selectedPickerCoverId;
+                  return (
+                    <button
+                      key={asset.id}
+                      type="button"
+                      className={`group relative overflow-hidden rounded-lg border bg-slate-100 transition ${
+                        isSelected
+                          ? "border-slate-900 ring-2 ring-slate-900/30"
+                          : "border-slate-200 hover:border-slate-900"
+                      }`}
+                      onClick={() => {
+                        pickCover(pickerAlbumId, asset);
+                        setPickerAlbumId(null);
+                      }}
+                      title={asset.canonical_filename}
+                    >
+                      <div className="aspect-square w-full bg-slate-100">
+                        {asset.thumbUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={asset.thumbUrl}
+                            alt={asset.canonical_filename}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+                            No preview
+                          </div>
+                        )}
+                      </div>
+
+                      {isSelected && (
+                        <span className="absolute right-2 top-2 rounded-full bg-slate-900 px-2 py-1 text-xs font-medium text-white">
+                          Selected
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </MediaWorkspaceShell>
+  );
+}
