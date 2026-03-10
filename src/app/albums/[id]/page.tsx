@@ -59,6 +59,9 @@ type UploadQueueItem = {
   message?: string;
 };
 
+const BETA_MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024;
+const BETA_MAX_UPLOAD_SIZE_LABEL = "5 MB";
+
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   return String(error);
@@ -627,6 +630,27 @@ async function load() {
         setUploadQueue((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
       };
 
+      const allowedUploads: { file: File; queueItem: UploadQueueItem }[] = [];
+      let oversizedCount = 0;
+      for (let i = 0; i < fileArray.length; i += 1) {
+        const file = fileArray[i];
+        const queueItem = initialQueue[i];
+        if (file.size > BETA_MAX_UPLOAD_SIZE_BYTES) {
+          oversizedCount += 1;
+          updateQueue(queueItem.id, {
+            status: "error",
+            message: `File exceeds beta max size (${BETA_MAX_UPLOAD_SIZE_LABEL}).`,
+          });
+          continue;
+        }
+        allowedUploads.push({ file, queueItem });
+      }
+
+      if (allowedUploads.length === 0) {
+        setStatus(`Upload blocked: beta currently limits each image to ${BETA_MAX_UPLOAD_SIZE_LABEL}.`);
+        return;
+      }
+
       const hashHex = async (file: File) => {
         const buf = await file.arrayBuffer();
         const digest = await crypto.subtle.digest("SHA-256", buf);
@@ -640,9 +664,8 @@ async function load() {
       }
 
       const hashesByQueueId: Record<string, string> = {};
-      for (let i = 0; i < fileArray.length; i += 1) {
-        const queueItem = initialQueue[i];
-        const file = fileArray[i];
+      for (let i = 0; i < allowedUploads.length; i += 1) {
+        const { queueItem, file } = allowedUploads[i];
         updateQueue(queueItem.id, { status: "hashing" });
         const h = await hashHex(file);
         hashesByQueueId[queueItem.id] = h;
@@ -691,9 +714,8 @@ async function load() {
       let failedCount = 0;
 
       // Upload each file sequentially (MVP)
-      for (let i = 0; i < fileArray.length; i += 1) {
-        const file = fileArray[i];
-        const queueItem = initialQueue[i];
+      for (let i = 0; i < allowedUploads.length; i += 1) {
+        const { file, queueItem } = allowedUploads[i];
         const fileHash = hashesByQueueId[queueItem.id];
 
         if (existingHashSet.has(fileHash)) {
@@ -787,8 +809,12 @@ async function load() {
         existingHashSet.add(fileHash);
       }
 
-      setStatus(`Upload complete: ${uploadedCount} uploaded, ${duplicateCount} duplicate, ${failedCount} failed.`);
-      if (uploadedCount > 0 || duplicateCount > 0 || failedCount > 0) {
+      setStatus(
+        `Upload complete: ${uploadedCount} uploaded, ${duplicateCount} duplicate, ${failedCount} failed${
+          oversizedCount > 0 ? `, ${oversizedCount} too large` : ""
+        }.`
+      );
+      if (uploadedCount > 0 || duplicateCount > 0 || failedCount > 0 || oversizedCount > 0) {
         void logAuditEventClient({
           orgId: activeOrgId,
           eventType: "assets_uploaded_batch",
@@ -798,6 +824,7 @@ async function load() {
             uploadedCount,
             duplicateCount,
             failedCount,
+            oversizedCount,
             attemptedCount: fileArray.length,
           },
         });
@@ -1061,7 +1088,7 @@ async function load() {
         ) : null}
 
         <p className="mt-3 text-xs text-slate-500">
-          Upload policy: Photos supports image files only. Upload PDFs and other documents in Brand Portal.
+          Upload policy: Photos supports image files only. Beta max file size is {BETA_MAX_UPLOAD_SIZE_LABEL} per image. Upload PDFs and other documents in Brand Portal.
         </p>
 
         {album && (

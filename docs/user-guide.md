@@ -67,9 +67,15 @@ Notes:
 - upload supports image files
 - phone upload is supported (photo library/files, depending on your device/browser)
 - folder upload is not supported yet (select files instead)
+- beta upload limit: `5 MB` per image file
 - there is no fixed in-app max file count per upload right now; for best reliability, use smaller batches on slower devices/networks
 - files are added in sequence order
 - upload queue shows progress and duplicate detection feedback
+
+If a photo is too large:
+- export a smaller copy from your phone or photo app before uploading
+- use trusted tools such as Apple Photos, Preview (Mac), Adobe Express, or Canva to resize/compress the image
+- keep enough quality for school marketing use, but reduce oversized originals before upload
 
 ## Choose Album Cover
 From the Albums page:
