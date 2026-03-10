@@ -7,9 +7,15 @@ Use this document after launch to capture what should become standard for the ne
 
 ## Change
 - Add lessons here after launch.
+- Treat Vercel environment variables as a first-class deployment step. The project build can look correct and still fail if the variables were entered during setup but never saved into Project Settings.
+- After changing Vercel environment variables, always trigger a fresh deployment and verify the new deployment is tied to the latest Git commit hash before trusting the error log.
+- For multi-tenant asset tables, do not assume intended RLS policies exist just because they are documented elsewhere. Add explicit migrations for live policies and verify the database state.
 
 ## Avoid Next Time
 - Add lessons here after launch.
+- Avoid relying on client-side state for database-derived sequencing like `assets.sequence_number`; use the database as the source of truth.
+- Avoid deleting storage files unless the matching database rows were actually deleted. Partial delete behavior creates orphaned asset rows and broken previews.
+- Avoid debugging the wrong Vercel deployment. Always check the deployment source commit before acting on a build error.
 
 ## Build Workflow Notes
 
@@ -64,6 +70,18 @@ Use this document after launch to capture what should become standard for the ne
 - Practical rule:
   - if one short sentence clearly describes the work, the commit is probably scoped well
   - if the message needs many unrelated ideas joined together, the commit may be too broad
+
+### 5. Vercel beta deployment note
+- In Vercel, `Production` means the primary environment for that specific project.
+- A beta-only project such as `photovault-beta` can still use its own `Production` environment safely during private beta.
+- This is separate from the final public go-live decision and separate from the later production domain strategy.
+
+### 6. Beta issue patterns already discovered
+- Private beta surfaced production-only TypeScript issues that did not block local iteration. A Vercel build should be treated as a real validation gate, not a formality.
+- Asset upload and delete workflows need database-first safety checks:
+  - explicit `assets` RLS policies must exist in Supabase
+  - upload retries must handle orphaned storage objects
+  - deletes must confirm database rows were removed before cleaning up storage
 
 ## Suggested Questions To Answer After Launch
 - What decisions saved the most time?

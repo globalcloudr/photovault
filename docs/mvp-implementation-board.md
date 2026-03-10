@@ -857,7 +857,7 @@ Follow this order sequentially. Do not skip ahead.
 
 ## Current Position
 - Completed: PV-000, PV-001, PV-002, PV-003, PV-004, PV-005, PV-006, PV-007, PV-008, PV-009, PV-010, PV-011, PV-017, PV-019, PV-020 (MVP scope), PV-023, PV-024
-- In Progress: none
+- In Progress: PV-029 (private beta deployment/testing now live on Vercel)
 - Deferred (intentional): PV-018 until beta feedback pass is complete
 - Next active step: Beta School Testing Pass (pre-PV-025/PV-018)
 - Remaining steps in lockstep sequence: 16
@@ -925,6 +925,9 @@ Follow this order sequentially. Do not skip ahead.
   - added upload policy helper text clarifying:
     - photos page accepts image uploads only
     - PDF/doc uploads should use Brand Portal
+  - fixed upload queue sequence collisions by reading the next `sequence_number` from the database instead of stale client state
+  - fixed upload retry collisions by cleaning up orphaned storage objects before retrying the same file path
+  - fixed delete flow to verify database row deletion before storage cleanup so partial deletes cannot leave orphaned asset rows
 - Icon system:
   - shared icon primitives introduced and applied to sidebar nav + key action controls
 - Invite/setup experience:
@@ -936,6 +939,19 @@ Follow this order sequentially. Do not skip ahead.
   - normalized buyer-facing copy to match in-app terms (`Brand Portal`, `Appearance`, `Share Album links`)
   - updated homepage CMS helper text for clearer non-technical editing workflow
   - added one-click `Apply recommended defaults` action in `/super-admin/homepage` to reset editor state to the latest optimized copy baseline before saving
+  - hero image is now CMS-editable from `/super-admin/homepage`
+  - mobile hero stack order fixed so the image appears before the text block on smaller screens
+- Global auth and session UX:
+  - login page now includes `Back to homepage`
+  - homepage setup/progress modal now appears only for invite acceptance flow, not general public visitors
+  - logout flow now completes on first click with explicit `Logging out…` state
+- Super Admin page:
+  - card footer actions normalized into stable rows for consistent rendering across organizations
+  - utility actions (`Open workspace`, `Open audit`) styled as secondary links with divider separation
+- Beta deployment hardening:
+  - Vercel beta deployment is live and connected to GitHub auto-deploy
+  - fixed multiple production-only TypeScript issues surfaced during Vercel build
+  - added explicit `assets` RLS migration: `/Users/zylstra/Documents/photovault/docs/sql/2026-03-10-pv-029-assets-rls-policies.sql`
 
 ## Notes
 - Use migration files for every DB change.

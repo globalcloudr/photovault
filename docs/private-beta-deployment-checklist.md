@@ -9,6 +9,7 @@ Use this checklist when preparing the live beta environment for pilot schools.
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
+- Verify the variables are actually visible in `Project Settings -> Environment Variables` after saving.
 - Verify no environment values point to localhost.
 
 ## 2. Supabase Auth Configuration
@@ -48,6 +49,7 @@ Use this checklist when preparing the live beta environment for pilot schools.
 - Update Brand Portal content
 - Update Appearance settings
 - Invite and remove staff
+- Delete photos and re-upload a fresh batch in the same album
 
 ## 6. Beta Feedback Process
 - Create one copy of `docs/beta-school-feedback-checklist.md` per pilot school/session.
