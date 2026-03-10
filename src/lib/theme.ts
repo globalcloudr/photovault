@@ -86,7 +86,7 @@ export async function fetchOrgThemeSettings(orgId: string) {
     .single();
 
   if (error) throw error;
-  return data as OrgThemeSettings;
+  return data as unknown as OrgThemeSettings;
 }
 
 export async function updateOrgThemeSettings(orgId: string, patch: OrgThemeUpdate) {
@@ -101,7 +101,7 @@ export async function updateOrgThemeSettings(orgId: string, patch: OrgThemeUpdat
     .single();
 
   if (error) throw error;
-  return data as OrgThemeSettings;
+  return data as unknown as OrgThemeSettings;
 }
 
 export function makeStorageRef(bucket: string, path: string) {
