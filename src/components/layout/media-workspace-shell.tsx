@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useOrg } from "@/components/org/org-provider";
 import { OrgBrandLockup } from "@/components/layout/org-brand-lockup";
@@ -58,12 +58,12 @@ export function MediaWorkspaceShell({
   hidePageHeader = false,
   sidebarLogoOnly = true,
 }: MediaWorkspaceShellProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const { activeOrgId, isSuperAdmin, orgs } = useOrg();
   const activeOrg = useMemo(() => orgs.find((o) => o.id === activeOrgId) ?? null, [orgs, activeOrgId]);
   const [orgLogoUrl, setOrgLogoUrl] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
   const [userRole, setUserRole] = useState<string>("viewer");
@@ -83,8 +83,14 @@ export function MediaWorkspaceShell({
   const displayName = userName.trim() || userEmail || "User";
 
   async function signOut() {
-    await supabase.auth.signOut();
-    router.replace("/login");
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await supabase.auth.signOut();
+      window.location.assign("/login");
+    } finally {
+      setSigningOut(false);
+    }
   }
 
   useEffect(() => {
@@ -278,14 +284,15 @@ export function MediaWorkspaceShell({
                   <div className="border-t border-slate-200 p-2">
                     <button
                       type="button"
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-100"
+                      disabled={signingOut}
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
                       onClick={() => {
                         setMenuOpen(false);
                         void signOut();
                       }}
                     >
                       <IconLogout className="h-4 w-4" />
-                      Logout
+                      {signingOut ? "Logging out…" : "Logout"}
                     </button>
                   </div>
                 </div>
