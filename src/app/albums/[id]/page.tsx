@@ -718,6 +718,28 @@ async function load() {
         // Storage path: org/album/canonicalFilename
         const storagePath = `${activeOrgId}/${albumId}/${canonicalFilename}`;
 
+        // If a prior upload failed after storage succeeded but before the asset row
+        // was inserted, the storage object can be orphaned. Clean it up before retrying
+        // only when no asset row currently points at the same path.
+        const { data: existingPathRow, error: existingPathError } = await supabase
+          .from("assets")
+          .select("id")
+          .eq("org_id", activeOrgId)
+          .eq("album_id", albumId)
+          .eq("storage_path", storagePath)
+          .maybeSingle();
+
+        if (existingPathError) {
+          throw new Error("Upload precheck failed: " + existingPathError.message);
+        }
+
+        if (!existingPathRow) {
+          const { error: cleanupError } = await supabase.storage.from("originals").remove([storagePath]);
+          if (cleanupError && !/not found/i.test(cleanupError.message)) {
+            throw cleanupError;
+          }
+        }
+
         // Upload to Storage bucket "originals"
         const { error: upErr } = await supabase.storage
           .from("originals")
@@ -753,6 +775,7 @@ async function load() {
         });
 
         if (insErr) {
+          await supabase.storage.from("originals").remove([storagePath]);
           failedCount += 1;
           updateQueue(queueItem.id, { status: "error", message: insErr.message });
           continue;
