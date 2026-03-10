@@ -22,6 +22,10 @@ type MembershipRow = {
   created_at: string;
 };
 
+type ProfileRow = {
+  is_super_admin: boolean | null;
+};
+
 type AuthUser = {
   id: string;
   email?: string | null;
@@ -42,8 +46,11 @@ async function canManageOrg(authedSupabase: ReturnType<typeof createClient>, use
     authedSupabase.from("profiles").select("is_super_admin").eq("user_id", userId).single(),
     authedSupabase.from("memberships").select("role").eq("org_id", orgId).eq("user_id", userId).single(),
   ]);
-  const isSuperAdmin = Boolean(profileData?.is_super_admin);
-  const isOwner = membershipData?.role === "owner";
+
+  const profile = profileData as ProfileRow | null;
+  const membership = membershipData as Pick<MembershipRow, "role"> | null;
+  const isSuperAdmin = Boolean(profile?.is_super_admin);
+  const isOwner = membership?.role === "owner";
   return isSuperAdmin || isOwner;
 }
 
