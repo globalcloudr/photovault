@@ -233,14 +233,14 @@ export function MediaWorkspaceShell({
 
                   <div className="space-y-0.5 px-2 py-2">
                     <a
-                      href="mailto:support@photovault.app"
+                      href="mailto:info@akkedisdigital.com"
                       className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
                     >
                       <IconHelp className="h-4 w-4" />
                       Help
                     </a>
                     <a
-                      href="mailto:support@photovault.app?subject=PhotoVault%20Question%20%2F%20Feedback"
+                      href="mailto:info@akkedisdigital.com?subject=PhotoVault%20Question%20%2F%20Feedback"
                       className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
                     >
                       <IconFeedback className="h-4 w-4" />

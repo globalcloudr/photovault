@@ -599,14 +599,14 @@ export default function AlbumsPage() {
                       Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
                     </p>
 
-                    <div className="flex items-center gap-2 border-t border-slate-200 pt-2">
-                      <Link className={buttonClass("secondary", "sm")} href={`/albums/${a.id}`}>
+                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(7.75rem,1.2fr)_minmax(0,1fr)] gap-2 border-t border-slate-200 pt-2">
+                      <Link className={buttonClass("secondary", "sm") + " whitespace-nowrap"} href={`/albums/${a.id}`}>
                         Open
                       </Link>
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="cursor-pointer"
+                        className="min-w-0 cursor-pointer whitespace-nowrap px-2"
                         disabled={photoCount === 0}
                         onClick={() => setPickerAlbumId(a.id)}
                       >
@@ -615,7 +615,7 @@ export default function AlbumsPage() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="cursor-pointer"
+                        className="min-w-0 cursor-pointer whitespace-nowrap"
                         onClick={() => void openShareModal(a.id)}
                       >
                         Share
@@ -663,14 +663,14 @@ export default function AlbumsPage() {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link className={buttonClass("secondary", "sm")} href={`/albums/${a.id}`}>
+                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(7.75rem,1.2fr)_minmax(0,1fr)] gap-2">
+                      <Link className={buttonClass("secondary", "sm") + " whitespace-nowrap"} href={`/albums/${a.id}`}>
                         Open
                       </Link>
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="cursor-pointer"
+                        className="min-w-0 cursor-pointer whitespace-nowrap px-2"
                         disabled={photoCount === 0}
                         onClick={() => setPickerAlbumId(a.id)}
                       >
@@ -679,7 +679,7 @@ export default function AlbumsPage() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="cursor-pointer"
+                        className="min-w-0 cursor-pointer whitespace-nowrap"
                         onClick={() => void openShareModal(a.id)}
                       >
                         Share

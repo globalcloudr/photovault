@@ -14,6 +14,13 @@ type SetupStage = "auth" | "org" | "workspace" | "complete" | "unauthenticated" 
 export default function Home() {
   const router = useRouter();
   const { orgs, activeOrgId, setActiveOrgId, loading: orgLoading } = useOrg();
+  const [hasInviteTokens] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
+    if (!hash) return false;
+    const params = new URLSearchParams(hash);
+    return Boolean(params.get("access_token") && params.get("refresh_token"));
+  });
   const [stage, setStage] = useState<SetupStage>("auth");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [orgName, setOrgName] = useState<string>("your school");
@@ -58,6 +65,11 @@ export default function Home() {
 
       if (!sessionData.session?.user) {
         setStage("unauthenticated");
+        return;
+      }
+
+      if (!hasInviteTokens) {
+        router.replace("/albums");
         return;
       }
 
@@ -125,11 +137,11 @@ export default function Home() {
     return () => {
       mounted = false;
     };
-  }, [activeOrgId, orgLoading, orgs, router, setActiveOrgId]);
+  }, [activeOrgId, hasInviteTokens, orgLoading, orgs, router, setActiveOrgId]);
 
   const elapsedSeconds = Math.floor((nowTs - startedAt) / 1000);
   const showFallback = stage !== "unauthenticated" && stage !== "error" && stage !== "complete" && elapsedSeconds >= 10;
-  const showSetupMode = stage !== "unauthenticated";
+  const showSetupMode = hasInviteTokens && stage !== "unauthenticated";
 
   const steps = useMemo(
     () => [

@@ -769,6 +769,28 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - future product builds can reuse documented component decisions
   - tooling recommendation recorded: adopt, partially adopt, or keep custom approach
 
+### PV-038: Contact Us + Questions/Feedback Intake
+- Goal: Replace simple mailto support links with a structured support/contact experience for users and prospects.
+- Scope:
+  - create a dedicated Contact Us page
+  - add a Questions/Feedback form that captures:
+    - name
+    - email
+    - organization
+    - role
+    - topic
+    - message
+  - route submissions to email and/or internal ticket workflow
+  - evaluate whether a lightweight internal ticket system is warranted
+- Files:
+  - new route/page under `/Users/zylstra/Documents/photovault/src/app/`
+  - supporting API route or integration for message handling
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+- Acceptance:
+  - users can submit structured support/feedback requests without leaving the app
+  - required metadata is captured before message delivery
+  - future ticketing workflow direction is documented
+
 ### PV-036: Post-Launch Lessons Learned + Build Workflow Retrospective
 - Goal: Capture what worked, what slowed delivery, and what should change before building the next product.
 - Scope:
@@ -784,7 +806,7 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - identify avoidable mistakes and process gaps
   - produce a concise recommendations list for the next build
 - Files:
-  - new retrospective doc under `/Users/zylstra/Documents/photovault/docs/`
+  - `/Users/zylstra/Documents/photovault/docs/lessons-learned.md`
   - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
 - Acceptance:
   - lessons learned document exists and is actionable
@@ -825,7 +847,8 @@ Follow this order sequentially. Do not skip ahead.
 29. PV-033 TinaCMS Integration (SuperAdmin-Only Marketing + Help Content)
 30. PV-035 Paper.design Evaluation for Marketing Workflow
 31. PV-037 Internal Component Library + Design System Pass
-32. PV-036 Post-Launch Lessons Learned + Build Workflow Retrospective
+32. PV-038 Contact Us + Questions/Feedback Intake
+33. PV-036 Post-Launch Lessons Learned + Build Workflow Retrospective
 
 ### Temporary Execution Note (Approved)
 - Before starting PV-018, run a short beta validation cycle with selected schools.
@@ -837,7 +860,7 @@ Follow this order sequentially. Do not skip ahead.
 - In Progress: none
 - Deferred (intentional): PV-018 until beta feedback pass is complete
 - Next active step: Beta School Testing Pass (pre-PV-025/PV-018)
-- Remaining steps in lockstep sequence: 15
+- Remaining steps in lockstep sequence: 16
 - Beta checklist template: `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
 - Beta deployment checklist: `/Users/zylstra/Documents/photovault/docs/private-beta-deployment-checklist.md`
 

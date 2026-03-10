@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -67,6 +68,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">PhotoVault Login</h1>
         <p className="mt-2 text-slate-600">Sign in to your school PhotoVault.</p>
+        <p className="mt-3 text-sm text-slate-500">
+          <Link href="/" className="font-medium text-slate-700 underline-offset-4 hover:text-slate-900 hover:underline">
+            Back to homepage
+          </Link>
+        </p>
 
         <form onSubmit={signIn} className="mt-6 space-y-3">
           <input

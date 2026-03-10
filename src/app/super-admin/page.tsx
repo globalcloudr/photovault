@@ -641,23 +641,41 @@ export default function SuperAdminPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 px-3 py-2">
-                      {isActive && <Badge>Active</Badge>}
-                      {acceptedOwnerCount > 0 ? <Badge>Admin accepted</Badge> : null}
-                      {acceptedOwnerCount === 0 && ownerCount > 0 ? <Badge>Invite sent</Badge> : null}
-                      {ownerCount === 0 ? <Badge>Needs invite</Badge> : null}
-                      <Button size="sm" variant="secondary" onClick={() => openOrgRoute(org.id, "/collections/brand-guidelines")}>
-                        <IconGuidelines className="mr-1 h-3.5 w-3.5" />
-                        Open Brand Portal
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => openOrgRoute(org.id, "/albums")}>
-                        <IconAlbums className="mr-1 h-3.5 w-3.5" />
-                        Open workspace
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => openOrgRoute(org.id, "/audit")}>
-                        <IconAudit className="mr-1 h-3.5 w-3.5" />
-                        Open audit
-                      </Button>
+                    <div className="space-y-3 border-t border-slate-200 px-3 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {isActive && <Badge>Active</Badge>}
+                        {acceptedOwnerCount > 0 ? <Badge>Admin accepted</Badge> : null}
+                        {acceptedOwnerCount === 0 && ownerCount > 0 ? <Badge>Invite sent</Badge> : null}
+                        {ownerCount === 0 ? <Badge>Needs invite</Badge> : null}
+                      </div>
+
+                      <div>
+                        <Button size="sm" variant="secondary" onClick={() => openOrgRoute(org.id, "/collections/brand-guidelines")}>
+                          <IconGuidelines className="mr-1 h-3.5 w-3.5" />
+                          Open Brand Portal
+                        </Button>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="px-0 py-1 text-sm font-medium text-slate-600 hover:bg-transparent hover:text-slate-900"
+                          onClick={() => openOrgRoute(org.id, "/albums")}
+                        >
+                          <IconAlbums className="mr-1 h-3.5 w-3.5 text-slate-500" />
+                          Open workspace
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="px-0 py-1 text-sm font-medium text-slate-600 hover:bg-transparent hover:text-slate-900"
+                          onClick={() => openOrgRoute(org.id, "/audit")}
+                        >
+                          <IconAudit className="mr-1 h-3.5 w-3.5 text-slate-500" />
+                          Open audit
+                        </Button>
+                      </div>
                     </div>
                   </li>
                 );
