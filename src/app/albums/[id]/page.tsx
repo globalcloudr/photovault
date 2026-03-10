@@ -668,8 +668,23 @@ async function load() {
           .filter((h): h is string => Boolean(h))
       );
 
-      // Determine starting sequence number
-      const currentMaxSeq = assets.reduce((max, a) => Math.max(max, a.sequence_number), 0);
+      // Determine starting sequence number from the database, not local state.
+      // Local state can be stale during retries or after failed inserts, which causes
+      // storage path collisions and duplicate sequence numbers.
+      const { data: latestAssetRow, error: latestAssetError } = await supabase
+        .from("assets")
+        .select("sequence_number")
+        .eq("org_id", activeOrgId)
+        .eq("album_id", albumId)
+        .order("sequence_number", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (latestAssetError) {
+        throw new Error("Failed to determine next upload sequence: " + latestAssetError.message);
+      }
+
+      const currentMaxSeq = latestAssetRow?.sequence_number ?? 0;
       let seq = currentMaxSeq + 1;
       let uploadedCount = 0;
       let duplicateCount = 0;
@@ -832,14 +847,21 @@ async function load() {
     setDeletingAssetIds(assetIds);
 
     try {
-      const { error: deleteRowError } = await supabase
+      const { data: deletedRows, error: deleteRowError } = await supabase
         .from("assets")
         .delete()
+        .select("id")
         .eq("org_id", activeOrgId)
         .eq("album_id", albumId)
         .in("id", assetIds);
 
       if (deleteRowError) throw deleteRowError;
+      const deletedCount = deletedRows?.length ?? 0;
+      if (deletedCount !== assetIds.length) {
+        throw new Error(
+          `Delete did not remove all selected rows (${deletedCount}/${assetIds.length}). Check asset delete permissions before retrying.`
+        );
+      }
 
       const paths = targets.map((target) => target.storage_path).filter(Boolean);
       let storageWarning: string | null = null;
