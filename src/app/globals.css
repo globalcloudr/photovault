@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../components/marketing/marketing-homepage.css";
 
 :root {
   --background: #eef2ff;
@@ -27,6 +28,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-dm-serif-display: var(--font-dm-serif-display);
+  --font-outfit: var(--font-outfit);
 }
 
 @media (prefers-color-scheme: dark) {
