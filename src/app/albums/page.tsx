@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useOrg } from "@/components/org/org-provider";
-import { IconGrid, IconList } from "@/components/ui/icons";
+import { IconEdit, IconGrid, IconList } from "@/components/ui/icons";
 import { formatDateMDY, formatDateTimeMDY } from "@/lib/date-format";
 
 const COVER_PREFS_KEY = "album_cover_storage_paths_v1";
@@ -123,6 +123,12 @@ export default function AlbumsPage() {
   const [sharePassword, setSharePassword] = useState("");
   const [shareExpiresAt, setShareExpiresAt] = useState("");
   const [shareExpiresInputType, setShareExpiresInputType] = useState<"text" | "date">("text");
+  const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
+  const [albumEditorName, setAlbumEditorName] = useState("");
+  const [albumEditorEventDate, setAlbumEditorEventDate] = useState("");
+  const [albumEditorRights, setAlbumEditorRights] = useState<Album["rights_status"]>("unknown");
+  const [albumEditorSaving, setAlbumEditorSaving] = useState(false);
+  const [albumEditorStatus, setAlbumEditorStatus] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -289,6 +295,25 @@ export default function AlbumsPage() {
       ),
     [assetsByAlbumId]
   );
+  const editingAlbumPhotoCount = useMemo(
+    () => (editingAlbum ? (assetsByAlbumId[editingAlbum.id] ?? []).length : 0),
+    [assetsByAlbumId, editingAlbum]
+  );
+  const editingAlbumStorageBytes = useMemo(
+    () =>
+      editingAlbum
+        ? (assetsByAlbumId[editingAlbum.id] ?? []).reduce((sum, item) => sum + (item.size_bytes ?? 0), 0)
+        : 0,
+    [assetsByAlbumId, editingAlbum]
+  );
+  const hasAlbumEditorChanges = useMemo(() => {
+    if (!editingAlbum) return false;
+    return (
+      editingAlbum.event_name !== albumEditorName.trim() ||
+      editingAlbum.event_date !== albumEditorEventDate ||
+      editingAlbum.rights_status !== albumEditorRights
+    );
+  }, [albumEditorEventDate, albumEditorName, albumEditorRights, editingAlbum]);
 
   async function loadShareLinks(albumId: string) {
     if (!activeOrgId) return;
@@ -399,6 +424,69 @@ export default function AlbumsPage() {
     const url = `${window.location.origin}/share/${token}`;
     await navigator.clipboard.writeText(url);
     setShareStatus("Share link copied.");
+  }
+
+  function openAlbumEditor(album: Album) {
+    setEditingAlbum(album);
+    setAlbumEditorName(album.event_name);
+    setAlbumEditorEventDate(album.event_date);
+    setAlbumEditorRights(album.rights_status);
+    setAlbumEditorStatus(null);
+  }
+
+  function closeAlbumEditor() {
+    if (albumEditorSaving) return;
+    if (hasAlbumEditorChanges) {
+      const confirmed = window.confirm("Discard unsaved changes?");
+      if (!confirmed) return;
+    }
+    setEditingAlbum(null);
+    setAlbumEditorStatus(null);
+  }
+
+  async function saveAlbumEditor() {
+    if (!activeOrgId || !editingAlbum) return;
+    const trimmedName = albumEditorName.trim();
+    if (!trimmedName) {
+      setAlbumEditorStatus("Album name is required.");
+      return;
+    }
+    if (!albumEditorEventDate) {
+      setAlbumEditorStatus("Event date is required.");
+      return;
+    }
+
+    setAlbumEditorSaving(true);
+    setAlbumEditorStatus(null);
+    try {
+      const payload = {
+        event_name: trimmedName,
+        event_date: albumEditorEventDate,
+        rights_status: albumEditorRights,
+      };
+      const { error } = await supabase
+        .from("albums")
+        .update(payload)
+        .eq("id", editingAlbum.id)
+        .eq("org_id", activeOrgId);
+
+      if (error) {
+        setAlbumEditorStatus(`Save failed: ${error.message}`);
+        return;
+      }
+
+      setAlbums((prev) =>
+        prev.map((album) => (album.id === editingAlbum.id ? { ...album, ...payload } : album))
+      );
+      setEditingAlbum((prev) => (prev ? { ...prev, ...payload } : prev));
+      setAlbumEditorStatus("Saved.");
+    } catch (error) {
+      setAlbumEditorStatus(
+        `Save failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+    } finally {
+      setAlbumEditorSaving(false);
+    }
   }
 
   return (
@@ -585,6 +673,15 @@ export default function AlbumsPage() {
                     <Badge tone="dark" className="absolute right-3 top-3">
                       {photoCount} {photoCount === 1 ? "photo" : "photos"}
                     </Badge>
+                    <button
+                      type="button"
+                      className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-sm transition hover:bg-slate-100"
+                      aria-label={`Edit ${a.event_name}`}
+                      title="Edit album"
+                      onClick={() => openAlbumEditor(a)}
+                    >
+                      <IconEdit className="h-4 w-4" />
+                    </button>
                   </div>
 
                   <div className="space-y-2.5 p-4">
@@ -654,6 +751,15 @@ export default function AlbumsPage() {
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                         <h2 className="truncate text-base font-semibold text-slate-900">{a.event_name}</h2>
                         <Badge tone="light">{photoCount} {photoCount === 1 ? "photo" : "photos"}</Badge>
+                        <button
+                          type="button"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+                          aria-label={`Edit ${a.event_name}`}
+                          title="Edit album"
+                          onClick={() => openAlbumEditor(a)}
+                        >
+                          <IconEdit className="h-4 w-4" />
+                        </button>
                       </div>
                       <p className="mt-1 text-xs text-slate-500">
                         {formatDateMDY(a.event_date)} • Updated {formatDateMDY(a.created_at)}
@@ -873,6 +979,114 @@ export default function AlbumsPage() {
           </div>
         </div>
       )}
+
+      {editingAlbum ? (
+        <div className="fixed inset-0 z-[60]">
+          <button
+            type="button"
+            aria-label="Close album editor"
+            className="absolute inset-0 bg-slate-950/35"
+            onClick={closeAlbumEditor}
+          />
+          <aside className="absolute inset-y-0 right-0 w-full overflow-y-auto overscroll-contain bg-white shadow-2xl sm:max-w-xl sm:border-l sm:border-slate-200">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-5">
+              <h3 className="text-2xl font-semibold tracking-tight text-slate-950">Album Details</h3>
+              <Button size="sm" variant="ghost" onClick={closeAlbumEditor} disabled={albumEditorSaving}>
+                Close
+              </Button>
+            </div>
+
+            <div className="space-y-5 px-4 py-4 pb-28 sm:px-5 sm:py-5 sm:pb-24">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Album name</label>
+                <Input
+                  value={albumEditorName}
+                  onChange={(e) => setAlbumEditorName(e.target.value)}
+                  placeholder="Album name"
+                />
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-900">Event date</label>
+                  <Input
+                    type="date"
+                    value={albumEditorEventDate}
+                    onChange={(e) => setAlbumEditorEventDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-900">Rights</label>
+                  <select
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+                    value={albumEditorRights}
+                    onChange={(e) => setAlbumEditorRights(e.target.value)}
+                  >
+                    <option value="ok_for_marketing">OK for marketing</option>
+                    <option value="internal_only">Internal only</option>
+                    <option value="do_not_use">Do not use</option>
+                    <option value="unknown">Unknown</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-2 text-sm font-semibold text-slate-900">Album details</p>
+                <div className="overflow-hidden rounded-lg border border-slate-200">
+                  <dl className="divide-y divide-slate-200 text-sm">
+                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
+                      <dt className="text-slate-500">Created</dt>
+                      <dd className="text-slate-800">{formatDateTimeMDY(editingAlbum.created_at)}</dd>
+                    </div>
+                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
+                      <dt className="text-slate-500">Photos</dt>
+                      <dd className="text-slate-800">
+                        {editingAlbumPhotoCount} {editingAlbumPhotoCount === 1 ? "photo" : "photos"}
+                      </dd>
+                    </div>
+                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
+                      <dt className="text-slate-500">Storage used</dt>
+                      <dd className="text-slate-800">{formatBytes(editingAlbumStorageBytes)}</dd>
+                    </div>
+                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
+                      <dt className="text-slate-500">Cover photo</dt>
+                      <dd className="text-slate-800">
+                        {coverByAlbumId[editingAlbum.id]?.canonical_filename ?? "Not selected"}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div className="mt-3">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled={editingAlbumPhotoCount === 0}
+                    onClick={() => {
+                      setPickerAlbumId(editingAlbum.id);
+                    }}
+                  >
+                    Choose cover
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 border-t border-slate-200 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="min-h-4 text-xs text-slate-600">{albumEditorStatus ?? " "}</p>
+                <div className="flex items-center justify-end gap-2">
+                  <Button size="sm" variant="secondary" onClick={closeAlbumEditor} disabled={albumEditorSaving}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" variant="primary" onClick={saveAlbumEditor} disabled={albumEditorSaving}>
+                    {albumEditorSaving ? "Saving…" : "Save changes"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      ) : null}
     </MediaWorkspaceShell>
   );
 }
