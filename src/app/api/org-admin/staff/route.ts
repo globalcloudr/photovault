@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { MembershipRole } from "@/lib/roles";
 import { logAuditEvent } from "@/lib/audit-server";
@@ -41,7 +41,7 @@ function getEnv() {
   return { supabaseUrl, anonKey, serviceRoleKey };
 }
 
-async function canManageOrg(authedSupabase: ReturnType<typeof createClient>, userId: string, orgId: string) {
+async function canManageOrg(authedSupabase: SupabaseClient, userId: string, orgId: string) {
   const [{ data: profileData }, { data: membershipData }] = await Promise.all([
     authedSupabase.from("profiles").select("is_super_admin").eq("user_id", userId).single(),
     authedSupabase.from("memberships").select("role").eq("org_id", orgId).eq("user_id", userId).single(),
@@ -55,7 +55,7 @@ async function canManageOrg(authedSupabase: ReturnType<typeof createClient>, use
 }
 
 async function fetchAuthUsersMap(
-  adminSupabase: ReturnType<typeof createClient>,
+  adminSupabase: SupabaseClient,
   wantedUserIds: Set<string>
 ) {
   const usersMap = new Map<string, AuthUser>();
