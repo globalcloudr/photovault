@@ -396,12 +396,14 @@ export default function BrandGuidelinesPage() {
       await persistConfig(nextConfig);
       setConfig(nextConfig);
       setStatus("Hero image removed.");
-      void logAuditEventClient({
-        orgId: activeOrgId,
-        eventType: "guideline_hero_removed",
-        entityType: "file",
-        entityId: config.heroImagePath,
-      });
+      if (activeOrgId) {
+        void logAuditEventClient({
+          orgId: activeOrgId,
+          eventType: "guideline_hero_removed",
+          entityType: "file",
+          entityId: config.heroImagePath,
+        });
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setStatus(`Failed to remove hero image: ${message}`);
