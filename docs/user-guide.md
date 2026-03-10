@@ -5,10 +5,17 @@ This is a starter guide for school staff using PhotoVault. It will be updated as
 
 ## What Is PhotoVault?
 PhotoVault helps your school team:
-- create photo albums for events
-- upload and organize photos
-- choose album cover images
-- search and review photos quickly
+- manage approved marketing and brand assets
+- create event photo albums
+- upload and organize photos for campaigns and communications
+- store approved logos and brand reference files in Brand Portal
+- search, review, and share marketing-ready assets quickly
+
+Positioning note:
+- PhotoVault is the dedicated layer for school marketing, brand, and approved media assets.
+- It is not meant to replace Google Drive or other general document/file storage systems.
+- Use PhotoVault for approved photos, logos, brand assets, and campaign-ready media.
+- Use your general file tools for broader document storage and collaboration.
 
 ## Sign In
 1. Open your PhotoVault login page.
@@ -98,6 +105,7 @@ Use it to store:
 - logo versions
 - PDF/Doc brand guidance
 - approved brand reference files for staff
+- marketing and social-ready supporting assets that should remain on-brand
 
 ## Page Layout (What You See)
 - Top utility header:

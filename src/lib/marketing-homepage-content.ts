@@ -115,13 +115,13 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
   },
   hero: {
     badge: "Built Specifically for Adult Education",
-    title: "The secure DAM for adult schools,",
+    title: "The dedicated marketing and brand asset system for adult schools,",
     emphasis: "ready for daily team use.",
     subtitle:
-      "PhotoVault helps adult schools organize event media, protect brand consistency, and share approved assets faster across communications, enrollment, and district teams.",
+      "PhotoVault gives adult schools one secure place for approved photos, brand assets, campaign files, and social-ready media without trying to replace Google Drive for general documents.",
     primaryCta: "Book a 20-minute demo",
     secondaryCta: "Client sign in",
-    trust: "Designed for school communications, enrollment campaigns, and district reporting workflows.",
+    trust: "Designed for school communications, enrollment campaigns, district reporting, and brand management workflows.",
     imageUrl: "",
   },
   trusted: {
@@ -140,7 +140,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
       {
         value: "3x",
         label: "Faster asset retrieval",
-        detail: "Teams find approved photos and files in seconds, not hours.",
+        detail: "Teams find approved marketing and brand assets in seconds, not hours.",
       },
       {
         value: "100%",
@@ -160,7 +160,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
     cards: [
       {
         title: "One Trusted Source",
-        body: "Keep school photos, logos, templates, and brand assets in one organized workspace instead of scattered drives.",
+        body: "Keep approved school photos, logos, templates, and campaign assets in one organized workspace instead of scattered folders and email threads.",
       },
       {
         title: "Role-Safe Permissions",
@@ -177,7 +177,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
       {
         label: "Daily Workflow",
         title: "Upload, Tag, Search, Share",
-        body: "Create event albums, upload quickly, apply metadata in bulk, and publish secure Share Album links with expiration dates and password controls.",
+        body: "Create event albums, upload approved photos, apply metadata in bulk, and publish secure Share Album links for marketing, communications, and enrollment teams.",
         bullets: [
           "Duplicate checks and upload queue visibility",
           "Metadata fields for campus, event type, photographer",
@@ -189,7 +189,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
       {
         label: "Brand Consistency",
         title: "Brand Portal + Appearance Controls",
-        body: "Keep branding consistent with a centralized Brand Portal for logos, iconography, documents, and school-specific Appearance settings.",
+        body: "Keep branding consistent with a centralized Brand Portal for logos, iconography, templates, and school-specific Appearance settings.",
         bullets: [
           "Per-school logo and color system",
           "Brand files accessible for staff and partners",
@@ -270,9 +270,9 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
     ],
   },
   cta: {
-    label: "Ready for a better school DAM?",
+    label: "Ready for a better school marketing asset system?",
     title: "The only enterprise-grade DAM built specifically for adult education.",
-    body: "Give every school a private, branded PhotoVault to organize, govern, and share approved media with confidence.",
+    body: "Give every school a private, branded PhotoVault for approved photos, brand assets, and campaign-ready media while keeping general files in the systems you already use.",
     primaryCta: "Request pricing",
     secondaryCta: "Existing client sign in",
   },

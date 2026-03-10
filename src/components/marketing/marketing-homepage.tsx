@@ -142,7 +142,7 @@ export default function MarketingHomepage() {
                     <span className="mockup-dot" />
                     <span className="mockup-dot" />
                     <span className="mockup-dot" />
-                    <span className="mockup-sidebar-label">School DAM</span>
+                    <span className="mockup-sidebar-label">School Brand Hub</span>
                   </div>
                   <div className="mockup-body">
                     <div className="mockup-sidebar">
