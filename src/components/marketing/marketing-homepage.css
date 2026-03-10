@@ -63,6 +63,8 @@
 .marketing-homepage .hero-visual { position: relative; animation: fadeUp .8s ease .3s both; }
 .marketing-homepage .hero-mockup { background: var(--white); border-radius: var(--radius-lg); box-shadow: 0 2px 4px rgba(0,0,0,.02), 0 8px 24px rgba(0,0,0,.06), 0 24px 60px rgba(0,0,0,.08); padding: 16px; position: relative; z-index: 2; }
 .marketing-homepage .hero-image { display: block; width: 100%; height: auto; max-height: 520px; object-fit: cover; border-radius: calc(var(--radius-lg) - 8px); }
+.marketing-homepage .hero-custom-image-shell { position: relative; z-index: 2; }
+.marketing-homepage .hero-image-transparent { max-height: none; object-fit: contain; border-radius: 0; filter: drop-shadow(0 18px 40px rgba(12,24,41,.14)); }
 .marketing-homepage .mockup-topbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--navy); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
 .marketing-homepage .mockup-dot { width: 8px; height: 8px; border-radius: 50%; }
 .marketing-homepage .mockup-dot:nth-child(1) { background: #ff5f57; }
@@ -190,6 +192,7 @@
   .marketing-homepage .hero-visual { order: 1; }
   .marketing-homepage h1 { font-size: 48px; }
   .marketing-homepage .hero-float-badge { left: 0; bottom: 16px; }
+  .marketing-homepage .hero-image-transparent { max-width: 100%; }
   .marketing-homepage .why-grid, .marketing-homepage .testimonial-grid, .marketing-homepage .metrics-grid, .marketing-homepage .security-grid, .marketing-homepage .how-grid { grid-template-columns: 1fr; }
   .marketing-homepage .feature-row { grid-template-columns: 1fr; gap: 30px; }
   .marketing-homepage .feature-row.reverse .feature-visual { order: 0; }
