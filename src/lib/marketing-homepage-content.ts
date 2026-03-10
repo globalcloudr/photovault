@@ -45,6 +45,7 @@ export type MarketingHomepageContent = {
     testimonialsText: string;
     signInText: string;
     bookDemoText: string;
+    bookDemoUrl: string;
   };
   hero: {
     badge: string;
@@ -109,6 +110,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
     testimonialsText: "Testimonials",
     signInText: "Sign in",
     bookDemoText: "Book a demo",
+    bookDemoUrl: "",
   },
   hero: {
     badge: "Built Specifically for Adult Education",
@@ -400,6 +402,7 @@ export function normalizeMarketingHomepageContent(input: unknown): MarketingHome
       testimonialsText: asString(nav.testimonialsText, defaultMarketingHomepageContent.nav.testimonialsText),
       signInText: asString(nav.signInText, defaultMarketingHomepageContent.nav.signInText),
       bookDemoText: asString(nav.bookDemoText, defaultMarketingHomepageContent.nav.bookDemoText),
+      bookDemoUrl: asString(nav.bookDemoUrl, defaultMarketingHomepageContent.nav.bookDemoUrl),
     },
     hero: {
       badge: asString(hero.badge, defaultMarketingHomepageContent.hero.badge),

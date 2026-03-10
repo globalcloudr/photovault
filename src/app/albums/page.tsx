@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useOrg } from "@/components/org/org-provider";
 import { IconGrid, IconList } from "@/components/ui/icons";
-import { formatDateMDY } from "@/lib/date-format";
+import { formatDateMDY, formatDateTimeMDY } from "@/lib/date-format";
 
 const COVER_PREFS_KEY = "album_cover_storage_paths_v1";
 const ALBUMS_VIEW_MODE_KEY = "albums_view_mode_v1";
@@ -32,6 +32,16 @@ type AssetThumb = {
   sequence_number: number;
   size_bytes: number;
   thumbUrl?: string | null;
+};
+
+type ShareLinkRow = {
+  id: string;
+  token: string | null;
+  expires_at: string | null;
+  allow_download: boolean | null;
+  password_hash: string | null;
+  revoked_at: string | null;
+  created_at: string;
 };
 
 function formatRightsLabel(rightsStatus: string) {
@@ -105,6 +115,14 @@ export default function AlbumsPage() {
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">(readInitialAlbumsSortMode);
   const [viewMode, setViewMode] = useState<"grid" | "list">(readInitialAlbumsViewMode);
   const [rightsFilter, setRightsFilter] = useState<"all" | "ok_for_marketing" | "internal_only" | "do_not_use" | "unknown">("all");
+  const [shareAlbumId, setShareAlbumId] = useState<string | null>(null);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [creatingShare, setCreatingShare] = useState(false);
+  const [shareLinksByAlbumId, setShareLinksByAlbumId] = useState<Record<string, ShareLinkRow[]>>({});
+  const [shareAllowDownload, setShareAllowDownload] = useState(true);
+  const [sharePassword, setSharePassword] = useState("");
+  const [shareExpiresAt, setShareExpiresAt] = useState("");
+  const [shareExpiresInputType, setShareExpiresInputType] = useState<"text" | "date">("text");
 
   useEffect(() => {
     try {
@@ -215,6 +233,13 @@ export default function AlbumsPage() {
 
   const pickerAssets = pickerAlbumId ? assetsByAlbumId[pickerAlbumId] ?? [] : [];
   const selectedPickerCoverId = pickerAlbumId ? coverByAlbumId[pickerAlbumId]?.id ?? null : null;
+  const shareLinks = useMemo(() => {
+    if (!shareAlbumId) return [];
+    return shareLinksByAlbumId[shareAlbumId] ?? [];
+  }, [shareAlbumId, shareLinksByAlbumId]);
+  const activeShareLinks = useMemo(() => shareLinks.filter((link) => !link.revoked_at), [shareLinks]);
+  const revokedShareLinksCount = useMemo(() => shareLinks.filter((link) => Boolean(link.revoked_at)).length, [shareLinks]);
+  const shareAlbum = useMemo(() => (shareAlbumId ? albums.find((a) => a.id === shareAlbumId) ?? null : null), [albums, shareAlbumId]);
   const noActiveOrg = !orgLoading && !activeOrgId;
   const filteredAlbums = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -264,6 +289,117 @@ export default function AlbumsPage() {
       ),
     [assetsByAlbumId]
   );
+
+  async function loadShareLinks(albumId: string) {
+    if (!activeOrgId) return;
+    const { data, error } = await supabase
+      .from("share_links")
+      .select("id,token,expires_at,allow_download,password_hash,revoked_at,created_at")
+      .eq("album_id", albumId)
+      .eq("org_id", activeOrgId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setShareStatus(`Share links unavailable: ${error.message}`);
+      return;
+    }
+
+    setShareLinksByAlbumId((prev) => ({
+      ...prev,
+      [albumId]: (data ?? []) as ShareLinkRow[],
+    }));
+  }
+
+  async function openShareModal(albumId: string) {
+    setShareAlbumId(albumId);
+    setShareAllowDownload(true);
+    setSharePassword("");
+    setShareExpiresAt("");
+    setShareExpiresInputType("text");
+    setShareStatus(null);
+    await loadShareLinks(albumId);
+  }
+
+  async function createShareLink() {
+    if (!activeOrgId || !shareAlbumId) return;
+    setCreatingShare(true);
+    setShareStatus(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setShareStatus("Not authenticated. Please sign in again.");
+        return;
+      }
+
+      const response = await fetch("/api/share-links", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          orgId: activeOrgId,
+          albumId: shareAlbumId,
+          allowDownload: shareAllowDownload,
+          password: sharePassword || undefined,
+          expiresAt: shareExpiresAt ? `${shareExpiresAt}T23:59:59` : null,
+        }),
+      });
+
+      const body = (await response.json()) as { error?: string; url?: string };
+      if (!response.ok) {
+        setShareStatus(body.error ?? "Failed to create share link.");
+        return;
+      }
+
+      if (body.url) {
+        await navigator.clipboard.writeText(body.url);
+      }
+      setShareStatus(body.url ? "Share link created and copied to clipboard." : "Share link created.");
+      setSharePassword("");
+      setShareExpiresAt("");
+      setShareExpiresInputType("text");
+      await loadShareLinks(shareAlbumId);
+    } catch (error) {
+      setShareStatus(`Failed to create share link: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setCreatingShare(false);
+    }
+  }
+
+  async function revokeShareLink(linkId: string) {
+    if (!activeOrgId || !shareAlbumId) return;
+    setShareStatus(null);
+    const confirmed = window.confirm("Revoke this share link?");
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("share_links")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", linkId)
+      .eq("org_id", activeOrgId);
+
+    if (error) {
+      setShareStatus(`Failed to revoke link: ${error.message}`);
+      return;
+    }
+
+    setShareStatus("Share link revoked.");
+    setShareLinksByAlbumId((prev) => {
+      const items = prev[shareAlbumId] ?? [];
+      return {
+        ...prev,
+        [shareAlbumId]: items.map((x) => (x.id === linkId ? { ...x, revoked_at: new Date().toISOString() } : x)),
+      };
+    });
+  }
+
+  async function copyShareLink(token: string) {
+    const url = `${window.location.origin}/share/${token}`;
+    await navigator.clipboard.writeText(url);
+    setShareStatus("Share link copied.");
+  }
 
   return (
     <MediaWorkspaceShell
@@ -344,6 +480,11 @@ export default function AlbumsPage() {
             <Input
               placeholder="Search albums"
               value={search}
+              name="album-search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck={false}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
@@ -471,6 +612,14 @@ export default function AlbumsPage() {
                       >
                         Choose cover
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="cursor-pointer"
+                        onClick={() => void openShareModal(a.id)}
+                      >
+                        Share
+                      </Button>
                     </div>
                   </div>
                 </Card>
@@ -526,6 +675,14 @@ export default function AlbumsPage() {
                         onClick={() => setPickerAlbumId(a.id)}
                       >
                         Choose cover
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="cursor-pointer"
+                        onClick={() => void openShareModal(a.id)}
+                      >
+                        Share
                       </Button>
                     </div>
                   </div>
@@ -606,6 +763,113 @@ export default function AlbumsPage() {
                 })}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {shareAlbumId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75 p-6"
+          onClick={() => setShareAlbumId(null)}
+        >
+          <div
+            className="max-h-[85vh] w-full max-w-5xl overflow-auto rounded-2xl border border-slate-300 bg-white p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Share Album</h2>
+                <p className="text-sm text-slate-600">
+                  {shareAlbum ? `Create secure links for ${shareAlbum.event_name}.` : "Create secure links for this album."}
+                </p>
+              </div>
+              <Button size="sm" variant="secondary" onClick={() => setShareAlbumId(null)}>
+                Close
+              </Button>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={shareAllowDownload}
+                  onChange={(e) => setShareAllowDownload(e.target.checked)}
+                />
+                Allow download
+              </label>
+              <Input
+                type="password"
+                placeholder="Password (optional)"
+                value={sharePassword}
+                name="share-password"
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="none"
+                onChange={(e) => setSharePassword(e.target.value)}
+              />
+              <Input
+                type={shareExpiresInputType}
+                placeholder="Expiration Date"
+                value={shareExpiresAt}
+                name="share-expiration-date"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                onFocus={() => setShareExpiresInputType("date")}
+                onBlur={() => {
+                  if (!shareExpiresAt) setShareExpiresInputType("text");
+                }}
+                onChange={(e) => setShareExpiresAt(e.target.value)}
+                aria-label="Expiration Date"
+              />
+              <Button variant="primary" onClick={createShareLink} disabled={creatingShare}>
+                {creatingShare ? "Creating…" : "Create share link"}
+              </Button>
+            </div>
+
+            <p className="mt-2 text-xs text-slate-500">
+              Revoked/expired links are retained for audit for up to 1 year.
+            </p>
+            {shareStatus ? <p className="mt-2 text-xs text-slate-600">{shareStatus}</p> : null}
+
+            <div className="mt-3 space-y-2">
+              {activeShareLinks.length === 0 ? (
+                <p className="text-xs text-slate-500">No share links created yet.</p>
+              ) : (
+                activeShareLinks.map((link) => (
+                  <div key={link.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-slate-200 px-3 py-2">
+                    <div>
+                      <p className="text-xs font-medium text-slate-700">
+                        {link.expires_at ? `Expires ${formatDateMDY(link.expires_at)}` : "No expiry"}
+                        {" • "}
+                        {link.allow_download ? "Download enabled" : "Download disabled"}
+                        {" • "}
+                        {link.password_hash ? "Password protected" : "No password"}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        Created {formatDateTimeMDY(link.created_at)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {link.token ? (
+                        <Button size="sm" variant="secondary" onClick={() => void copyShareLink(link.token!)}>
+                          Copy link
+                        </Button>
+                      ) : null}
+                      <Button size="sm" variant="danger" onClick={() => void revokeShareLink(link.id)}>
+                        Revoke
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+              {revokedShareLinksCount > 0 ? (
+                <p className="text-xs text-slate-400">
+                  {revokedShareLinksCount} revoked {revokedShareLinksCount === 1 ? "link is" : "links are"} hidden.
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
       )}

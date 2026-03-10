@@ -264,6 +264,16 @@ export default function SuperAdminHomepageCmsPage() {
       <Card className="p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Hero</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-slate-800">Book demo URL (Calendly)</label>
+            <Input
+              className="mt-1.5"
+              value={content.nav.bookDemoUrl}
+              onChange={(e) => setPath("nav.bookDemoUrl", e.target.value)}
+              placeholder="https://calendly.com/your-handle/your-event"
+            />
+            <p className="mt-1 text-xs text-slate-500">Used by the top nav and hero Book demo buttons.</p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-800">Badge</label>
             <Input className="mt-1.5" value={content.hero.badge} onChange={(e) => setPath("hero.badge", e.target.value)} />

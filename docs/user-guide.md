@@ -65,6 +65,9 @@ You can upload in two ways:
 
 Notes:
 - upload supports image files
+- phone upload is supported (photo library/files, depending on your device/browser)
+- folder upload is not supported yet (select files instead)
+- there is no fixed in-app max file count per upload right now; for best reliability, use smaller batches on slower devices/networks
 - files are added in sequence order
 - upload queue shows progress and duplicate detection feedback
 

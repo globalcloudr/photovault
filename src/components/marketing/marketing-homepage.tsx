@@ -74,6 +74,8 @@ export default function MarketingHomepage() {
   const testimonials = content.testimonials.items.slice(0, 3);
   const securityItems = content.security.items.slice(0, 6);
   const howSteps = content.howItWorks.steps.slice(0, 3);
+  const demoHref = content.nav.bookDemoUrl.trim() || "#cta";
+  const demoExternal = /^https?:\/\//i.test(demoHref);
 
   return (
     <main className="marketing-homepage">
@@ -87,7 +89,12 @@ export default function MarketingHomepage() {
           <Link href="/login" className="btn-signin">
             {content.nav.signInText}
           </Link>
-          <a href="#cta" className="btn-demo">
+          <a
+            href={demoHref}
+            className="btn-demo"
+            target={demoExternal ? "_blank" : undefined}
+            rel={demoExternal ? "noopener noreferrer" : undefined}
+          >
             {content.nav.bookDemoText}
           </a>
         </div>
@@ -105,7 +112,12 @@ export default function MarketingHomepage() {
             </h1>
             <p className="hero-sub">{content.hero.subtitle}</p>
             <div className="hero-actions">
-              <a href="#cta" className="btn-primary">
+              <a
+                href={demoHref}
+                className="btn-primary"
+                target={demoExternal ? "_blank" : undefined}
+                rel={demoExternal ? "noopener noreferrer" : undefined}
+              >
                 {content.hero.primaryCta}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14" />

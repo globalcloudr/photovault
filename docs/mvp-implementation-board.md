@@ -484,8 +484,8 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - limit checks enforced server-side
   - over-limit behavior is clear in UI/API responses
 
-### PV-025: Vercel Deployment + Production Readiness
-- Goal: Deploy PhotoVault to Vercel with stable production configuration.
+### PV-025: Vercel Production Deployment (Go-Live)
+- Goal: Push approved build to production Vercel environment after beta sign-off and readiness review.
 - Scope:
   - connect repository to Vercel project
   - configure environment variables for production:
@@ -577,12 +577,219 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - Vercel project settings
   - Supabase Auth URL settings
   - `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
+  - `/Users/zylstra/Documents/photovault/docs/private-beta-deployment-checklist.md`
   - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
 - Acceptance:
   - beta URL is stable and accessible to invited schools
   - invite/login/reset flows work against beta URL
   - feedback collected from at least 2 pilot schools
   - top beta issues are prioritized before production cutover
+
+### PV-030: Production Readiness Code Review Gate (Pre-Go-Live)
+- Goal: Verify codebase is production-ready before final Vercel production deployment.
+- Scope:
+  - run full engineering readiness review:
+    - lint/type/test checks
+    - route smoke tests for core flows
+    - security review pass (RLS/policies/env exposure/service-role usage)
+    - performance sanity checks (largest pages/routes)
+    - error-state review (loading/retry/failure paths)
+  - verify docs/ops readiness:
+    - migration history complete
+    - rollback notes present for latest critical changes
+    - environment variable inventory is current
+- Files:
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+  - `/Users/zylstra/Documents/photovault/README.md`
+  - optional release checklist doc under `/Users/zylstra/Documents/photovault/docs/`
+- Acceptance:
+  - production-readiness checklist is complete and signed off
+  - open critical/high issues = 0
+  - explicit go/no-go decision recorded before PV-025
+
+### PV-034: Cloudflare Production Hardening
+- Goal: Add edge/network protection appropriate for school clients before production launch.
+- Scope:
+  - connect production domain through Cloudflare
+  - enable SSL/TLS and verify secure origin configuration
+  - configure WAF protections for common web attack classes
+  - add rate limiting and bot mitigation for sensitive routes where appropriate
+  - verify caching rules do not interfere with authenticated app flows
+  - document production DNS and traffic-routing setup
+- Files/Systems:
+  - Cloudflare zone settings
+  - production domain DNS records
+  - Vercel domain settings
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+- Acceptance:
+  - production domain is proxied through Cloudflare with valid TLS
+  - WAF/rate-limiting rules are active and tested
+  - authenticated app routes continue to work correctly behind Cloudflare
+  - DNS and security configuration are documented for operations
+
+## Phase 4: Product Roadmap (AI)
+
+### AI-01: Metadata Q&A Assistant
+- Goal: Let users query PhotoVault albums/assets with natural language while staying within org and role boundaries.
+- Scope:
+  - natural-language Q&A over structured metadata:
+    - albums, photos, tags, event type, campus, photographer, rights status, dates
+  - return actionable answers + linked result sets (open album/photos view)
+  - support common prompts:
+    - "show all graduation photos from San Mateo campus"
+    - "find marketing-ready photos from last quarter"
+    - "which albums have no tags yet?"
+- Acceptance:
+  - responses are org-scoped and role-safe (no cross-org leakage)
+  - assistant output maps to existing filters/views in app
+  - incorrect/ambiguous prompts return safe fallback guidance
+
+### AI-02: Internal Knowledge Assistant
+- Goal: Provide in-app help for school teams using internal docs and guidance content.
+- Scope:
+  - retrieval over approved internal knowledge:
+    - `docs/user-guide.md` (primary launch source)
+    - SOPs, Brand Portal guidance, onboarding docs
+  - answer "how do I…" questions contextually inside PhotoVault
+  - role-aware guidance for `owner`, `uploader`, `viewer`
+  - deep-link answers to the exact route/action when possible (for example `/albums`, `/albums/[id]`, `/settings/profile`, `/collections/brand-guidelines`)
+  - include audit-aware help patterns for governance actions
+- Acceptance:
+  - answers are grounded in approved sources with clear references
+  - org/role boundaries are enforced for any scoped knowledge content
+  - assistant can route users to the correct app page/workflow via direct links
+
+### PV-031: Integrations Hub (Google Drive + External Connectors)
+- Goal: Provide a centralized Integrations page where organizations can connect approved external storage/services.
+- Scope:
+  - add `Integrations` page in settings/super-admin context
+  - support connection management lifecycle:
+    - connect
+    - view status
+    - disconnect/revoke
+  - initial connector targets:
+    - Google Drive
+    - placeholder architecture for additional providers (Dropbox, OneDrive, Box, etc.)
+  - define sync/import behavior per connector (manual import first, scheduled sync later)
+  - include audit events for connect/disconnect/import actions
+- Files:
+  - new integrations UI route under `/Users/zylstra/Documents/photovault/src/app/`
+  - connector API routes under `/Users/zylstra/Documents/photovault/src/app/api/`
+  - credentials/token storage model (encrypted/secure handling)
+- Acceptance:
+  - org owner (and super admin as designed) can connect/disconnect providers
+  - provider access is org-scoped and role-safe
+  - connection failures show actionable error states
+  - imported files/assets preserve org boundaries and audit visibility
+
+### PV-032: Customer-Facing Product Roadmap Page (High-Level)
+- Goal: Provide users with a clear, non-technical view of product direction to build trust and transparency.
+- Scope:
+  - add a lightweight in-app page (or public page) with three sections:
+    - `Now shipping`
+    - `Up next`
+    - `Exploring`
+  - keep content benefit-focused and non-technical
+  - avoid internal implementation details, security internals, or hard launch dates
+  - include a feedback link to capture user interest/priorities
+- Files:
+  - new route/page under `/Users/zylstra/Documents/photovault/src/app/`
+  - optional content source in docs/CMS for easy updates
+- Acceptance:
+  - roadmap language is customer-safe and easy to scan
+  - content can be updated without engineering-heavy changes
+  - page improves roadmap visibility without overcommitting timelines
+
+### PV-033: TinaCMS Integration (SuperAdmin-Only Marketing + Help Content)
+- Goal: Enable Git-based content workflows for marketing/help pages, editable by Super Admin only.
+- Scope:
+  - integrate TinaCMS for content collections such as:
+    - homepage marketing copy
+    - help/user-facing docs
+    - customer-facing roadmap/changelog copy
+  - restrict Tina editor access to Super Admin users only
+  - keep operational app data in Supabase (no DAM runtime data in Tina)
+  - publish via Git commits + standard Vercel deployment flow
+- Files/Systems:
+  - Tina config and schema files in repository
+  - marketing/help page renderers that read Tina-managed content
+  - auth/guard wiring for super-admin-only editor access
+- Acceptance:
+  - Super Admin can edit approved content collections without direct code edits
+  - non-super-admin users cannot access Tina editor
+  - content changes are versioned in Git and deploy through normal pipeline
+  - albums/photos/users/share/runtime DAM data remains Supabase-managed
+
+### PV-035: Paper.design Evaluation for Marketing Workflow
+- Goal: Evaluate whether Paper.design improves homepage/marketing design iteration without disrupting the current implementation workflow.
+- Scope:
+  - test Paper.design on one marketing page flow such as homepage or roadmap page
+  - verify fit with the current VS Code/Codex workflow
+  - compare iteration speed and output quality against the direct build approach
+  - document whether Paper.design should be adopted, limited to experiments, or rejected
+- Files/Systems:
+  - Paper.design evaluation notes
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+- Acceptance:
+  - one real evaluation pass completed
+  - decision recorded: adopt, defer, or reject
+  - no dependency added to the runtime app architecture without explicit approval
+
+### PV-037: Internal Component Library + Design System Pass
+- Goal: Turn recurring PhotoVault UI patterns into a reusable component system that improves consistency and speeds up future products.
+- Scope:
+  - identify and standardize core UI primitives:
+    - buttons
+    - inputs
+    - selects
+    - badges/chips
+    - cards
+    - modals
+    - drawers
+    - menus
+  - extract recurring app patterns into reusable components:
+    - search/sort/view toolbar
+    - empty states
+    - album cards
+    - photo cards
+    - profile menu
+    - settings panels
+  - document visual and behavioral rules for reuse
+  - evaluate component-system tooling for future adoption, including:
+    - `shadcn/ui`
+    - `Radix UI`
+    - `HeroUI`
+- Files:
+  - shared UI components under `/Users/zylstra/Documents/photovault/src/components/`
+  - style/design-system notes under `/Users/zylstra/Documents/photovault/docs/`
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+- Acceptance:
+  - repeated UI patterns are consolidated into reusable components
+  - design behavior is more consistent across app surfaces
+  - future product builds can reuse documented component decisions
+  - tooling recommendation recorded: adopt, partially adopt, or keep custom approach
+
+### PV-036: Post-Launch Lessons Learned + Build Workflow Retrospective
+- Goal: Capture what worked, what slowed delivery, and what should change before building the next product.
+- Scope:
+  - document lessons learned across:
+    - planning and sequencing
+    - design iteration workflow
+    - SQL migration workflow
+    - frontend build patterns
+    - deployment/release process
+    - beta feedback and issue triage
+    - documentation quality and maintenance
+  - identify repeatable patterns worth standardizing for future products
+  - identify avoidable mistakes and process gaps
+  - produce a concise recommendations list for the next build
+- Files:
+  - new retrospective doc under `/Users/zylstra/Documents/photovault/docs/`
+  - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
+- Acceptance:
+  - lessons learned document exists and is actionable
+  - improvements are grouped into “keep”, “change”, and “avoid next time”
+  - next-product workflow recommendations are clear enough to reuse directly
 
 ## Sequential Delivery Order (Lockstep)
 Follow this order sequentially. Do not skip ahead.
@@ -607,8 +814,18 @@ Follow this order sequentially. Do not skip ahead.
 18. PV-027 UI Consistency QA Checklist + Audit Pass
 19. PV-028 End-User Guide (PhotoVault Navigation + Tasks)
 20. PV-029 Private Beta Deployment + School Testing Cycle
-21. PV-025 Vercel Deployment + Production Readiness
-22. PV-018 Billing + Plan Boundaries (pre-paid onboarding gate)
+21. PV-030 Production Readiness Code Review Gate (Pre-Go-Live)
+22. PV-034 Cloudflare Production Hardening
+23. PV-025 Vercel Production Deployment (Go-Live)
+24. PV-018 Billing + Plan Boundaries (pre-paid onboarding gate)
+25. AI-01 Metadata Q&A Assistant
+26. AI-02 Internal Knowledge Assistant
+27. PV-031 Integrations Hub (Google Drive + External Connectors)
+28. PV-032 Customer-Facing Product Roadmap Page (High-Level)
+29. PV-033 TinaCMS Integration (SuperAdmin-Only Marketing + Help Content)
+30. PV-035 Paper.design Evaluation for Marketing Workflow
+31. PV-037 Internal Component Library + Design System Pass
+32. PV-036 Post-Launch Lessons Learned + Build Workflow Retrospective
 
 ### Temporary Execution Note (Approved)
 - Before starting PV-018, run a short beta validation cycle with selected schools.
@@ -620,8 +837,9 @@ Follow this order sequentially. Do not skip ahead.
 - In Progress: none
 - Deferred (intentional): PV-018 until beta feedback pass is complete
 - Next active step: Beta School Testing Pass (pre-PV-025/PV-018)
-- Remaining steps in lockstep sequence: 8
+- Remaining steps in lockstep sequence: 15
 - Beta checklist template: `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
+- Beta deployment checklist: `/Users/zylstra/Documents/photovault/docs/private-beta-deployment-checklist.md`
 
 ## Recent Completed Enhancements (Implemented)
 - Global workspace shell:
@@ -663,6 +881,10 @@ Follow this order sequentially. Do not skip ahead.
   - search moved to top toolbar
   - sort dropdown and view controls (`Grid`/`List`)
   - 4-column desktop grid for album cards
+  - album-level share flow moved from photo page to albums cards:
+    - `Share` button added next to `Choose cover` (grid + list cards)
+    - modal share management pattern aligned with `Choose cover` popup
+    - supports create/copy/revoke share links at album-card level
 - Photos page:
   - 4-column desktop grid for photo cards
   - redesigned photo cards with image-overlay actions (`Select`, `View`, `Download`, `More`)
@@ -676,6 +898,10 @@ Follow this order sequentially. Do not skip ahead.
     - save/cancel + unsaved-changes guard
     - read-only technical details (`created`, `updated`, format, size, dimensions, taken-at)
   - `Updated` timestamp is now DB-backed and persistent across refreshes (`assets.updated_at`)
+  - Share Album box removed from `/albums/[id]` after move to albums-level workflow
+  - added upload policy helper text clarifying:
+    - photos page accepts image uploads only
+    - PDF/doc uploads should use Brand Portal
 - Icon system:
   - shared icon primitives introduced and applied to sidebar nav + key action controls
 - Invite/setup experience:

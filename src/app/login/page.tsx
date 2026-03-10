@@ -47,8 +47,13 @@ export default function LoginPage() {
     setBusy(true);
     setStatus(null);
 
+    const redirectTo =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/reset-password`
+        : undefined;
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/reset-password",
+      redirectTo,
     });
 
     setBusy(false);

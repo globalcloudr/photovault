@@ -59,16 +59,6 @@ type UploadQueueItem = {
   message?: string;
 };
 
-type ShareLinkRow = {
-  id: string;
-  token: string | null;
-  expires_at: string | null;
-  allow_download: boolean | null;
-  password_hash: string | null;
-  revoked_at: string | null;
-  created_at: string;
-};
-
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   return String(error);
@@ -176,15 +166,6 @@ export default function AlbumDetailPage() {
 
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [shareStatus, setShareStatus] = useState<string | null>(null);
-  const [creatingShare, setCreatingShare] = useState(false);
-  const [shareLinks, setShareLinks] = useState<ShareLinkRow[]>([]);
-  const [shareAllowDownload, setShareAllowDownload] = useState(true);
-  const [sharePassword, setSharePassword] = useState("");
-  const [shareExpiresAt, setShareExpiresAt] = useState("");
-  const [shareExpiresInputType, setShareExpiresInputType] = useState<"text" | "date">("text");
-  const activeShareLinks = useMemo(() => shareLinks.filter((link) => !link.revoked_at), [shareLinks]);
-  const revokedShareLinksCount = useMemo(() => shareLinks.filter((link) => Boolean(link.revoked_at)).length, [shareLinks]);
   const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [bulkTagsText, setBulkTagsText] = useState("");
@@ -487,20 +468,6 @@ async function load() {
     const withThumbs = await signUrls(rows);
     setAssets(withThumbs);
 
-    const { data: linkData, error: linkError } = await supabase
-      .from("share_links")
-      .select("id,token,expires_at,allow_download,password_hash,revoked_at,created_at")
-      .eq("album_id", albumId)
-      .eq("org_id", activeOrgId)
-      .order("created_at", { ascending: false });
-
-    if (linkError) {
-      setShareLinks([]);
-      setShareStatus(`Share links unavailable: ${linkError.message}`);
-    } else {
-      setShareStatus(null);
-      setShareLinks((linkData ?? []) as ShareLinkRow[]);
-    }
   } catch (error: unknown) {
     setStatus(getErrorMessage(error) || "Failed to load album");
   } finally {
@@ -913,89 +880,6 @@ async function load() {
     }
   }
 
-  async function createShareLink() {
-    if (!activeOrgId || !albumId) return;
-    setCreatingShare(true);
-    setShareStatus(null);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (!accessToken) {
-        setShareStatus("Not authenticated. Please sign in again.");
-        return;
-      }
-
-      const response = await fetch("/api/share-links", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          orgId: activeOrgId,
-          albumId,
-          allowDownload: shareAllowDownload,
-          password: sharePassword || undefined,
-          expiresAt: shareExpiresAt ? `${shareExpiresAt}T23:59:59` : null,
-        }),
-      });
-
-      const body = (await response.json()) as { error?: string; url?: string };
-      if (!response.ok) {
-        setShareStatus(body.error ?? "Failed to create share link.");
-        return;
-      }
-
-      if (body.url) {
-        await navigator.clipboard.writeText(body.url);
-      }
-      setShareStatus(body.url ? "Share link created and copied to clipboard." : "Share link created.");
-      setSharePassword("");
-      setShareExpiresAt("");
-      setShareExpiresInputType("text");
-      await load();
-    } catch (error) {
-      setShareStatus(`Failed to create share link: ${getErrorMessage(error)}`);
-    } finally {
-      setCreatingShare(false);
-    }
-  }
-
-  async function revokeShareLink(linkId: string) {
-    if (!activeOrgId) return;
-    setShareStatus(null);
-    const confirmed = window.confirm("Revoke this share link?");
-    if (!confirmed) return;
-
-    const { error } = await supabase
-      .from("share_links")
-      .update({ revoked_at: new Date().toISOString() })
-      .eq("id", linkId)
-      .eq("org_id", activeOrgId);
-
-    if (error) {
-      setShareStatus(`Failed to revoke link: ${error.message}`);
-      return;
-    }
-
-    setShareStatus("Share link revoked.");
-    setShareLinks((prev) => prev.map((x) => (x.id === linkId ? { ...x, revoked_at: new Date().toISOString() } : x)));
-    void logAuditEventClient({
-      orgId: activeOrgId,
-      eventType: "share_link_revoked",
-      entityType: "share_link",
-      entityId: linkId,
-      metadata: {
-        albumId,
-      },
-    });
-  }
-
-  async function copyShareLink(token: string) {
-    const url = `${window.location.origin}/share/${token}`;
-    await navigator.clipboard.writeText(url);
-    setShareStatus("Share link copied.");
-  }
   function moveLightbox(delta: number) {
     if (!lightbox || assets.length === 0) return;
 
@@ -1131,6 +1015,10 @@ async function load() {
           </Card>
         ) : null}
 
+        <p className="mt-3 text-xs text-slate-500">
+          Upload policy: Photos supports image files only. Upload PDFs and other documents in Brand Portal.
+        </p>
+
         {album && (
           <Card className="overflow-hidden">
             <div className="relative h-36 overflow-hidden border-b border-slate-200 sm:h-44">
@@ -1155,88 +1043,6 @@ async function load() {
             </div>
           </Card>
         )}
-
-        <Card className="mt-4 border-slate-200 p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900">Share Album</h3>
-              <p className="mt-1 text-xs text-slate-500">
-                Create secure external links with expiry, optional password, and download control. Revoked/expired links are retained for audit for up to 1 year.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <label className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={shareAllowDownload}
-                onChange={(e) => setShareAllowDownload(e.target.checked)}
-              />
-              Allow download
-            </label>
-            <Input
-              type="password"
-              placeholder="Password (optional)"
-              value={sharePassword}
-              onChange={(e) => setSharePassword(e.target.value)}
-            />
-            <Input
-              type={shareExpiresInputType}
-              placeholder="Expiration Date"
-              value={shareExpiresAt}
-              onFocus={() => setShareExpiresInputType("date")}
-              onBlur={() => {
-                if (!shareExpiresAt) setShareExpiresInputType("text");
-              }}
-              onChange={(e) => setShareExpiresAt(e.target.value)}
-              aria-label="Expiration Date"
-            />
-            <Button variant="primary" onClick={createShareLink} disabled={creatingShare}>
-              {creatingShare ? "Creating…" : "Create share link"}
-            </Button>
-          </div>
-
-          {shareStatus ? <p className="mt-2 text-xs text-slate-600">{shareStatus}</p> : null}
-
-          <div className="mt-3 space-y-2">
-            {activeShareLinks.length === 0 ? (
-              <p className="text-xs text-slate-500">No share links created yet.</p>
-            ) : (
-              activeShareLinks.map((link) => (
-                <div key={link.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-slate-200 px-3 py-2">
-                  <div>
-                    <p className="text-xs font-medium text-slate-700">
-                      {link.expires_at ? `Expires ${formatDateMDY(link.expires_at)}` : "No expiry"}
-                      {" • "}
-                      {link.allow_download ? "Download enabled" : "Download disabled"}
-                      {" • "}
-                      {link.password_hash ? "Password protected" : "No password"}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Created {formatDateTimeMDY(link.created_at)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {link.token ? (
-                      <Button size="sm" variant="secondary" onClick={() => copyShareLink(link.token!)}>
-                        Copy link
-                      </Button>
-                    ) : null}
-                    <Button size="sm" variant="danger" onClick={() => revokeShareLink(link.id)}>
-                      Revoke
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-            {revokedShareLinksCount > 0 ? (
-              <p className="text-xs text-slate-400">
-                {revokedShareLinksCount} revoked {revokedShareLinksCount === 1 ? "link is" : "links are"} hidden.
-              </p>
-            ) : null}
-          </div>
-        </Card>
 
         <Card className="mt-4 p-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
