@@ -93,6 +93,7 @@ export default function BrandingSettingsPage() {
   useEffect(() => {
     if (orgLoading) return;
     if (!activeOrgId) return;
+    const orgId = activeOrgId;
 
     async function load() {
       setLoading(true);
@@ -110,7 +111,7 @@ export default function BrandingSettingsPage() {
         const { data: memberData, error: memberError } = await supabase
           .from("memberships")
           .select("role")
-          .eq("org_id", activeOrgId)
+          .eq("org_id", orgId)
           .eq("user_id", userId)
           .single();
 
@@ -127,7 +128,7 @@ export default function BrandingSettingsPage() {
       }
 
       try {
-        const theme = await fetchOrgThemeSettings(activeOrgId);
+        const theme = await fetchOrgThemeSettings(orgId);
         setForm(toFormState(theme));
         applyTheme(theme);
         setAllowed(true);
