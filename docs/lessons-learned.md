@@ -52,6 +52,19 @@ Use this document after launch to capture what should become standard for the ne
   - easier to troubleshoot
   - easier to redeploy safely
 
+### 4. Commit message guideline
+- Use a commit message that describes the main logical outcome of the change.
+- Good pattern:
+  - `Verb + outcome`
+- Examples:
+  - `Fix beta deployment TypeScript blockers`
+  - `Polish super admin card actions`
+  - `Update homepage demo CTA and login navigation`
+  - `Add private beta deployment checklist`
+- Practical rule:
+  - if one short sentence clearly describes the work, the commit is probably scoped well
+  - if the message needs many unrelated ideas joined together, the commit may be too broad
+
 ## Suggested Questions To Answer After Launch
 - What decisions saved the most time?
 - What caused the most rework?

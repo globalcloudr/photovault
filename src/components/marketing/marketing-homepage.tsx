@@ -633,6 +633,8 @@ export default function MarketingHomepage() {
           .marketing-homepage .nav-links { gap: 14px; }
           .marketing-homepage .nav-links a[href="#features"], .marketing-homepage .nav-links a[href="#testimonials"] { display: none; }
           .marketing-homepage .hero .container { grid-template-columns: 1fr; gap: 50px; }
+          .marketing-homepage .hero-text { order: 2; }
+          .marketing-homepage .hero-visual { order: 1; }
           .marketing-homepage h1 { font-size: 48px; }
           .marketing-homepage .hero-float-badge { left: 0; bottom: 16px; }
           .marketing-homepage .why-grid, .marketing-homepage .testimonial-grid, .marketing-homepage .metrics-grid, .marketing-homepage .security-grid, .marketing-homepage .how-grid { grid-template-columns: 1fr; }
