@@ -182,6 +182,46 @@ export default function SuperAdminHomepageCmsPage() {
     }
   }
 
+  async function uploadHeroImage(file: File) {
+    const slot = "hero";
+    setUploadingSlot(slot);
+    setStatus(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setStatus("Not authenticated. Please sign in again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("slot", slot);
+
+      const response = await fetch("/api/super-admin/marketing-homepage/upload-image", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+
+      const body = (await response.json()) as { error?: string; storageRef?: string };
+      if (!response.ok || !body.storageRef) {
+        setStatus(body.error ?? "Image upload failed.");
+        return;
+      }
+
+      setPath("hero.imageUrl", body.storageRef);
+      setStatus("Hero image uploaded. Save changes to publish.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setStatus("Image upload failed: " + message);
+    } finally {
+      setUploadingSlot(null);
+    }
+  }
+
   async function restoreVersion(versionId: number) {
     setBusy(true);
     setStatus(null);
@@ -301,6 +341,29 @@ export default function SuperAdminHomepageCmsPage() {
           <div>
             <label className="block text-sm font-medium text-slate-800">Secondary CTA</label>
             <Input className="mt-1.5" value={content.hero.secondaryCta} onChange={(e) => setPath("hero.secondaryCta", e.target.value)} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-slate-800">Hero image URL</label>
+            <Input
+              className="mt-1.5"
+              value={content.hero.imageUrl}
+              onChange={(e) => setPath("hero.imageUrl", e.target.value)}
+              placeholder="/images/home/hero.jpg or storage://..."
+            />
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void uploadHeroImage(file);
+                  e.currentTarget.value = "";
+                }}
+                className="text-xs text-slate-600"
+              />
+              {uploadingSlot === "hero" ? <span className="text-xs text-slate-500">Uploading…</span> : null}
+            </div>
+            <p className="mt-1 text-xs text-slate-500">If empty, the current mockup illustration remains in place.</p>
           </div>
         </div>
       </Card>

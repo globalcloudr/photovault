@@ -133,57 +133,64 @@ export default function MarketingHomepage() {
 
           <div className="hero-visual">
             <div className="hero-mockup">
-              <div className="mockup-topbar">
-                <span className="mockup-dot" />
-                <span className="mockup-dot" />
-                <span className="mockup-dot" />
-                <span className="mockup-sidebar-label">School DAM</span>
-              </div>
-              <div className="mockup-body">
-                <div className="mockup-sidebar">
-                  <div className="sidebar-item active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <rect x="3" y="3" width="7" height="7" />
-                      <rect x="14" y="3" width="7" height="7" />
-                      <rect x="3" y="14" width="7" height="7" />
-                      <rect x="14" y="14" width="7" height="7" />
-                    </svg>
-                    Albums
+              {content.hero.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={content.hero.imageUrl} alt="PhotoVault hero preview" className="hero-image" />
+              ) : (
+                <>
+                  <div className="mockup-topbar">
+                    <span className="mockup-dot" />
+                    <span className="mockup-dot" />
+                    <span className="mockup-dot" />
+                    <span className="mockup-sidebar-label">School DAM</span>
                   </div>
-                  <div className="sidebar-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 8v8" />
-                      <path d="M8 12h8" />
-                    </svg>
-                    Brand Portal
+                  <div className="mockup-body">
+                    <div className="mockup-sidebar">
+                      <div className="sidebar-item active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <rect x="3" y="3" width="7" height="7" />
+                          <rect x="14" y="3" width="7" height="7" />
+                          <rect x="3" y="14" width="7" height="7" />
+                          <rect x="14" y="14" width="7" height="7" />
+                        </svg>
+                        Albums
+                      </div>
+                      <div className="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 8v8" />
+                          <path d="M8 12h8" />
+                        </svg>
+                        Brand Portal
+                      </div>
+                      <div className="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                        </svg>
+                        Share Album
+                      </div>
+                      <div className="sidebar-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                        Audit Logs
+                      </div>
+                    </div>
+                    <div className="mockup-grid">
+                      <div className="grid-thumb bg1" />
+                      <div className="grid-thumb bg2" />
+                      <div className="grid-thumb bg3" />
+                      <div className="grid-thumb grid-thumb-wide bg4" />
+                      <div className="grid-thumb bg5" />
+                      <div className="grid-thumb bg6" />
+                      <div className="grid-thumb bg7" />
+                      <div className="grid-thumb bg8" />
+                    </div>
                   </div>
-                  <div className="sidebar-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                    </svg>
-                    Share Album
-                  </div>
-                  <div className="sidebar-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    Audit Logs
-                  </div>
-                </div>
-                <div className="mockup-grid">
-                  <div className="grid-thumb bg1" />
-                  <div className="grid-thumb bg2" />
-                  <div className="grid-thumb bg3" />
-                  <div className="grid-thumb grid-thumb-wide bg4" />
-                  <div className="grid-thumb bg5" />
-                  <div className="grid-thumb bg6" />
-                  <div className="grid-thumb bg7" />
-                  <div className="grid-thumb bg8" />
-                </div>
-              </div>
+                </>
+              )}
             </div>
             <div className="hero-float-badge">
               <div className="float-icon">
@@ -510,6 +517,7 @@ export default function MarketingHomepage() {
         }
         .marketing-homepage .hero-visual { position: relative; animation: fadeUp .8s ease .3s both; }
         .marketing-homepage .hero-mockup { background: var(--white); border-radius: var(--radius-lg); box-shadow: 0 2px 4px rgba(0,0,0,.02), 0 8px 24px rgba(0,0,0,.06), 0 24px 60px rgba(0,0,0,.08); padding: 16px; position: relative; z-index: 2; }
+        .marketing-homepage .hero-image { display: block; width: 100%; height: auto; max-height: 520px; object-fit: cover; border-radius: calc(var(--radius-lg) - 8px); }
         .marketing-homepage .mockup-topbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--navy); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
         .marketing-homepage .mockup-dot { width: 8px; height: 8px; border-radius: 50%; }
         .marketing-homepage .mockup-dot:nth-child(1) { background: #ff5f57; }

@@ -40,6 +40,18 @@ export async function GET() {
 
     const content = normalizeMarketingHomepageContent(data?.content ?? defaultMarketingHomepageContent);
 
+    const heroStorageRef = parseStorageRef(content.hero.imageUrl);
+    let signedHeroImageUrl = content.hero.imageUrl;
+    if (heroStorageRef) {
+      const { data: signedHeroData, error: signedHeroError } = await adminSupabase.storage
+        .from(heroStorageRef.bucket)
+        .createSignedUrl(heroStorageRef.path, 60 * 60 * 24);
+
+      if (!signedHeroError && signedHeroData?.signedUrl) {
+        signedHeroImageUrl = signedHeroData.signedUrl;
+      }
+    }
+
     const signedFeatures = await Promise.all(
       content.features.items.map(async (feature) => {
         const storageRef = parseStorageRef(feature.imageUrl);
@@ -61,6 +73,10 @@ export async function GET() {
       {
         content: {
           ...content,
+          hero: {
+            ...content.hero,
+            imageUrl: signedHeroImageUrl,
+          },
           features: {
             ...content.features,
             items: signedFeatures,

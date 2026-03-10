@@ -55,6 +55,7 @@ export type MarketingHomepageContent = {
     primaryCta: string;
     secondaryCta: string;
     trust: string;
+    imageUrl: string;
   };
   trusted: {
     label: string;
@@ -121,6 +122,7 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
     primaryCta: "Book a 20-minute demo",
     secondaryCta: "Client sign in",
     trust: "Designed for school communications, enrollment campaigns, and district reporting workflows.",
+    imageUrl: "",
   },
   trusted: {
     label: "Trusted by adult education teams including",
@@ -412,6 +414,7 @@ export function normalizeMarketingHomepageContent(input: unknown): MarketingHome
       primaryCta: asString(hero.primaryCta, defaultMarketingHomepageContent.hero.primaryCta),
       secondaryCta: asString(hero.secondaryCta, defaultMarketingHomepageContent.hero.secondaryCta),
       trust: asString(hero.trust, defaultMarketingHomepageContent.hero.trust),
+      imageUrl: typeof hero.imageUrl === "string" ? hero.imageUrl.trim() : defaultMarketingHomepageContent.hero.imageUrl,
     },
     trusted: {
       label: asString(trusted.label, defaultMarketingHomepageContent.trusted.label),
