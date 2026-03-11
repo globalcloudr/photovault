@@ -334,6 +334,10 @@ export default function AlbumsPage() {
         : 0,
     [assetsByAlbumId, editingAlbum]
   );
+  const editingAlbumCover = useMemo(
+    () => (editingAlbum ? coverByAlbumId[editingAlbum.id] ?? null : null),
+    [coverByAlbumId, editingAlbum]
+  );
   const departmentLabelById = useMemo(
     () =>
       Object.fromEntries(
@@ -1226,6 +1230,24 @@ export default function AlbumsPage() {
 
             <div className="space-y-5 px-4 py-4 pb-28 sm:px-5 sm:py-5 sm:pb-24">
               <div>
+                <p className="mb-2 text-sm font-semibold text-slate-900">Preview</p>
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                  {editingAlbumCover?.thumbUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={editingAlbumCover.thumbUrl}
+                      alt={`${editingAlbum.event_name} cover`}
+                      className="aspect-[16/10] w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex aspect-[16/10] w-full items-center justify-center text-sm text-slate-500">
+                      No cover selected
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-900">Album name</label>
                 <Input
                   value={albumEditorName}
@@ -1302,32 +1324,6 @@ export default function AlbumsPage() {
                     <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
                       <dt className="text-slate-500">Storage used</dt>
                       <dd className="text-slate-800">{formatBytes(editingAlbumStorageBytes)}</dd>
-                    </div>
-                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
-                      <dt className="text-slate-500">Cover photo</dt>
-                      <dd className="text-slate-800">
-                        {coverByAlbumId[editingAlbum.id] ? (
-                          <div className="space-y-2">
-                            <div className="h-28 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100 sm:w-48">
-                              {coverByAlbumId[editingAlbum.id]?.thumbUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={coverByAlbumId[editingAlbum.id]!.thumbUrl ?? ""}
-                                  alt={`${editingAlbum.event_name} cover`}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
-                                  No preview
-                                </div>
-                              )}
-                            </div>
-                            <p>{coverByAlbumId[editingAlbum.id]?.canonical_filename}</p>
-                          </div>
-                        ) : (
-                          "Not selected"
-                        )}
-                      </dd>
                     </div>
                   </dl>
                 </div>
