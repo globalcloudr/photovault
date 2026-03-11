@@ -97,13 +97,13 @@
 .marketing-homepage .float-label { font-size: 11px; color: var(--slate); }
 .marketing-homepage .float-value { font-size: 15px; font-weight: 700; color: var(--navy); }
 .marketing-homepage .why { padding: 100px 0; position: relative; }
-.marketing-homepage .why-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 420px); gap: 40px; align-items: center; margin-bottom: 56px; }
+.marketing-homepage .why-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 400px); gap: 32px; align-items: center; margin-bottom: 56px; }
 .marketing-homepage .why-heading-group { min-width: 0; }
 .marketing-homepage .section-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--teal-dim); margin-bottom: 16px; }
 .marketing-homepage .section-title { font-family: var(--font-dm-serif-display), Georgia, serif; font-size: 52px; line-height: 1.12; color: var(--navy); letter-spacing: -1px; margin-bottom: 0; max-width: 680px; }
-.marketing-homepage .why-visual-cluster { position: relative; min-height: 330px; }
+.marketing-homepage .why-visual-cluster { position: relative; min-height: 310px; max-width: 360px; margin: -8px auto 0; }
 .marketing-homepage .why-cluster-card { position: absolute; background: rgba(255,255,255,.92); border: 1px solid rgba(12,24,41,.08); border-radius: 26px; box-shadow: 0 14px 45px rgba(12,24,41,.08); backdrop-filter: blur(10px); }
-.marketing-homepage .why-cluster-album { top: 18px; right: 30px; width: 290px; padding: 18px; transform: rotate(-4deg); }
+.marketing-homepage .why-cluster-album { top: 0; right: 18px; width: 278px; padding: 18px; transform: rotate(-4deg); }
 .marketing-homepage .why-cluster-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .marketing-homepage .why-cluster-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); display: inline-block; }
 .marketing-homepage .why-cluster-line { height: 8px; border-radius: 999px; background: rgba(22,34,64,.12); display: inline-block; }
@@ -112,7 +112,7 @@
 .marketing-homepage .why-photo-tile { height: 76px; border-radius: 18px; display: block; box-shadow: inset 0 0 0 1px rgba(255,255,255,.28); }
 .marketing-homepage .why-photo-tile.wide { grid-column: 1 / -1; height: 94px; }
 .marketing-homepage .why-cluster-pill { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; background: rgba(45,212,168,.12); color: var(--teal-dim); font-size: 14px; font-weight: 700; }
-.marketing-homepage .why-cluster-brand { left: 14px; bottom: 24px; width: 220px; padding: 22px; transform: rotate(3deg); }
+.marketing-homepage .why-cluster-brand { left: 18px; bottom: 42px; width: 214px; padding: 20px; transform: rotate(3deg); }
 .marketing-homepage .why-cluster-brand-mark { font-family: var(--font-dm-serif-display), Georgia, serif; font-size: 54px; line-height: 1; color: var(--navy); margin-bottom: 18px; letter-spacing: -.04em; }
 .marketing-homepage .why-cluster-swatch-row { display: flex; gap: 10px; margin-bottom: 16px; }
 .marketing-homepage .why-swatch { width: 34px; height: 34px; border-radius: 12px; display: inline-block; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
@@ -120,11 +120,11 @@
 .marketing-homepage .why-swatch.teal { background: linear-gradient(135deg, #2dd4a8, #1aa886); }
 .marketing-homepage .why-swatch.coral { background: linear-gradient(135deg, #ff8a8a, #f4b84e); }
 .marketing-homepage .why-cluster-mini-label { font-size: 14px; font-weight: 700; color: var(--navy-mid); }
-.marketing-homepage .why-cluster-badge { position: absolute; right: 0; bottom: 0; display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: var(--navy); color: var(--white); border-radius: 20px; box-shadow: 0 12px 34px rgba(12,24,41,.22); }
-.marketing-homepage .why-cluster-badge-icon { width: 36px; height: 36px; border-radius: 12px; background: rgba(45,212,168,.14); color: var(--teal); display: inline-flex; align-items: center; justify-content: center; }
+.marketing-homepage .why-cluster-badge { position: absolute; right: 10px; bottom: 8px; display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--navy); color: var(--white); border-radius: 18px; box-shadow: 0 12px 34px rgba(12,24,41,.22); }
+.marketing-homepage .why-cluster-badge-icon { width: 32px; height: 32px; border-radius: 11px; background: rgba(45,212,168,.14); color: var(--teal); display: inline-flex; align-items: center; justify-content: center; }
 .marketing-homepage .why-cluster-badge-icon svg { width: 18px; height: 18px; }
 .marketing-homepage .why-cluster-badge-label { font-size: 12px; color: rgba(255,255,255,.55); margin-bottom: 2px; }
-.marketing-homepage .why-cluster-badge-value { font-size: 15px; font-weight: 700; color: var(--white); }
+.marketing-homepage .why-cluster-badge-value { font-size: 14px; font-weight: 700; color: var(--white); }
 .marketing-homepage .why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; }
 .marketing-homepage .why-card { background: var(--white); border: 1px solid rgba(0,0,0,.04); border-radius: var(--radius); padding: 36px 32px; transition: all .3s ease; position: relative; overflow: hidden; }
 .marketing-homepage .why-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .4s ease; }
@@ -222,9 +222,9 @@
   .marketing-homepage .hero-image-transparent { max-width: 100%; }
   .marketing-homepage .why-grid, .marketing-homepage .testimonial-grid, .marketing-homepage .metrics-grid, .marketing-homepage .security-grid, .marketing-homepage .how-grid { grid-template-columns: 1fr; }
   .marketing-homepage .why-header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
-  .marketing-homepage .why-visual-cluster { min-height: 280px; max-width: 420px; }
-  .marketing-homepage .why-cluster-album { width: 250px; right: 8px; top: 0; }
-  .marketing-homepage .why-cluster-brand { width: 190px; left: 0; bottom: 18px; }
+  .marketing-homepage .why-visual-cluster { min-height: 280px; max-width: 360px; margin: 0 auto; }
+  .marketing-homepage .why-cluster-album { width: 250px; right: 10px; top: 0; }
+  .marketing-homepage .why-cluster-brand { width: 190px; left: 6px; bottom: 24px; }
   .marketing-homepage .why-cluster-badge { right: 6px; bottom: 0; }
   .marketing-homepage .feature-row { grid-template-columns: 1fr; gap: 30px; }
   .marketing-homepage .feature-row.reverse .feature-visual { order: 0; }
