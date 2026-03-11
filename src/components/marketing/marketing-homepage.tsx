@@ -232,8 +232,46 @@ export default function MarketingHomepage() {
 
       <section className="why" id="why">
         <div className="container">
-          <div className="section-label reveal">{content.why.label}</div>
-          <h2 className="section-title reveal">{content.why.title}</h2>
+          <div className="why-header">
+            <div className="why-heading-group">
+              <div className="section-label reveal">{content.why.label}</div>
+              <h2 className="section-title reveal">{content.why.title}</h2>
+            </div>
+            <div className="why-visual-cluster reveal" aria-hidden="true">
+              <div className="why-cluster-card why-cluster-album">
+                <div className="why-cluster-card-top">
+                  <span className="why-cluster-dot teal"></span>
+                  <span className="why-cluster-line short"></span>
+                </div>
+                <div className="why-cluster-photo-grid">
+                  <span className="why-photo-tile bg1"></span>
+                  <span className="why-photo-tile bg4"></span>
+                  <span className="why-photo-tile bg2 wide"></span>
+                </div>
+                <div className="why-cluster-pill">Approved photos</div>
+              </div>
+              <div className="why-cluster-card why-cluster-brand">
+                <div className="why-cluster-brand-mark">SM</div>
+                <div className="why-cluster-swatch-row">
+                  <span className="why-swatch navy"></span>
+                  <span className="why-swatch teal"></span>
+                  <span className="why-swatch coral"></span>
+                </div>
+                <div className="why-cluster-mini-label">Brand Portal</div>
+              </div>
+              <div className="why-cluster-badge">
+                <span className="why-cluster-badge-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+                <div>
+                  <div className="why-cluster-badge-label">Ready to share</div>
+                  <div className="why-cluster-badge-value">Marketing approved</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="why-grid">
             <div className="why-card reveal">
               <div className="why-icon">
