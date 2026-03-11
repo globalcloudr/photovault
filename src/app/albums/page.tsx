@@ -22,6 +22,7 @@ type Album = {
   event_date: string;
   rights_status: string;
   created_at: string;
+  department_id: string | null;
 };
 
 type AssetThumb = {
@@ -42,6 +43,12 @@ type ShareLinkRow = {
   password_hash: string | null;
   revoked_at: string | null;
   created_at: string;
+};
+
+type OrgDepartment = {
+  id: string;
+  code: string;
+  name: string;
 };
 
 function formatRightsLabel(rightsStatus: string) {
@@ -115,6 +122,7 @@ export default function AlbumsPage() {
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">(readInitialAlbumsSortMode);
   const [viewMode, setViewMode] = useState<"grid" | "list">(readInitialAlbumsViewMode);
   const [rightsFilter, setRightsFilter] = useState<"all" | "ok_for_marketing" | "internal_only" | "do_not_use" | "unknown">("all");
+  const [departments, setDepartments] = useState<OrgDepartment[]>([]);
   const [shareAlbumId, setShareAlbumId] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [creatingShare, setCreatingShare] = useState(false);
@@ -127,6 +135,7 @@ export default function AlbumsPage() {
   const [albumEditorName, setAlbumEditorName] = useState("");
   const [albumEditorEventDate, setAlbumEditorEventDate] = useState("");
   const [albumEditorRights, setAlbumEditorRights] = useState<Album["rights_status"]>("unknown");
+  const [albumEditorDepartmentId, setAlbumEditorDepartmentId] = useState("");
   const [albumEditorSaving, setAlbumEditorSaving] = useState(false);
   const [albumEditorStatus, setAlbumEditorStatus] = useState<string | null>(null);
   const [openAlbumMenuId, setOpenAlbumMenuId] = useState<string | null>(null);
@@ -162,7 +171,7 @@ export default function AlbumsPage() {
 
       const { data, error } = await supabase
         .from("albums")
-        .select("id,event_name,event_date,rights_status,created_at")
+        .select("id,event_name,event_date,rights_status,created_at,department_id")
         .eq("org_id", activeOrgId)
         .order("event_date", { ascending: false });
 
@@ -227,6 +236,23 @@ export default function AlbumsPage() {
       setAssetsByAlbumId(grouped);
       setCoverByAlbumId(initialCovers);
       setLoading(false);
+    })();
+  }, [activeOrgId, orgLoading]);
+
+  useEffect(() => {
+    if (orgLoading || !activeOrgId) return;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from("org_departments")
+        .select("id,code,name")
+        .eq("org_id", activeOrgId)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+
+      if (!error && data) {
+        setDepartments(data as OrgDepartment[]);
+      }
     })();
   }, [activeOrgId, orgLoading]);
 
@@ -308,14 +334,25 @@ export default function AlbumsPage() {
         : 0,
     [assetsByAlbumId, editingAlbum]
   );
+  const departmentLabelById = useMemo(
+    () =>
+      Object.fromEntries(
+        departments.map((department) => [
+          department.id,
+          department.code ? `${department.code} — ${department.name}` : department.name,
+        ])
+      ) as Record<string, string>,
+    [departments]
+  );
   const hasAlbumEditorChanges = useMemo(() => {
     if (!editingAlbum) return false;
     return (
       editingAlbum.event_name !== albumEditorName.trim() ||
       editingAlbum.event_date !== albumEditorEventDate ||
-      editingAlbum.rights_status !== albumEditorRights
+      editingAlbum.rights_status !== albumEditorRights ||
+      (editingAlbum.department_id ?? "") !== albumEditorDepartmentId
     );
-  }, [albumEditorEventDate, albumEditorName, albumEditorRights, editingAlbum]);
+  }, [albumEditorDepartmentId, albumEditorEventDate, albumEditorName, albumEditorRights, editingAlbum]);
 
   async function loadShareLinks(albumId: string) {
     if (!activeOrgId) return;
@@ -433,6 +470,7 @@ export default function AlbumsPage() {
     setAlbumEditorName(album.event_name);
     setAlbumEditorEventDate(album.event_date);
     setAlbumEditorRights(album.rights_status);
+    setAlbumEditorDepartmentId(album.department_id ?? "");
     setAlbumEditorStatus(null);
   }
 
@@ -465,6 +503,7 @@ export default function AlbumsPage() {
         event_name: trimmedName,
         event_date: albumEditorEventDate,
         rights_status: albumEditorRights,
+        department_id: albumEditorDepartmentId || null,
       };
       const { error } = await supabase
         .from("albums")
@@ -863,6 +902,12 @@ export default function AlbumsPage() {
                     <p className="text-xs text-slate-600">
                       Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
                     </p>
+                    {a.department_id && departmentLabelById[a.department_id] ? (
+                      <p className="text-xs text-slate-600">
+                        Program / Department:{" "}
+                        <span className="font-medium text-slate-800">{departmentLabelById[a.department_id]}</span>
+                      </p>
+                    ) : null}
                   </div>
                 </Card>
               );
@@ -911,6 +956,12 @@ export default function AlbumsPage() {
                       <p className="mt-1 text-xs text-slate-600">
                         Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
                       </p>
+                      {a.department_id && departmentLabelById[a.department_id] ? (
+                        <p className="mt-1 text-xs text-slate-600">
+                          Program / Department:{" "}
+                          <span className="font-medium text-slate-800">{departmentLabelById[a.department_id]}</span>
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
@@ -1208,9 +1259,36 @@ export default function AlbumsPage() {
               </div>
 
               <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Program / Department</label>
+                <select
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+                  value={albumEditorDepartmentId}
+                  onChange={(e) => setAlbumEditorDepartmentId(e.target.value)}
+                >
+                  <option value="">No program / department</option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.code ? `${department.code} — ${department.name}` : department.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1.5 text-xs text-slate-500">
+                  Use this to group albums by school program area, such as Career Education, ESL, GED, or Active Adults.
+                </p>
+              </div>
+
+              <div>
                 <p className="mb-2 text-sm font-semibold text-slate-900">Album details</p>
                 <div className="overflow-hidden rounded-lg border border-slate-200">
                   <dl className="divide-y divide-slate-200 text-sm">
+                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
+                      <dt className="text-slate-500">Program / Department</dt>
+                      <dd className="text-slate-800">
+                        {albumEditorDepartmentId && departmentLabelById[albumEditorDepartmentId]
+                          ? departmentLabelById[albumEditorDepartmentId]
+                          : "Not set"}
+                      </dd>
+                    </div>
                     <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
                       <dt className="text-slate-500">Created</dt>
                       <dd className="text-slate-800">{formatDateTimeMDY(editingAlbum.created_at)}</dd>

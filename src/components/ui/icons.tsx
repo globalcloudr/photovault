@@ -67,6 +67,16 @@ export function IconUsers({ className }: IconProps) {
   );
 }
 
+export function IconPrograms({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={base(className)} aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <path d="M8 8h8M8 12h8M8 16h5" />
+      <circle cx="17" cy="16" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function IconView({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={base(className)} aria-hidden="true">

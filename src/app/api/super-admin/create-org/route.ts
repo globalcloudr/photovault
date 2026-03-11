@@ -9,6 +9,19 @@ type CreateOrgBody = {
   slug?: string;
 };
 
+const DEFAULT_ORG_DEPARTMENTS = [
+  { code: "AWD", name: "Adults with Disabilities", sort_order: 10 },
+  { code: "AAP", name: "Active Adults Program", sort_order: 20 },
+  { code: "ASE", name: "Adult Secondary Education", sort_order: 30 },
+  { code: "ABE", name: "Adult Basic Education", sort_order: 40 },
+  { code: "CE", name: "Career Education", sort_order: 50 },
+  { code: "CTE", name: "Career Technical Education", sort_order: 60 },
+  { code: "ESL", name: "English as a Second Language", sort_order: 70 },
+  { code: "HSD", name: "High School Diploma", sort_order: 80 },
+  { code: "HiSET", name: "High School Equivalency", sort_order: 90 },
+  { code: "CC", name: "Community Classes", sort_order: 100 },
+] as const;
+
 function getEnv() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -71,6 +84,26 @@ export async function POST(req: Request) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  const { error: departmentsError } = await adminSupabase.from("org_departments").insert(
+    DEFAULT_ORG_DEPARTMENTS.map((department) => ({
+      org_id: data.id,
+      code: department.code,
+      name: department.name,
+      sort_order: department.sort_order,
+      is_active: true,
+    }))
+  );
+
+  if (departmentsError) {
+    return NextResponse.json(
+      {
+        error: `Organization created, but default programs failed to seed: ${departmentsError.message}`,
+        org: data,
+      },
+      { status: 500 }
+    );
   }
 
   await logAuditEvent({

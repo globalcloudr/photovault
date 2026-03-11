@@ -17,6 +17,7 @@ import {
   IconGuidelines,
   IconHelp,
   IconLogout,
+  IconPrograms,
   IconSuperAdmin,
   IconUsers,
 } from "@/components/ui/icons";
@@ -330,6 +331,10 @@ export function MediaWorkspaceShell({
                 <Link href="/settings/branding" className={navClass(pathname.startsWith("/settings/branding"))}>
                   <IconAppearance className="h-4 w-4" />
                   Appearance
+                </Link>
+                <Link href="/settings/programs" className={navClass(pathname.startsWith("/settings/programs"))}>
+                  <IconPrograms className="h-4 w-4" />
+                  Programs
                 </Link>
                 <Link href="/settings/users" className={navClass(pathname.startsWith("/settings/users"))}>
                   <IconUsers className="h-4 w-4" />

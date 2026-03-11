@@ -42,7 +42,6 @@ export default function NewAlbumPage() {
 
       if (!error && data) {
         setDepartments(data as Dept[]);
-        if (data.length > 0) setDepartmentId(data[0].id);
       }
     })();
   }, [activeOrgId, orgLoading]);
@@ -161,14 +160,15 @@ export default function NewAlbumPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-800">Department (optional)</label>
+              <label className="block text-sm font-medium text-slate-800">Program / Department (optional)</label>
               <select
                 className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                 value={departmentId}
                 onChange={(e) => setDepartmentId(e.target.value)}
               >
+                <option value="">No program / department</option>
                 {departments.length === 0 ? (
-                  <option value="">No departments yet</option>
+                  <option value="" disabled>No programs / departments yet</option>
                 ) : (
                   departments.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -177,7 +177,9 @@ export default function NewAlbumPage() {
                   ))
                 )}
               </select>
-              <p className="mt-1.5 text-xs text-slate-500">Department can be changed later as needed.</p>
+              <p className="mt-1.5 text-xs text-slate-500">
+                Use this to group albums by school program area. You can update it later in Album Details.
+              </p>
             </div>
           </div>
 
