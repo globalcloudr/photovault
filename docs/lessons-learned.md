@@ -3,19 +3,24 @@
 Use this document after launch to capture what should become standard for the next product build.
 
 ## Keep
-- Add lessons here after launch.
+- Use a live, GitHub-connected Vercel beta environment early. It surfaced production-only TypeScript, auth, and rendering issues that local development did not catch.
+- Commit by logical unit of work and use clear outcome-based commit messages. That made redeploys, rollback reasoning, and issue tracking much easier.
+- Keep school taxonomy fields org-scoped and controlled. `Program / Department` works better as a managed org list than as free text.
 
 ## Change
-- Add lessons here after launch.
 - Treat Vercel environment variables as a first-class deployment step. The project build can look correct and still fail if the variables were entered during setup but never saved into Project Settings.
 - After changing Vercel environment variables, always trigger a fresh deployment and verify the new deployment is tied to the latest Git commit hash before trusting the error log.
 - For multi-tenant asset tables, do not assume intended RLS policies exist just because they are documented elsewhere. Add explicit migrations for live policies and verify the database state.
+- Treat homepage styling and font loading as production concerns. Client-injected marketing CSS caused a visible first-paint flash until the styles were moved into the normal app stylesheet path.
+- When changing default seed data for new schools, include a backfill migration for existing orgs in the same workstream.
+- Document clearly whether a behavior is code-managed or CMS-managed. Homepage copy and images can appear “unchanged” if the database content is overriding the new code defaults.
 
 ## Avoid Next Time
-- Add lessons here after launch.
 - Avoid relying on client-side state for database-derived sequencing like `assets.sequence_number`; use the database as the source of truth.
 - Avoid deleting storage files unless the matching database rows were actually deleted. Partial delete behavior creates orphaned asset rows and broken previews.
 - Avoid debugging the wrong Vercel deployment. Always check the deployment source commit before acting on a build error.
+- Avoid UI helper text that promises “can be changed later” before the edit path actually exists in the product.
+- Avoid using checkbox-style affordances for actions that are not true selection states. Album `Select` worked better once it was treated as an explicit drawer/open action.
 
 ## Build Workflow Notes
 

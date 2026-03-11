@@ -40,16 +40,20 @@ Use this checklist when preparing the live beta environment for pilot schools.
 
 ## 5. Feature Validation for Pilot Schools
 - Create album
+- Edit album details and verify the drawer shows the current cover preview
 - Upload photos by button
 - Upload photos by drag/drop
 - Search and sort albums/photos
 - Switch Grid/List view
 - Edit photo metadata in asset drawer
 - Create and revoke album share links
+- Delete photos and re-upload a fresh batch in the same album
+- Confirm album `Program / Department` options are correct for the school and editable from Settings
 - Update Brand Portal content
 - Update Appearance settings
 - Invite and remove staff
-- Delete photos and re-upload a fresh batch in the same album
+- Log out and confirm logout completes on the first click
+- Load the homepage and confirm there is no first-paint unstyled flash on the live beta domain
 
 ## 6. Beta Feedback Process
 - Create one copy of `docs/beta-school-feedback-checklist.md` per pilot school/session.

@@ -578,10 +578,13 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - Supabase Auth URL settings
   - `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
   - `/Users/zylstra/Documents/photovault/docs/private-beta-deployment-checklist.md`
+  - `/Users/zylstra/Documents/photovault/docs/sql/2026-03-10-pv-029-assets-rls-policies.sql`
+  - `/Users/zylstra/Documents/photovault/docs/sql/2026-03-11-pv-029-seed-org-programs.sql`
   - `/Users/zylstra/Documents/photovault/docs/mvp-implementation-board.md`
 - Acceptance:
   - beta URL is stable and accessible to invited schools
   - invite/login/reset flows work against beta URL
+  - asset delete and re-upload in the same album works cleanly
   - feedback collected from at least 2 pilot schools
   - top beta issues are prioritized before production cutover
 
@@ -702,6 +705,8 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
 
 ### PV-033: TinaCMS Integration (SuperAdmin-Only Marketing + Help Content)
 - Goal: Enable Git-based content workflows for marketing/help pages, editable by Super Admin only.
+- Planning note:
+  - see [PV-033 TinaCMS Implementation Plan](/Users/zylstra/Documents/photovault/docs/pv-033-tinacms-implementation-plan.md)
 - Scope:
   - integrate TinaCMS for content collections such as:
     - homepage marketing copy
@@ -856,11 +861,12 @@ Follow this order sequentially. Do not skip ahead.
 - PV-018 remains a hard gate before paid onboarding at scale.
 
 ## Current Position
-- Completed: PV-000, PV-001, PV-002, PV-003, PV-004, PV-005, PV-006, PV-007, PV-008, PV-009, PV-010, PV-011, PV-017, PV-019, PV-020 (MVP scope), PV-023, PV-024
+- Completed: PV-000, PV-001, PV-002, PV-003, PV-004, PV-005, PV-006, PV-007, PV-008, PV-009, PV-010, PV-011, PV-017, PV-019, PV-020 (MVP scope), PV-023, PV-024, PV-028
 - In Progress: PV-029 (private beta deployment/testing now live on Vercel)
 - Deferred (intentional): PV-018 until beta feedback pass is complete
 - Next active step: Beta School Testing Pass (pre-PV-025/PV-018)
-- Remaining steps in lockstep sequence: 16
+- Open pre-go-live items still outstanding: PV-026, PV-022, PV-016, PV-027, PV-029, PV-030, PV-034, PV-025, PV-018
+- Remaining steps in lockstep sequence (including current PV-029): 18
 - Beta checklist template: `/Users/zylstra/Documents/photovault/docs/beta-school-feedback-checklist.md`
 - Beta deployment checklist: `/Users/zylstra/Documents/photovault/docs/private-beta-deployment-checklist.md`
 
@@ -908,6 +914,16 @@ Follow this order sequentially. Do not skip ahead.
     - `Share` button added next to `Choose cover` (grid + list cards)
     - modal share management pattern aligned with `Choose cover` popup
     - supports create/copy/revoke share links at album-card level
+  - album cards now mirror the photo-card action system:
+    - top overlay actions (`Select`, `Open`, `Share`, `More`)
+    - `Select` opens the album details drawer
+    - `More` includes `Edit`, `Open`, and `Delete`
+  - added right-side `Album Details` drawer with:
+    - top preview area aligned to the photo drawer pattern
+    - editable album name, date, rights, and `Program / Department`
+    - cover preview + `Choose cover`
+    - read-only details for created date, photo count, and storage used
+  - `Program / Department` is now surfaced on album cards and editable after creation
 - Photos page:
   - 4-column desktop grid for photo cards
   - redesigned photo cards with image-overlay actions (`Select`, `View`, `Download`, `More`)
@@ -928,6 +944,13 @@ Follow this order sequentially. Do not skip ahead.
   - fixed upload queue sequence collisions by reading the next `sequence_number` from the database instead of stale client state
   - fixed upload retry collisions by cleaning up orphaned storage objects before retrying the same file path
   - fixed delete flow to verify database row deletion before storage cleanup so partial deletes cannot leave orphaned asset rows
+  - added beta upload limit: `5 MB per image`
+  - lightbox controls now use explicit high-contrast styling for arrows and close action
+- Settings:
+  - added `/settings/programs` manager for school-level `Program / Department` options
+  - seeded fuller default program list for new schools
+  - added backfill migration for existing schools:
+    - `/Users/zylstra/Documents/photovault/docs/sql/2026-03-11-pv-029-seed-org-programs.sql`
 - Icon system:
   - shared icon primitives introduced and applied to sidebar nav + key action controls
 - Invite/setup experience:
@@ -941,6 +964,8 @@ Follow this order sequentially. Do not skip ahead.
   - added one-click `Apply recommended defaults` action in `/super-admin/homepage` to reset editor state to the latest optimized copy baseline before saving
   - hero image is now CMS-editable from `/super-admin/homepage`
   - mobile hero stack order fixed so the image appears before the text block on smaller screens
+  - moved homepage styles/fonts into static CSS/font loading to eliminate first-paint unstyled flash on live beta
+  - added a custom illustration set under `/Users/zylstra/Documents/photovault/public/images/home/`
 - Global auth and session UX:
   - login page now includes `Back to homepage`
   - homepage setup/progress modal now appears only for invite acceptance flow, not general public visitors
@@ -952,6 +977,8 @@ Follow this order sequentially. Do not skip ahead.
   - Vercel beta deployment is live and connected to GitHub auto-deploy
   - fixed multiple production-only TypeScript issues surfaced during Vercel build
   - added explicit `assets` RLS migration: `/Users/zylstra/Documents/photovault/docs/sql/2026-03-10-pv-029-assets-rls-policies.sql`
+  - verified env vars saved in Vercel project settings after initial import
+  - validated delete -> re-upload same album flow after RLS and orphan cleanup fixes
 
 ## Notes
 - Use migration files for every DB change.
