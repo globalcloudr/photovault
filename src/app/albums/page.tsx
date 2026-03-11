@@ -1231,16 +1231,16 @@ export default function AlbumsPage() {
             <div className="space-y-5 px-4 py-4 pb-28 sm:px-5 sm:py-5 sm:pb-24">
               <div>
                 <p className="mb-2 text-sm font-semibold text-slate-900">Preview</p>
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                   {editingAlbumCover?.thumbUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={editingAlbumCover.thumbUrl}
                       alt={`${editingAlbum.event_name} cover`}
-                      className="aspect-[16/10] w-full object-cover"
+                      className="h-64 w-full object-cover"
                     />
                   ) : (
-                    <div className="flex aspect-[16/10] w-full items-center justify-center text-sm text-slate-500">
+                    <div className="flex h-64 items-center justify-center text-sm text-slate-500">
                       No cover selected
                     </div>
                   )}
