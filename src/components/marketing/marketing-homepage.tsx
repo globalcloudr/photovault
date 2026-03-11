@@ -7,6 +7,7 @@ import { defaultMarketingHomepageContent, MarketingHomepageContent, normalizeMar
 
 export default function MarketingHomepage() {
   const [content, setContent] = useState<MarketingHomepageContent>(defaultMarketingHomepageContent);
+  const [contentReady, setContentReady] = useState(false);
 
   useEffect(() => {
     const nav = document.getElementById("marketing-nav");
@@ -56,6 +57,9 @@ export default function MarketingHomepage() {
       } catch {
         if (!mounted) return;
         setContent(defaultMarketingHomepageContent);
+      } finally {
+        if (!mounted) return;
+        setContentReady(true);
       }
     }
 
@@ -132,11 +136,13 @@ export default function MarketingHomepage() {
           </div>
 
           <div className="hero-visual">
-            {content.hero.imageUrl ? (
+            {contentReady && content.hero.imageUrl ? (
               <div className="hero-custom-image-shell">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={content.hero.imageUrl} alt="PhotoVault hero preview" className="hero-image hero-image-transparent" />
               </div>
+            ) : !contentReady ? (
+              <div className="hero-loading-shell" aria-hidden="true" />
             ) : (
               <div className="hero-mockup">
                 <>
@@ -194,7 +200,7 @@ export default function MarketingHomepage() {
                 </>
               </div>
             )}
-            {!content.hero.imageUrl ? (
+            {contentReady && !content.hero.imageUrl ? (
               <div className="hero-float-badge">
                 <div className="float-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -336,9 +342,11 @@ export default function MarketingHomepage() {
               </ul>
             </div>
             <div className="feature-visual">
-              {featureOne.imageUrl ? (
+              {contentReady && featureOne.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={featureOne.imageUrl} alt={featureOne.title} className="feature-img" />
+              ) : !contentReady ? (
+                <div className="feature-img-loading" aria-hidden="true" />
               ) : (
                 <div className={`feature-img-placeholder ${featureOne.theme === "navy" ? "navy-theme" : "teal-theme"}`}>
                   <div className="grid-overlay" />
@@ -366,9 +374,11 @@ export default function MarketingHomepage() {
               </ul>
             </div>
             <div className="feature-visual">
-              {featureTwo.imageUrl ? (
+              {contentReady && featureTwo.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={featureTwo.imageUrl} alt={featureTwo.title} className="feature-img" />
+              ) : !contentReady ? (
+                <div className="feature-img-loading" aria-hidden="true" />
               ) : (
                 <div className={`feature-img-placeholder ${featureTwo.theme === "navy" ? "navy-theme" : "teal-theme"}`}>
                   <div className="grid-overlay" />
