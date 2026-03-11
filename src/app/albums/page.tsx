@@ -783,7 +783,7 @@ export default function AlbumsPage() {
                       aria-label={`Edit ${a.event_name}`}
                       title="Edit album"
                     >
-                      <span className="h-3.5 w-3.5 rounded border border-slate-300 bg-white" aria-hidden="true" />
+                      <IconEdit className="h-3.5 w-3.5" />
                       Select
                     </button>
 
@@ -900,7 +900,7 @@ export default function AlbumsPage() {
                           aria-label={`Edit ${a.event_name}`}
                           title="Edit album"
                         >
-                          <span className="h-4 w-4 rounded border border-slate-300 bg-white" aria-hidden="true" />
+                          <IconEdit className="h-4 w-4" />
                           Select
                         </button>
                         <h2 className="truncate text-base font-semibold text-slate-900">{a.event_name}</h2>
