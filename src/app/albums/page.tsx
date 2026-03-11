@@ -1236,7 +1236,7 @@ export default function AlbumsPage() {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-semibold text-slate-900">Event date</label>
+                  <label className="mb-1 block text-sm font-semibold text-slate-900">Date</label>
                   <Input
                     type="date"
                     value={albumEditorEventDate}

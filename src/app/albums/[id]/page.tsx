@@ -1104,7 +1104,7 @@ async function load() {
               ) : null}
               <div className={`absolute inset-0 ${heroCoverUrl ? "bg-slate-900/45" : "bg-gradient-to-r from-slate-900 to-slate-700"}`} />
               <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">Event Date: {formatDateMDY(album.event_date)}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">Date: {formatDateMDY(album.event_date)}</p>
                 <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">{album.event_name}</h2>
               </div>
             </div>
