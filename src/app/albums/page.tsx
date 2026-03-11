@@ -129,7 +129,6 @@ export default function AlbumsPage() {
   const [albumEditorRights, setAlbumEditorRights] = useState<Album["rights_status"]>("unknown");
   const [albumEditorSaving, setAlbumEditorSaving] = useState(false);
   const [albumEditorStatus, setAlbumEditorStatus] = useState<string | null>(null);
-  const [selectedAlbumIds, setSelectedAlbumIds] = useState<string[]>([]);
   const [openAlbumMenuId, setOpenAlbumMenuId] = useState<string | null>(null);
   const [deletingAlbumId, setDeletingAlbumId] = useState<string | null>(null);
 
@@ -238,12 +237,6 @@ export default function AlbumsPage() {
     const storedPaths = readStoredCoverPaths();
     storedPaths[albumId] = asset.storage_path;
     saveStoredCoverPaths(storedPaths);
-  }
-
-  function toggleAlbumSelection(albumId: string) {
-    setSelectedAlbumIds((prev) =>
-      prev.includes(albumId) ? prev.filter((id) => id !== albumId) : [...prev, albumId]
-    );
   }
 
   const pickerAssets = pickerAlbumId ? assetsByAlbumId[pickerAlbumId] ?? [] : [];
@@ -586,8 +579,6 @@ export default function AlbumsPage() {
         delete next[album.id];
         return next;
       });
-      setSelectedAlbumIds((prev) => prev.filter((id) => id !== album.id));
-
       const storedCoverPaths = readStoredCoverPaths();
       if (storedCoverPaths[album.id]) {
         delete storedCoverPaths[album.id];
@@ -785,15 +776,16 @@ export default function AlbumsPage() {
                     </div>
                     <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent opacity-90 transition sm:opacity-0 sm:group-hover:opacity-100" />
 
-                    <label className="absolute left-2 top-2 z-10 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 px-2 py-1 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur">
-                      <input
-                        type="checkbox"
-                        className="h-3.5 w-3.5 rounded border-slate-300"
-                        checked={selectedAlbumIds.includes(a.id)}
-                        onChange={() => toggleAlbumSelection(a.id)}
-                      />
+                    <button
+                      type="button"
+                      className="absolute left-2 top-2 z-10 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 px-2 py-1 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur transition hover:bg-slate-100"
+                      onClick={() => openAlbumEditor(a)}
+                      aria-label={`Edit ${a.event_name}`}
+                      title="Edit album"
+                    >
+                      <span className="h-3.5 w-3.5 rounded border border-slate-300 bg-white" aria-hidden="true" />
                       Select
-                    </label>
+                    </button>
 
                     <div className="absolute right-2 top-2 z-20 flex items-center gap-1">
                       <Link
@@ -901,15 +893,16 @@ export default function AlbumsPage() {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                        <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-slate-600">
-                          <input
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-slate-300"
-                            checked={selectedAlbumIds.includes(a.id)}
-                            onChange={() => toggleAlbumSelection(a.id)}
-                          />
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-2 text-xs text-slate-600 transition hover:text-slate-800"
+                          onClick={() => openAlbumEditor(a)}
+                          aria-label={`Edit ${a.event_name}`}
+                          title="Edit album"
+                        >
+                          <span className="h-4 w-4 rounded border border-slate-300 bg-white" aria-hidden="true" />
                           Select
-                        </label>
+                        </button>
                         <h2 className="truncate text-base font-semibold text-slate-900">{a.event_name}</h2>
                       </div>
                       <p className="mt-1 text-xs text-slate-500">

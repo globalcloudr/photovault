@@ -1671,11 +1671,21 @@ async function load() {
             <div className="flex h-full w-full flex-col sm:h-auto sm:max-w-5xl" onClick={(e) => e.stopPropagation()}>
               <div className="hidden items-center justify-between text-sm text-slate-300 sm:mb-3 sm:flex">
                 <div className="flex items-center gap-2">
-                  <Button size="sm" variant="ghost" className="bg-white/10 px-2 py-1 hover:bg-white/20" onClick={prevLightbox}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="border border-white/15 bg-black/45 px-2 py-1 text-white shadow-sm backdrop-blur hover:bg-black/60"
+                    onClick={prevLightbox}
+                  >
                     ←
                   </Button>
 
-                  <Button size="sm" variant="ghost" className="bg-white/10 px-2 py-1 hover:bg-white/20" onClick={nextLightbox}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="border border-white/15 bg-black/45 px-2 py-1 text-white shadow-sm backdrop-blur hover:bg-black/60"
+                    onClick={nextLightbox}
+                  >
                     →
                   </Button>
 
@@ -1685,7 +1695,12 @@ async function load() {
                   </span>
                 </div>
 
-                <Button size="sm" variant="ghost" className="bg-white/10 hover:bg-white/20" onClick={() => setLightbox(null)}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="border border-white/15 bg-black/45 text-white shadow-sm backdrop-blur hover:bg-black/60"
+                  onClick={() => setLightbox(null)}
+                >
                   Close
                 </Button>
               </div>
@@ -1706,13 +1721,28 @@ async function load() {
                   {Math.max(assets.findIndex((x) => x.id === lightbox.id) + 1, 1)}/{assets.length}
                 </p>
                 <div className="mt-3 flex items-center justify-between gap-2">
-                  <Button size="sm" variant="ghost" className="bg-white/10 px-3 py-2 hover:bg-white/20" onClick={prevLightbox}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="border border-white/15 bg-black/45 px-3 py-2 text-white shadow-sm backdrop-blur hover:bg-black/60"
+                    onClick={prevLightbox}
+                  >
                     Prev
                   </Button>
-                  <Button size="sm" variant="ghost" className="bg-white/10 px-3 py-2 hover:bg-white/20" onClick={nextLightbox}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="border border-white/15 bg-black/45 px-3 py-2 text-white shadow-sm backdrop-blur hover:bg-black/60"
+                    onClick={nextLightbox}
+                  >
                     Next
                   </Button>
-                  <Button size="sm" variant="ghost" className="bg-white/10 px-3 py-2 hover:bg-white/20" onClick={() => setLightbox(null)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="border border-white/15 bg-black/45 px-3 py-2 text-white shadow-sm backdrop-blur hover:bg-black/60"
+                    onClick={() => setLightbox(null)}
+                  >
                     Close
                   </Button>
                 </div>
