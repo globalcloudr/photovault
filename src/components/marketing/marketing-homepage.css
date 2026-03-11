@@ -120,7 +120,7 @@
 .marketing-homepage .feature-row.reverse .feature-visual { order: -1; }
 .marketing-homepage .feature-visual { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
 .marketing-homepage .feature-img-placeholder { width: 100%; height: 340px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.marketing-homepage .feature-img { width: 100%; height: 340px; object-fit: cover; border-radius: var(--radius-lg); display: block; background: var(--sand); }
+.marketing-homepage .feature-img { width: 100%; height: 340px; object-fit: contain; border-radius: var(--radius-lg); display: block; background: transparent; }
 .marketing-homepage .teal-theme { background: linear-gradient(135deg,#0f2027,#203a43,#2c5364); }
 .marketing-homepage .navy-theme { background: linear-gradient(135deg,var(--navy),var(--navy-mid),#1a3a5c); }
 .marketing-homepage .grid-overlay { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size: 40px 40px; }
