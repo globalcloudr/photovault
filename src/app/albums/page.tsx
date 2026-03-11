@@ -1033,7 +1033,7 @@ export default function AlbumsPage() {
 
       {pickerAlbumId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75 p-6"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/75 p-6"
           onClick={() => setPickerAlbumId(null)}
         >
           <div
@@ -1107,7 +1107,7 @@ export default function AlbumsPage() {
 
       {shareAlbumId && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75 p-6"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/75 p-6"
           onClick={() => setShareAlbumId(null)}
         >
           <div
