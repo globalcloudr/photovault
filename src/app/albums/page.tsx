@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useOrg } from "@/components/org/org-provider";
-import { IconEdit, IconGrid, IconList } from "@/components/ui/icons";
+import { IconDelete, IconEdit, IconGrid, IconList, IconMore, IconOpen, IconShare } from "@/components/ui/icons";
 import { formatDateMDY, formatDateTimeMDY } from "@/lib/date-format";
 
 const COVER_PREFS_KEY = "album_cover_storage_paths_v1";
@@ -129,6 +129,9 @@ export default function AlbumsPage() {
   const [albumEditorRights, setAlbumEditorRights] = useState<Album["rights_status"]>("unknown");
   const [albumEditorSaving, setAlbumEditorSaving] = useState(false);
   const [albumEditorStatus, setAlbumEditorStatus] = useState<string | null>(null);
+  const [selectedAlbumIds, setSelectedAlbumIds] = useState<string[]>([]);
+  const [openAlbumMenuId, setOpenAlbumMenuId] = useState<string | null>(null);
+  const [deletingAlbumId, setDeletingAlbumId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -235,6 +238,12 @@ export default function AlbumsPage() {
     const storedPaths = readStoredCoverPaths();
     storedPaths[albumId] = asset.storage_path;
     saveStoredCoverPaths(storedPaths);
+  }
+
+  function toggleAlbumSelection(albumId: string) {
+    setSelectedAlbumIds((prev) =>
+      prev.includes(albumId) ? prev.filter((id) => id !== albumId) : [...prev, albumId]
+    );
   }
 
   const pickerAssets = pickerAlbumId ? assetsByAlbumId[pickerAlbumId] ?? [] : [];
@@ -489,6 +498,111 @@ export default function AlbumsPage() {
     }
   }
 
+  async function deleteAlbum(album: Album) {
+    if (!activeOrgId || deletingAlbumId) return;
+    const photoCount = (assetsByAlbumId[album.id] ?? []).length;
+    const confirmed = window.confirm(
+      photoCount > 0
+        ? `Delete "${album.event_name}" and its ${photoCount} ${photoCount === 1 ? "photo" : "photos"}?`
+        : `Delete "${album.event_name}"?`
+    );
+    if (!confirmed) return;
+
+    setDeletingAlbumId(album.id);
+    setOpenAlbumMenuId(null);
+
+    try {
+      const albumAssets = assetsByAlbumId[album.id] ?? [];
+
+      const { error: shareLinksError } = await supabase
+        .from("share_links")
+        .delete()
+        .eq("album_id", album.id)
+        .eq("org_id", activeOrgId);
+
+      if (shareLinksError) {
+        window.alert(`Delete failed: ${shareLinksError.message}`);
+        return;
+      }
+
+      const { data: deletedAssets, error: assetsError } = await supabase
+        .from("assets")
+        .delete()
+        .eq("album_id", album.id)
+        .eq("org_id", activeOrgId)
+        .select("id,storage_path");
+
+      if (assetsError) {
+        window.alert(`Delete failed: ${assetsError.message}`);
+        return;
+      }
+
+      const deletedAssetRows = (deletedAssets ?? []) as Pick<AssetThumb, "id" | "storage_path">[];
+      if (deletedAssetRows.length !== albumAssets.length) {
+        window.alert(
+          `Delete failed: expected to remove ${albumAssets.length} asset rows, removed ${deletedAssetRows.length}.`
+        );
+        return;
+      }
+
+      const { data: deletedAlbums, error: albumError } = await supabase
+        .from("albums")
+        .delete()
+        .eq("id", album.id)
+        .eq("org_id", activeOrgId)
+        .select("id");
+
+      if (albumError) {
+        window.alert(`Delete failed: ${albumError.message}`);
+        return;
+      }
+
+      if ((deletedAlbums ?? []).length !== 1) {
+        window.alert("Delete failed: album row was not removed.");
+        return;
+      }
+
+      const storagePaths = deletedAssetRows.map((asset) => asset.storage_path).filter(Boolean);
+      if (storagePaths.length > 0) {
+        const { error: storageError } = await supabase.storage.from("originals").remove(storagePaths);
+        if (storageError) {
+          window.alert(`Album deleted, but storage cleanup failed: ${storageError.message}`);
+        }
+      }
+
+      setAlbums((prev) => prev.filter((item) => item.id !== album.id));
+      setAssetsByAlbumId((prev) => {
+        const next = { ...prev };
+        delete next[album.id];
+        return next;
+      });
+      setCoverByAlbumId((prev) => {
+        const next = { ...prev };
+        delete next[album.id];
+        return next;
+      });
+      setShareLinksByAlbumId((prev) => {
+        const next = { ...prev };
+        delete next[album.id];
+        return next;
+      });
+      setSelectedAlbumIds((prev) => prev.filter((id) => id !== album.id));
+
+      const storedCoverPaths = readStoredCoverPaths();
+      if (storedCoverPaths[album.id]) {
+        delete storedCoverPaths[album.id];
+        saveStoredCoverPaths(storedCoverPaths);
+      }
+
+      if (editingAlbum?.id === album.id) {
+        setEditingAlbum(null);
+        setAlbumEditorStatus(null);
+      }
+    } finally {
+      setDeletingAlbumId(null);
+    }
+  }
+
   return (
     <MediaWorkspaceShell
       title="Albums"
@@ -650,12 +764,11 @@ export default function AlbumsPage() {
         ) : viewMode === "grid" ? (
           <ul className="mt-3 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {sortedAlbums.map((a) => {
-              const photoCount = (assetsByAlbumId[a.id] ?? []).length;
               const cover = coverByAlbumId[a.id];
 
               return (
                 <Card key={a.id} className="overflow-hidden border-slate-200 bg-white">
-                  <div className="relative border-b border-slate-200 bg-slate-100">
+                  <div className="group relative border-b border-slate-200 bg-slate-100">
                     <div className="aspect-video w-full">
                       {cover?.thumbUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -670,18 +783,81 @@ export default function AlbumsPage() {
                         </div>
                       )}
                     </div>
-                    <Badge tone="dark" className="absolute right-3 top-3">
-                      {photoCount} {photoCount === 1 ? "photo" : "photos"}
-                    </Badge>
-                    <button
-                      type="button"
-                      className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-sm transition hover:bg-slate-100"
-                      aria-label={`Edit ${a.event_name}`}
-                      title="Edit album"
-                      onClick={() => openAlbumEditor(a)}
-                    >
-                      <IconEdit className="h-4 w-4" />
-                    </button>
+                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent opacity-90 transition sm:opacity-0 sm:group-hover:opacity-100" />
+
+                    <label className="absolute left-2 top-2 z-10 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-slate-200 bg-white/95 px-2 py-1 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur">
+                      <input
+                        type="checkbox"
+                        className="h-3.5 w-3.5 rounded border-slate-300"
+                        checked={selectedAlbumIds.includes(a.id)}
+                        onChange={() => toggleAlbumSelection(a.id)}
+                      />
+                      Select
+                    </label>
+
+                    <div className="absolute right-2 top-2 z-20 flex items-center gap-1">
+                      <Link
+                        href={`/albums/${a.id}`}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-sm backdrop-blur transition hover:bg-slate-100"
+                        aria-label={`Open ${a.event_name}`}
+                        title="Open"
+                        onClick={() => setOpenAlbumMenuId(null)}
+                      >
+                        <IconOpen className="h-4 w-4" />
+                      </Link>
+                      <button
+                        type="button"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-sm backdrop-blur transition hover:bg-slate-100"
+                        aria-label="Share"
+                        title="Share"
+                        onClick={() => {
+                          setOpenAlbumMenuId(null);
+                          void openShareModal(a.id);
+                        }}
+                      >
+                        <IconShare className="h-4 w-4" />
+                      </button>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-sm backdrop-blur transition hover:bg-slate-100"
+                          aria-label="More actions"
+                          title="More actions"
+                          onClick={() => setOpenAlbumMenuId((prev) => (prev === a.id ? null : a.id))}
+                        >
+                          <IconMore className="h-4 w-4" />
+                        </button>
+                        {openAlbumMenuId === a.id ? (
+                          <div className="absolute right-0 top-9 z-30 w-36 rounded-lg border border-slate-200 bg-white p-1 shadow-md">
+                            <button
+                              type="button"
+                              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+                              onClick={() => openAlbumEditor(a)}
+                            >
+                              <IconEdit className="h-4 w-4" />
+                              Edit
+                            </button>
+                            <Link
+                              href={`/albums/${a.id}`}
+                              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+                              onClick={() => setOpenAlbumMenuId(null)}
+                            >
+                              <IconOpen className="h-4 w-4" />
+                              Open
+                            </Link>
+                            <button
+                              type="button"
+                              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-red-700 hover:bg-red-50"
+                              onClick={() => void deleteAlbum(a)}
+                              disabled={deletingAlbumId === a.id}
+                            >
+                              <IconDelete className="h-4 w-4" />
+                              {deletingAlbumId === a.id ? "Deleting…" : "Delete"}
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="space-y-2.5 p-4">
@@ -695,29 +871,6 @@ export default function AlbumsPage() {
                     <p className="text-xs text-slate-600">
                       Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
                     </p>
-
-                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(7.75rem,1.2fr)_minmax(0,1fr)] gap-2 border-t border-slate-200 pt-2">
-                      <Link className={buttonClass("secondary", "sm") + " whitespace-nowrap"} href={`/albums/${a.id}`}>
-                        Open
-                      </Link>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="min-w-0 cursor-pointer whitespace-nowrap px-2"
-                        disabled={photoCount === 0}
-                        onClick={() => setPickerAlbumId(a.id)}
-                      >
-                        Choose cover
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="min-w-0 cursor-pointer whitespace-nowrap"
-                        onClick={() => void openShareModal(a.id)}
-                      >
-                        Share
-                      </Button>
-                    </div>
                   </div>
                 </Card>
               );
@@ -726,13 +879,12 @@ export default function AlbumsPage() {
         ) : (
           <ul className="mt-3 space-y-3">
             {sortedAlbums.map((a) => {
-              const photoCount = (assetsByAlbumId[a.id] ?? []).length;
               const cover = coverByAlbumId[a.id];
 
               return (
                 <Card key={a.id} className="border-slate-200 bg-white p-3 sm:p-4">
                   <div className="flex items-start gap-3">
-                    <div className="h-20 w-28 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+                    <div className="relative h-20 w-28 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
                       {cover?.thumbUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -748,18 +900,17 @@ export default function AlbumsPage() {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                        <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-slate-600">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-slate-300"
+                            checked={selectedAlbumIds.includes(a.id)}
+                            onChange={() => toggleAlbumSelection(a.id)}
+                          />
+                          Select
+                        </label>
                         <h2 className="truncate text-base font-semibold text-slate-900">{a.event_name}</h2>
-                        <Badge tone="light">{photoCount} {photoCount === 1 ? "photo" : "photos"}</Badge>
-                        <button
-                          type="button"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
-                          aria-label={`Edit ${a.event_name}`}
-                          title="Edit album"
-                          onClick={() => openAlbumEditor(a)}
-                        >
-                          <IconEdit className="h-4 w-4" />
-                        </button>
                       </div>
                       <p className="mt-1 text-xs text-slate-500">
                         {formatDateMDY(a.event_date)} • Updated {formatDateMDY(a.created_at)}
@@ -769,27 +920,60 @@ export default function AlbumsPage() {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(7.75rem,1.2fr)_minmax(0,1fr)] gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Link className={buttonClass("secondary", "sm") + " whitespace-nowrap"} href={`/albums/${a.id}`}>
+                        <IconOpen className="mr-1 h-3.5 w-3.5" />
                         Open
                       </Link>
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="min-w-0 cursor-pointer whitespace-nowrap px-2"
-                        disabled={photoCount === 0}
-                        onClick={() => setPickerAlbumId(a.id)}
-                      >
-                        Choose cover
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="min-w-0 cursor-pointer whitespace-nowrap"
+                        className="whitespace-nowrap"
                         onClick={() => void openShareModal(a.id)}
                       >
+                        <IconShare className="mr-1 h-3.5 w-3.5" />
                         Share
                       </Button>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+                          aria-label="More actions"
+                          title="More actions"
+                          onClick={() => setOpenAlbumMenuId((prev) => (prev === a.id ? null : a.id))}
+                        >
+                          <IconMore className="h-4 w-4" />
+                        </button>
+                        {openAlbumMenuId === a.id ? (
+                          <div className="absolute right-0 top-9 z-30 w-36 rounded-lg border border-slate-200 bg-white p-1 shadow-md">
+                            <button
+                              type="button"
+                              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+                              onClick={() => openAlbumEditor(a)}
+                            >
+                              <IconEdit className="h-4 w-4" />
+                              Edit
+                            </button>
+                            <Link
+                              href={`/albums/${a.id}`}
+                              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+                              onClick={() => setOpenAlbumMenuId(null)}
+                            >
+                              <IconOpen className="h-4 w-4" />
+                              Open
+                            </Link>
+                            <button
+                              type="button"
+                              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-red-700 hover:bg-red-50"
+                              onClick={() => void deleteAlbum(a)}
+                              disabled={deletingAlbumId === a.id}
+                            >
+                              <IconDelete className="h-4 w-4" />
+                              {deletingAlbumId === a.id ? "Deleting…" : "Delete"}
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -1051,7 +1235,27 @@ export default function AlbumsPage() {
                     <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
                       <dt className="text-slate-500">Cover photo</dt>
                       <dd className="text-slate-800">
-                        {coverByAlbumId[editingAlbum.id]?.canonical_filename ?? "Not selected"}
+                        {coverByAlbumId[editingAlbum.id] ? (
+                          <div className="space-y-2">
+                            <div className="h-28 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100 sm:w-48">
+                              {coverByAlbumId[editingAlbum.id]?.thumbUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={coverByAlbumId[editingAlbum.id]!.thumbUrl ?? ""}
+                                  alt={`${editingAlbum.event_name} cover`}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+                                  No preview
+                                </div>
+                              )}
+                            </div>
+                            <p>{coverByAlbumId[editingAlbum.id]?.canonical_filename}</p>
+                          </div>
+                        ) : (
+                          "Not selected"
+                        )}
                       </dd>
                     </div>
                   </dl>
