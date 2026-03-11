@@ -101,7 +101,7 @@ export default function LoginPage() {
                       <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-600">
                         ✓
                       </span>
-                      <span className="text-lg leading-7">{item}</span>
+                      <span className="text-base leading-7">{item}</span>
                     </li>
                   ))}
                 </ul>
