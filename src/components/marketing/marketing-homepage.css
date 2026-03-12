@@ -56,9 +56,9 @@
 .marketing-homepage .trust-line { width: 30px; height: 1px; background: var(--sand); }
 .marketing-homepage .trust-strip { padding: 12px 0 72px; }
 .marketing-homepage .trusted-logos-label { margin: 0 0 16px; font-size: 14px; font-weight: 600; color: var(--slate); text-align: center; }
-.marketing-homepage .trusted-logos-grid { display: flex; flex-wrap: wrap; gap: 18px 34px; align-items: center; justify-content: center; }
-.marketing-homepage .trusted-logo-slot { min-height: 38px; min-width: 170px; display: flex; align-items: center; }
-.marketing-homepage .trusted-logo-image { max-height: 34px; max-width: 190px; width: auto; height: auto; object-fit: contain; filter: grayscale(100%); opacity: .84; }
+.marketing-homepage .trusted-logos-grid { display: flex; flex-wrap: wrap; gap: 22px 44px; align-items: center; justify-content: center; }
+.marketing-homepage .trusted-logo-slot { min-height: 56px; min-width: 220px; display: flex; align-items: center; justify-content: center; }
+.marketing-homepage .trusted-logo-image { max-height: 54px; max-width: 240px; width: auto; height: auto; object-fit: contain; filter: grayscale(100%); opacity: .9; }
 .marketing-homepage .trusted-logo-wordmark { font-size: 19px; font-weight: 700; color: rgba(26,35,50,.52); letter-spacing: .01em; }
 .marketing-homepage .hero-visual { position: relative; animation: fadeUp .8s ease .3s both; }
 .marketing-homepage .hero-mockup { background: var(--white); border-radius: var(--radius-lg); box-shadow: 0 2px 4px rgba(0,0,0,.02), 0 8px 24px rgba(0,0,0,.06), 0 24px 60px rgba(0,0,0,.08); padding: 16px; position: relative; z-index: 2; }
