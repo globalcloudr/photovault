@@ -72,7 +72,6 @@ export default function MarketingHomepage() {
 
   const featureOne = content.features.items[0] ?? defaultMarketingHomepageContent.features.items[0];
   const featureTwo = content.features.items[1] ?? defaultMarketingHomepageContent.features.items[1];
-  const trustedLogos = content.trusted.logos.slice(0, 6);
   const metrics = content.metrics.items.slice(0, 3);
   const whyCards = content.why.cards.slice(0, 3);
   const testimonials = content.testimonials.items.slice(0, 3);
@@ -80,6 +79,7 @@ export default function MarketingHomepage() {
   const howSteps = content.howItWorks.steps.slice(0, 3);
   const demoHref = content.nav.bookDemoUrl.trim() || "#cta";
   const demoExternal = /^https?:\/\//i.test(demoHref);
+  const trustStripUrl = "/images/home/logo_strip_preview.png";
 
   return (
     <main className="marketing-homepage">
@@ -221,17 +221,13 @@ export default function MarketingHomepage() {
       <section className="trust-strip" aria-label={content.trusted.label}>
         <div className="container">
           <p className="trusted-logos-label reveal">{content.trusted.label}</p>
-          <div className="trusted-logos-grid reveal">
-            {trustedLogos.map((logo, index) => (
-              <div key={`${logo.name}-${logo.logoUrl}-${index}`} className="trusted-logo-slot">
-                {logo.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logo.logoUrl} alt={logo.name || "School logo"} className="trusted-logo-image" />
-                ) : (
-                  <span className="trusted-logo-wordmark">{logo.name}</span>
-                )}
-              </div>
-            ))}
+          <div className="trusted-strip-wrap reveal">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={trustStripUrl}
+              alt="Trusted by adult education teams including Bay View, Golden Valley, Pacific Coast, Sierra Ridge, Central Valley, and Harbor Bridge."
+              className="trusted-strip-image"
+            />
           </div>
         </div>
       </section>
