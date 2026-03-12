@@ -220,7 +220,6 @@ export default function MarketingHomepage() {
 
       <section className="trust-strip" aria-label={content.trusted.label}>
         <div className="container">
-          <p className="trusted-logos-label reveal">{content.trusted.label}</p>
           <div className="trusted-strip-wrap reveal">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
