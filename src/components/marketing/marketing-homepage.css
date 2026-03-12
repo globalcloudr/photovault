@@ -59,7 +59,7 @@
 .marketing-homepage .trusted-strip-wrap { display: flex; justify-content: center; align-items: center; }
 .marketing-homepage .trusted-strip-image {
   display: block;
-  width: min(880px, 100%);
+  width: 100%;
   height: auto;
   object-fit: contain;
   filter: grayscale(100%);
@@ -226,7 +226,7 @@
   .marketing-homepage .hero-float-badge { left: 0; bottom: 16px; }
   .marketing-homepage .hero-image-transparent { max-width: 100%; }
   .marketing-homepage .trust-strip { padding: 8px 0 28px; }
-  .marketing-homepage .trusted-strip-image { width: min(720px, 100%); }
+  .marketing-homepage .trusted-strip-image { width: 100%; }
   .marketing-homepage .why-grid, .marketing-homepage .testimonial-grid, .marketing-homepage .metrics-grid, .marketing-homepage .security-grid, .marketing-homepage .how-grid { grid-template-columns: 1fr; }
   .marketing-homepage .why-header { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
   .marketing-homepage .why-visual-cluster { min-height: 280px; max-width: 360px; margin: 0 auto; }
