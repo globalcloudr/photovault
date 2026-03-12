@@ -22,6 +22,7 @@ type Album = {
   event_date: string;
   rights_status: string;
   created_at: string;
+  created_by: string | null;
   department_id: string | null;
 };
 
@@ -49,6 +50,11 @@ type OrgDepartment = {
   id: string;
   code: string;
   name: string;
+};
+
+type ProfileRow = {
+  user_id: string;
+  email: string | null;
 };
 
 function formatRightsLabel(rightsStatus: string) {
@@ -123,6 +129,7 @@ export default function AlbumsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">(readInitialAlbumsViewMode);
   const [rightsFilter, setRightsFilter] = useState<"all" | "ok_for_marketing" | "internal_only" | "do_not_use" | "unknown">("all");
   const [departments, setDepartments] = useState<OrgDepartment[]>([]);
+  const [creatorLabelByUserId, setCreatorLabelByUserId] = useState<Record<string, string>>({});
   const [shareAlbumId, setShareAlbumId] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [creatingShare, setCreatingShare] = useState(false);
@@ -171,7 +178,7 @@ export default function AlbumsPage() {
 
       const { data, error } = await supabase
         .from("albums")
-        .select("id,event_name,event_date,rights_status,created_at,department_id")
+        .select("id,event_name,event_date,rights_status,created_at,created_by,department_id")
         .eq("org_id", activeOrgId)
         .order("event_date", { ascending: false });
 
@@ -183,6 +190,34 @@ export default function AlbumsPage() {
 
       const albumRows = (data ?? []) as Album[];
       setAlbums(albumRows);
+
+      const creatorIds = Array.from(
+        new Set(albumRows.map((album) => album.created_by).filter(Boolean))
+      ) as string[];
+
+      if (creatorIds.length > 0) {
+        const { data: profileRows } = await supabase
+          .from("profiles")
+          .select("user_id,email")
+          .in("user_id", creatorIds);
+
+        const nextCreatorLabelByUserId = creatorIds.reduce<Record<string, string>>((acc, creatorId) => {
+          acc[creatorId] = creatorId;
+          return acc;
+        }, {});
+
+        for (const profile of (profileRows ?? []) as ProfileRow[]) {
+          nextCreatorLabelByUserId[profile.user_id] = profile.email ?? profile.user_id;
+        }
+
+        if (userData.user.email) {
+          nextCreatorLabelByUserId[userData.user.id] = userData.user.email;
+        }
+
+        setCreatorLabelByUserId(nextCreatorLabelByUserId);
+      } else {
+        setCreatorLabelByUserId({});
+      }
 
       if (albumRows.length === 0) {
         setAssetsByAlbumId({});
@@ -1314,6 +1349,14 @@ export default function AlbumsPage() {
                     <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
                       <dt className="text-slate-500">Created</dt>
                       <dd className="text-slate-800">{formatDateTimeMDY(editingAlbum.created_at)}</dd>
+                    </div>
+                    <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
+                      <dt className="text-slate-500">Created by</dt>
+                      <dd className="text-slate-800">
+                        {editingAlbum.created_by
+                          ? creatorLabelByUserId[editingAlbum.created_by] ?? editingAlbum.created_by
+                          : "Unknown"}
+                      </dd>
                     </div>
                     <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">
                       <dt className="text-slate-500">Photos</dt>
