@@ -43,8 +43,8 @@ function navClass(active: boolean) {
   return cn(
     "flex items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium transition",
     active
-      ? "bg-white text-slate-900 ring-1 ring-slate-200"
-      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+      ? "bg-[var(--surface)] text-[var(--foreground)] ring-1 ring-[var(--border)]"
+      : "text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
   );
 }
 
@@ -199,23 +199,23 @@ export function MediaWorkspaceShell({
   }, [menuOpen]);
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <div className="border-b border-slate-200 bg-white">
+    <main className="min-h-screen bg-[var(--background)]">
+      <div className="border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-6">
-          <p className="text-sm font-semibold tracking-tight text-slate-800">PhotoVault</p>
+          <p className="text-sm font-semibold tracking-tight text-[var(--foreground)]">PhotoVault</p>
           <div className="flex items-center gap-2 sm:gap-3">
             {utilityActions.length > 0 &&
               utilityActions.map((action) => <div key={action.key}>{action.node}</div>)}
             <a
               href="mailto:support@photovault.app"
-              className="text-sm font-medium text-slate-500 transition hover:text-slate-800"
+              className="text-sm font-medium text-[var(--text-muted)] transition hover:text-[var(--foreground)]"
             >
               Support
             </a>
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-muted)] text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)]"
                 onClick={() => setMenuOpen((prev) => !prev)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
@@ -225,15 +225,15 @@ export function MediaWorkspaceShell({
               </button>
 
               {menuOpen ? (
-                <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                  <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
+                <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-lg">
+                  <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] px-4 py-3">
                     <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-slate-800">{displayName}</p>
+                      <p className="truncate text-base font-semibold text-[var(--foreground)]">{displayName}</p>
                       {userName ? (
-                        <p className="truncate text-xs text-slate-500">{userEmail}</p>
+                        <p className="truncate text-xs text-[var(--text-muted)]">{userEmail}</p>
                       ) : null}
                     </div>
-                    <p className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-500">
+                    <p className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2 py-0.5 text-xs font-medium text-[var(--text-muted)]">
                       {userRole}
                     </p>
                   </div>
@@ -241,14 +241,14 @@ export function MediaWorkspaceShell({
                   <div className="space-y-0.5 px-2 py-2">
                     <a
                       href="mailto:info@akkedisdigital.com"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                     >
                       <IconHelp className="h-4 w-4" />
                       Help
                     </a>
                     <a
                       href="mailto:info@akkedisdigital.com?subject=PhotoVault%20Question%20%2F%20Feedback"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                     >
                       <IconFeedback className="h-4 w-4" />
                       Questions / feedback
@@ -256,7 +256,7 @@ export function MediaWorkspaceShell({
                     <button
                       type="button"
                       disabled
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-400"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[var(--text-muted)] opacity-60"
                       title="Billing dashboard coming soon"
                     >
                       <IconBilling className="h-4 w-4" />
@@ -264,7 +264,7 @@ export function MediaWorkspaceShell({
                     </button>
                     <Link
                       href="/settings/profile"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                       onClick={() => setMenuOpen(false)}
                     >
                       <IconAppearance className="h-4 w-4" />
@@ -273,7 +273,7 @@ export function MediaWorkspaceShell({
                     {isSuperAdmin ? (
                       <Link
                         href="/super-admin"
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                         onClick={() => setMenuOpen(false)}
                       >
                         <IconSuperAdmin className="h-4 w-4" />
@@ -282,11 +282,11 @@ export function MediaWorkspaceShell({
                     ) : null}
                   </div>
 
-                  <div className="border-t border-slate-200 p-2">
+                  <div className="border-t border-[var(--border)] p-2">
                     <button
                       type="button"
                       disabled={signingOut}
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)] disabled:cursor-not-allowed disabled:opacity-60"
                       onClick={() => {
                         setMenuOpen(false);
                         void signOut();
@@ -306,24 +306,24 @@ export function MediaWorkspaceShell({
       <div className="mx-auto max-w-[1600px]">
         <div className="grid min-h-[calc(100vh-3.5rem)] gap-0 md:grid-cols-[280px_minmax(0,1fr)]">
           {customSidebar ? (
-            <aside className="border-b border-slate-200 bg-slate-50 p-4 md:border-b-0 md:border-r">{customSidebar}</aside>
+            <aside className="border-b border-[var(--border)] bg-[var(--surface-muted)] p-4 md:border-b-0 md:border-r">{customSidebar}</aside>
           ) : (
-            <aside className="border-b border-slate-200 bg-slate-50 p-4 md:border-b-0 md:border-r">
+            <aside className="border-b border-[var(--border)] bg-[var(--surface-muted)] p-4 md:border-b-0 md:border-r">
               <section className="pb-4">
                 <OrgBrandLockup
                   orgName={activeOrg?.name}
                   logoUrl={displayedLogoUrl}
                   showName={!sidebarLogoOnly}
                   className="items-start gap-2"
-                  textClassName="text-lg font-semibold tracking-tight text-slate-900"
+                  textClassName="text-lg font-semibold tracking-tight text-[var(--foreground)]"
                   logoFrameClassName={sidebarLogoOnly ? "h-14 w-44" : "h-12 w-32"}
                   logoImageClassName={sidebarLogoOnly ? "h-10" : "h-9"}
                 />
-                <p className="mt-2 text-xs text-slate-500">{activeOrg?.slug ?? "No active org"}</p>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">{activeOrg?.slug ?? "No active org"}</p>
               </section>
 
-              <nav className="mt-2 border-t border-slate-200 pt-3">
-                <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Collections</p>
+              <nav className="mt-2 border-t border-[var(--border)] pt-3">
+                <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Collections</p>
                 <Link href="/albums" className={navClass(pathname.startsWith("/albums"))}>
                   <IconAlbums className="h-4 w-4" />
                   Albums
@@ -357,7 +357,7 @@ export function MediaWorkspaceShell({
               </nav>
 
               {sidebarContent ? (
-                <section className="mt-4 border-t border-slate-200 pt-4">{sidebarContent}</section>
+                <section className="mt-4 border-t border-[var(--border)] pt-4">{sidebarContent}</section>
               ) : null}
             </aside>
           )}
@@ -367,8 +367,8 @@ export function MediaWorkspaceShell({
               <header>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <h1 className="text-4xl font-semibold tracking-tight text-slate-900">{title}</h1>
-                    {subtitle ? <p className="mt-1.5 text-sm text-slate-600">{subtitle}</p> : null}
+                    <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)]">{title}</h1>
+                    {subtitle ? <p className="mt-1.5 text-sm text-[var(--text-muted)]">{subtitle}</p> : null}
                   </div>
 
                   {actions.length > 0 ? (
