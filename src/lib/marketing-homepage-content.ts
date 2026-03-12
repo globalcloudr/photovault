@@ -127,12 +127,12 @@ export const defaultMarketingHomepageContent: MarketingHomepageContent = {
   trusted: {
     label: "Trusted by adult education teams including",
     logos: [
-      { name: "Berkeley Adult School", logoUrl: "" },
-      { name: "San Mateo Adult & Career Education", logoUrl: "" },
-      { name: "San Jose Dance Theatre", logoUrl: "" },
-      { name: "Mountain View Adult School", logoUrl: "" },
-      { name: "Ventura County Adult Education", logoUrl: "" },
-      { name: "Santa Clara Adult Education", logoUrl: "" },
+      { name: "BV", logoUrl: "/images/home/logo_1_bv.png" },
+      { name: "GV", logoUrl: "/images/home/logo_2_gv.png" },
+      { name: "PC", logoUrl: "/images/home/logo_3_pc.png" },
+      { name: "SR", logoUrl: "/images/home/logo_4_sr.png" },
+      { name: "CV", logoUrl: "/images/home/logo_5_cv.png" },
+      { name: "HB", logoUrl: "/images/home/logo_6_hb.png" },
     ],
   },
   metrics: {
