@@ -710,6 +710,32 @@ export default function AlbumsPage() {
       sidebarContent={
         <div className="space-y-3">
           <div>
+            <Eyebrow>Album Workflow</Eyebrow>
+            <div className="mt-1.5 space-y-1">
+              {(
+                [
+                  ["all", `All albums (${albumStateCounts.all})`],
+                  ["with_photos", `With photos (${albumStateCounts.with_photos})`],
+                  ["empty", `Empty albums (${albumStateCounts.empty})`],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`w-full rounded-md px-2 py-1 text-left text-sm transition ${
+                    albumStateFilter === value
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-700 hover:bg-slate-100"
+                  }`}
+                  onClick={() => setAlbumStateFilter(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <Eyebrow>Rights Filter</Eyebrow>
             <div className="mt-1.5 space-y-1">
               {(
@@ -825,47 +851,17 @@ export default function AlbumsPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center gap-2">
-              {(
-                [
-                  ["all", `All albums (${albumStateCounts.all})`],
-                  ["with_photos", `With photos (${albumStateCounts.with_photos})`],
-                  ["empty", `Empty albums (${albumStateCounts.empty})`],
-                ] as const
-              ).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    albumStateFilter === value
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                  }`}
-                  onClick={() => setAlbumStateFilter(value)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <MetaText as="span">
-                Showing {sortedAlbums.length} of {albums.length} albums
-              </MetaText>
-              {hasActiveAlbumFilters ? (
-                <Button size="sm" variant="ghost" onClick={clearAlbumFilters}>
-                  Clear filters
-                </Button>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <MetaText as="span">
-              Search by album name or event date, then narrow the list to albums that already have photos or still need uploads.
+              Showing {sortedAlbums.length} of {albums.length} albums
             </MetaText>
+            {hasActiveAlbumFilters ? (
+              <Button size="sm" variant="ghost" onClick={clearAlbumFilters}>
+                Clear filters
+              </Button>
+            ) : null}
           </div>
+
         </div>
       </Card>
 
