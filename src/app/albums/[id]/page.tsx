@@ -650,13 +650,14 @@ async function load() {
           if (!selectedSet.has(asset.id)) return asset;
           const result = results.find((entry) => entry.assetId === asset.id);
           if (!result || !("rowPayload" in result)) return asset;
+          const rowPayload = result.rowPayload;
 
           return {
             ...asset,
-            tags: (result.rowPayload.tags as string[] | undefined) ?? asset.tags,
-            event_type: (result.rowPayload.event_type as string | null | undefined) ?? asset.event_type,
-            campus: (result.rowPayload.campus as string | null | undefined) ?? asset.campus,
-            photographer: (result.rowPayload.photographer as string | null | undefined) ?? asset.photographer,
+            tags: (rowPayload.tags as string[] | undefined) ?? asset.tags,
+            event_type: (rowPayload.event_type as string | null | undefined) ?? asset.event_type,
+            campus: (rowPayload.campus as string | null | undefined) ?? asset.campus,
+            photographer: (rowPayload.photographer as string | null | undefined) ?? asset.photographer,
           };
         })
       );
