@@ -609,30 +609,61 @@ async function load() {
     setBulkSaving(true);
     setBulkStatus(null);
     try {
-      const { error } = await supabase
-        .from("assets")
-        .update(payload)
-        .eq("album_id", albumId)
-        .eq("org_id", activeOrgId)
-        .in("id", selectedAssetIds);
+      const selectedSet = new Set(selectedAssetIds);
+      const assetsById = new Map(assets.map((asset) => [asset.id, asset]));
+      const updates = selectedAssetIds.map(async (assetId) => {
+        const asset = assetsById.get(assetId);
+        if (!asset) return { assetId, error: "Asset not found." };
 
-      if (error) {
-        setBulkStatus(`Bulk update failed: ${error.message}`);
+        const rowPayload: Record<string, unknown> = {
+          event_type: (payload.event_type as string | null | undefined) ?? asset.event_type ?? null,
+          campus: (payload.campus as string | null | undefined) ?? asset.campus ?? null,
+          photographer: (payload.photographer as string | null | undefined) ?? asset.photographer ?? null,
+        };
+
+        if (bulkClearTags) {
+          rowPayload.tags = [];
+        } else if (bulkTagsText.trim()) {
+          rowPayload.tags = Array.from(new Set([...(asset.tags ?? []), ...tags]));
+        }
+
+        const { error } = await supabase
+          .from("assets")
+          .update(rowPayload)
+          .eq("id", assetId)
+          .eq("album_id", albumId)
+          .eq("org_id", activeOrgId);
+
+        if (error) return { assetId, error: error.message };
+        return { assetId, rowPayload };
+      });
+
+      const results = await Promise.all(updates);
+      const failed = results.filter((result) => "error" in result);
+      if (failed.length > 0) {
+        setBulkStatus(`Bulk update failed: ${failed[0].error}`);
         return;
       }
 
       setAssets((prev) =>
-        prev.map((a) => {
-          if (!selectedAssetIds.includes(a.id)) return a;
+        prev.map((asset) => {
+          if (!selectedSet.has(asset.id)) return asset;
+          const result = results.find((entry) => entry.assetId === asset.id);
+          if (!result || !("rowPayload" in result)) return asset;
+
           return {
-            ...a,
-            tags: (payload.tags as string[] | undefined) ?? a.tags,
-            event_type: (payload.event_type as string | undefined) ?? a.event_type,
-            campus: (payload.campus as string | undefined) ?? a.campus,
-            photographer: (payload.photographer as string | undefined) ?? a.photographer,
+            ...asset,
+            tags: (result.rowPayload.tags as string[] | undefined) ?? asset.tags,
+            event_type: (result.rowPayload.event_type as string | null | undefined) ?? asset.event_type,
+            campus: (result.rowPayload.campus as string | null | undefined) ?? asset.campus,
+            photographer: (result.rowPayload.photographer as string | null | undefined) ?? asset.photographer,
           };
         })
       );
+
+      if (bulkTagsText.trim()) {
+        setBulkTagsText("");
+      }
 
       setBulkStatus(`Bulk metadata applied to ${selectedAssetIds.length} assets.`);
     } catch (error) {
@@ -1367,7 +1398,7 @@ async function load() {
                   disabled={bulkDeleting}
                 >
                   <IconDelete className="mr-1 h-3.5 w-3.5" />
-                  {bulkDeleting ? "Deleting…" : "Delete selected"}
+                  {bulkDeleting ? "Deleting…" : "Delete photos"}
                 </Button>
                 {bulkStatus ? <MetaText>{bulkStatus}</MetaText> : null}
               </div>
