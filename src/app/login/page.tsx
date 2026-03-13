@@ -73,7 +73,7 @@ export default function LoginPage() {
           <div className="relative mx-auto flex h-full max-w-2xl flex-col justify-between gap-8">
             <div>
               <Link href="/" className="inline-flex items-center gap-3 text-slate-900">
-                <span className="font-outfit text-3xl font-semibold tracking-[-0.04em]">PhotoVault</span>
+                <span className="font-dm-serif-display text-3xl tracking-[-0.03em]">PhotoVault</span>
               </Link>
             </div>
 
@@ -82,10 +82,10 @@ export default function LoginPage() {
                 <LabelText as="p" className="text-emerald-600 tracking-[0.28em]">
                   Built for adult schools
                 </LabelText>
-                <SectionTitle as="h2" className="max-w-xl text-4xl font-medium text-slate-950 sm:text-[3.2rem] sm:leading-[1.04]">
+                <SectionTitle as="h2" className="max-w-xl font-dm-serif-display text-4xl font-normal tracking-[-0.03em] text-slate-950 sm:text-[3.2rem] sm:leading-[1.04]">
                   Log in to the system built for approved school photos and brand assets.
                 </SectionTitle>
-                <BodyText muted className="max-w-xl text-lg">
+                <BodyText muted className="max-w-xl font-outfit text-lg">
                   Organize campaign-ready media, keep branding consistent, and share approved assets without
                   relying on scattered folders and email threads.
                 </BodyText>
@@ -102,7 +102,7 @@ export default function LoginPage() {
                       <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-600">
                         ✓
                       </span>
-                      <BodyText as="span" className="text-base">{item}</BodyText>
+                      <BodyText as="span" className="font-outfit text-base">{item}</BodyText>
                     </li>
                   ))}
                 </ul>
@@ -111,8 +111,8 @@ export default function LoginPage() {
 
             <div className="space-y-4">
               <div>
-                <SectionTitle as="h3" className="text-2xl text-slate-950">Trusted by adult education teams</SectionTitle>
-                <BodyText muted className="mt-2 text-base">
+                <SectionTitle as="h3" className="font-dm-serif-display text-2xl font-normal tracking-[-0.03em] text-slate-950">Trusted by adult education teams</SectionTitle>
+                <BodyText muted className="mt-2 font-outfit text-base">
                   Built for marketing, communications, enrollment, and district reporting workflows.
                 </BodyText>
               </div>
@@ -140,9 +140,9 @@ export default function LoginPage() {
         <section className="flex min-h-[100svh] items-center justify-center bg-white px-6 py-10 lg:h-full lg:min-h-0 lg:px-14 lg:py-10">
           <div className="w-full max-w-xl">
             <div className="mx-auto w-full max-w-md">
-              <PageTitle className="text-5xl text-slate-950">Log in</PageTitle>
-              <BodyText muted className="mt-4 text-lg">Sign in to your school PhotoVault.</BodyText>
-              <MetaText className="mt-4">
+              <PageTitle className="font-dm-serif-display text-5xl font-normal tracking-[-0.04em] text-slate-950">Log in</PageTitle>
+              <BodyText muted className="mt-4 font-outfit text-lg">Sign in to your school PhotoVault.</BodyText>
+              <MetaText className="mt-4 font-outfit">
                 <Link
                   href="/"
                   className="font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
@@ -156,7 +156,7 @@ export default function LoginPage() {
                   <FieldLabel htmlFor="email">Email address</FieldLabel>
                   <input
                     id="email"
-                    className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-lg text-slate-900 outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-200"
+                    className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 font-outfit text-lg text-slate-900 outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-200"
                     type="email"
                     placeholder="you@school.org"
                     value={email}
@@ -170,7 +170,7 @@ export default function LoginPage() {
                     <FieldLabel htmlFor="password">Password</FieldLabel>
                     <button
                       type="button"
-                      className="text-sm font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                      className="font-outfit text-sm font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                       onClick={sendReset}
                       disabled={busy}
                     >
@@ -179,7 +179,7 @@ export default function LoginPage() {
                   </div>
                   <input
                     id="password"
-                    className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-lg text-slate-900 outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-200"
+                    className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 font-outfit text-lg text-slate-900 outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-200"
                     type="password"
                     placeholder="Password"
                     value={password}
@@ -189,13 +189,13 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                  className="w-full cursor-pointer rounded-full border border-slate-950 bg-slate-950 px-6 py-3.5 text-lg font-medium text-white transition hover:border-slate-800 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full cursor-pointer rounded-full border border-slate-950 bg-slate-950 px-6 py-3.5 font-outfit text-lg font-medium text-white transition hover:border-slate-800 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={busy}
                 >
                   {busy ? "Working..." : "Log in"}
                 </button>
 
-                {status && <BodyText>{status}</BodyText>}
+                {status && <BodyText className="font-outfit">{status}</BodyText>}
               </form>
             </div>
           </div>

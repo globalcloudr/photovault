@@ -22,23 +22,23 @@ type HeadingProps = {
   children: ReactNode;
 };
 
-function Heading({ as = "h1", className, children, style }: HeadingProps & { style: string }) {
-  return createElement(as, { className: cn(style, className) }, children);
+function Heading({ as = "h1", className, children, textClassName }: HeadingProps & { textClassName: string }) {
+  return createElement(as, { className: cn(textClassName, className) }, children);
 }
 
 function TextBlock({
   as = "p",
   className,
   children,
-  style,
+  textClassName,
   ...props
 }: {
   as?: TextTag;
   className?: string;
   children?: ReactNode;
-  style: string;
+  textClassName: string;
 } & HTMLAttributes<HTMLElement>) {
-  return createElement(as, { className: cn(style, className), ...props }, children);
+  return createElement(as, { className: cn(textClassName, className), ...props }, children);
 }
 
 export function Eyebrow({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
@@ -46,15 +46,15 @@ export function Eyebrow({ className, ...props }: HTMLAttributes<HTMLParagraphEle
 }
 
 export function PageTitle(props: HeadingProps) {
-  return <Heading as={props.as ?? "h1"} className={props.className} style={typography.pageTitle}>{props.children}</Heading>;
+  return <Heading as={props.as ?? "h1"} className={props.className} textClassName={typography.pageTitle}>{props.children}</Heading>;
 }
 
 export function SectionTitle(props: HeadingProps) {
-  return <Heading as={props.as ?? "h2"} className={props.className} style={typography.sectionTitle}>{props.children}</Heading>;
+  return <Heading as={props.as ?? "h2"} className={props.className} textClassName={typography.sectionTitle}>{props.children}</Heading>;
 }
 
 export function CardTitle(props: HeadingProps) {
-  return <Heading as={props.as ?? "h3"} className={props.className} style={typography.cardTitle}>{props.children}</Heading>;
+  return <Heading as={props.as ?? "h3"} className={props.className} textClassName={typography.cardTitle}>{props.children}</Heading>;
 }
 
 export function BodyText({
@@ -65,7 +65,7 @@ export function BodyText({
   ...props
 }: HTMLAttributes<HTMLElement> & { as?: TextTag; muted?: boolean }) {
   return (
-    <TextBlock as={as} className={className} style={muted ? typography.bodyMuted : typography.body} {...props}>
+    <TextBlock as={as} className={className} textClassName={muted ? typography.bodyMuted : typography.body} {...props}>
       {children}
     </TextBlock>
   );
@@ -78,7 +78,7 @@ export function MetaText({
   ...props
 }: HTMLAttributes<HTMLElement> & { as?: TextTag }) {
   return (
-    <TextBlock as={as} className={className} style={typography.meta} {...props}>
+    <TextBlock as={as} className={className} textClassName={typography.meta} {...props}>
       {children}
     </TextBlock>
   );
@@ -99,7 +99,7 @@ export function LabelText({
   children: ReactNode;
 } & HTMLAttributes<HTMLElement>) {
   return (
-    <TextBlock as={as} className={className} style={typography.label} {...props}>
+    <TextBlock as={as} className={className} textClassName={typography.label} {...props}>
       {children}
     </TextBlock>
   );
