@@ -200,9 +200,9 @@ export function MediaWorkspaceShell({
   }, [menuOpen]);
 
   return (
-    <main className="min-h-screen bg-[var(--background)]">
+      <main className="min-h-screen bg-[var(--background)]">
       <div className="border-b border-[var(--border)] bg-[var(--surface)]">
-        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-6">
+        <div className="flex h-14 items-center justify-between gap-3 px-4 sm:px-6">
           <p className={cn(typography.label, "text-[15px] font-semibold text-[var(--foreground)]")}>PhotoVault</p>
           <div className="flex items-center gap-2 sm:gap-3">
             {utilityActions.length > 0 &&
@@ -304,7 +304,7 @@ export function MediaWorkspaceShell({
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1600px]">
+      <div>
         <div className="grid min-h-[calc(100vh-3.5rem)] gap-0 md:grid-cols-[280px_minmax(0,1fr)]">
           {customSidebar ? (
             <aside className="border-b border-[var(--border)] bg-[var(--surface-muted)] p-4 md:border-b-0 md:border-r">{customSidebar}</aside>
