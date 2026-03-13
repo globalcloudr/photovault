@@ -562,57 +562,25 @@ export default function BrandGuidelinesPage() {
       }
     >
       <Card className="p-5 sm:p-6">
-        <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
+        <div className="grid gap-5 lg:grid-cols-2 lg:items-stretch">
           <div className="space-y-4">
-            <Badge>Approved assets only</Badge>
             <PageTitle className="text-slate-900 sm:text-5xl">Brand Portal</PageTitle>
             <BodyText muted className="max-w-2xl text-lg">
               Keep your school brand consistent with shared standards, approved assets, and practical usage guidance.
             </BodyText>
-            <BodyText muted className="max-w-2xl">
-              Start here when you need a logo, social template, icon, or the latest usage rules. Everything on this page is intended to be the approved source for staff downloads.
+            <BodyText muted className="max-w-2xl text-lg">
+              This page gives staff one place to access logos, templates, and the most important rules to follow.
             </BodyText>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {featuredGuide?.signedUrl ? (
-                <a href={featuredGuide.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("primary")}>
-                  Download brand guide
-                </a>
-              ) : (
-                <button type="button" className={buttonClass("primary")} disabled>
-                  Download brand guide
-                </button>
-              )}
-              <a href="#logos" className={buttonClass("secondary")}>
-                Browse approved logos
+            {featuredGuide?.signedUrl ? (
+              <a href={featuredGuide.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("primary")}>
+                Download guide
               </a>
-              <a href="#templates-social" className={buttonClass("secondary")}>
-                Open templates
-              </a>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <Eyebrow>Approved Files</Eyebrow>
-                <SectionTitle as="h3" className="mt-1 text-lg">{totalApprovedAssets}</SectionTitle>
-                <MetaText>logos, icons, and documents in one library</MetaText>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <Eyebrow>Logo Library</Eyebrow>
-                <SectionTitle as="h3" className="mt-1 text-lg">{logos.length}</SectionTitle>
-                <MetaText>approved marks ready for reuse</MetaText>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <Eyebrow>Templates</Eyebrow>
-                <SectionTitle as="h3" className="mt-1 text-lg">{documents.length}</SectionTitle>
-                <MetaText>guides, docs, and ready-made files</MetaText>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <Eyebrow>Last Update</Eyebrow>
-                <SectionTitle as="h3" className="mt-1 text-lg text-base">{latestPortalUpdate}</SectionTitle>
-                <MetaText>latest published asset activity</MetaText>
-              </div>
-            </div>
+            ) : (
+              <button type="button" className={buttonClass("primary")} disabled>
+                Download guide
+              </button>
+            )}
 
           </div>
 
@@ -670,87 +638,8 @@ export default function BrandGuidelinesPage() {
           <Badge>{icons.length} icons</Badge>
           <Badge>{documents.length} docs</Badge>
           <Badge>Shared standards hub</Badge>
-          <Badge>Approved team downloads</Badge>
         </div>
       </Card>
-
-      {!noActiveOrg ? (
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <Card className="p-5">
-            <Eyebrow>Start Here</Eyebrow>
-            <SectionTitle as="h2" className="mt-2">Most-used assets for staff</SectionTitle>
-            <BodyText muted className="mt-2 max-w-2xl">
-              Download the current brand guide first, then pull the approved files you need for presentations, flyers, websites, and social posts.
-            </BodyText>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <LabelText className="text-slate-800">Brand Guide</LabelText>
-                <BodyText muted className="mt-1">
-                  {featuredGuide ? featuredGuide.name : "No published guide yet"}
-                </BodyText>
-                <MetaText className="mt-2">
-                  {featuredGuide?.sizeBytes ? formatSize(featuredGuide.sizeBytes) : "Add a PDF or document guide for staff"}
-                </MetaText>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  {featuredGuide?.signedUrl ? (
-                    <>
-                      <a href={featuredGuide.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("primary", "sm")}>
-                        Open guide
-                      </a>
-                      <a href={featuredGuide.signedUrl} download={featuredGuide.name} className={buttonClass("secondary", "sm")}>
-                        Download
-                      </a>
-                    </>
-                  ) : (
-                    <button type="button" className={buttonClass("secondary", "sm")} disabled>
-                      Guide unavailable
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <LabelText className="text-slate-800">Primary Logo Access</LabelText>
-                <BodyText muted className="mt-1">
-                  {featuredLogo ? featuredLogo.name : "No logo library yet"}
-                </BodyText>
-                <MetaText className="mt-2">
-                  {featuredLogo?.updatedAt ? `Updated ${formatDateMDY(featuredLogo.updatedAt)}` : "Upload logo variants for fast reuse"}
-                </MetaText>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <a href="#logos" className={buttonClass("primary", "sm")}>
-                    View logos
-                  </a>
-                  {featuredLogo?.signedUrl ? (
-                    <a href={featuredLogo.signedUrl} download={featuredLogo.name} className={buttonClass("secondary", "sm")}>
-                      Download sample
-                    </a>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-5">
-            <Eyebrow>Portal Promise</Eyebrow>
-            <SectionTitle as="h2" className="mt-2">Use this page as the published source of truth</SectionTitle>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <LabelText className="text-slate-800">Approved</LabelText>
-                <BodyText muted className="mt-1">Only current, school-approved assets should live here.</BodyText>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <LabelText className="text-slate-800">Downloadable</LabelText>
-                <BodyText muted className="mt-1">Staff should be able to find a file and use it immediately.</BodyText>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <LabelText className="text-slate-800">Clear</LabelText>
-                <BodyText muted className="mt-1">Each section should explain what belongs there and when to use it.</BodyText>
-              </div>
-            </div>
-          </Card>
-        </div>
-      ) : null}
 
       {loading ? <BodyText muted>Loading Brand Portal…</BodyText> : null}
       {status ? <BodyText className="rounded-md border border-slate-200 bg-white px-3 py-2">{status}</BodyText> : null}
@@ -765,11 +654,8 @@ export default function BrandGuidelinesPage() {
           <Card id="logos" className="p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <SectionTitle as="h3" className="text-lg">Approved Logo Library</SectionTitle>
-                  <Badge>{logos.length} assets</Badge>
-                </div>
-                <BodyText muted className="mt-1">Keep primary, alternate, lockup, and monochrome versions ready for immediate staff download.</BodyText>
+                <SectionTitle as="h3" className="text-lg">Logo Library</SectionTitle>
+                <BodyText muted className="mt-1">Upload primary, alternate, and monochrome logo versions.</BodyText>
               </div>
               <label className={`${buttonClass("primary", "sm")} ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                 <input
@@ -785,9 +671,7 @@ export default function BrandGuidelinesPage() {
             </div>
 
             {logos.length === 0 ? (
-              <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-                <BodyText muted>No logo files yet. Upload approved logo variants so staff have one trusted place to download them.</BodyText>
-              </div>
+              <BodyText muted className="mt-4">No logo files yet.</BodyText>
             ) : (
               <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {logos.map((asset) => (
@@ -801,38 +685,27 @@ export default function BrandGuidelinesPage() {
                       )}
                     </div>
                     <div className="border-t border-slate-200 p-3">
-                      <Badge>Approved logo</Badge>
                       <LabelText as="p" className="truncate text-slate-800" title={asset.name}>{asset.name}</LabelText>
-                      <MetaText className="mt-1">
-                        {formatSize(asset.sizeBytes)}
-                        {asset.updatedAt ? ` • updated ${formatDateMDY(asset.updatedAt)}` : ""}
-                      </MetaText>
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        {asset.signedUrl ? (
-                          <>
-                            <a
-                              href={asset.signedUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className={buttonClass("secondary", "sm")}
-                            >
-                              Open
-                            </a>
-                            <a href={asset.signedUrl} download={asset.name} className={buttonClass("primary", "sm")}>
-                              Download
-                            </a>
-                          </>
-                        ) : null}
-                        {canEdit ? (
-                          <button
-                            type="button"
-                            className={buttonClass("danger", "sm")}
-                            onClick={() => deleteAsset(asset.path)}
-                          >
-                            Delete
-                          </button>
-                        ) : null}
-                      </div>
+                      <MetaText className="mt-1">{formatSize(asset.sizeBytes)}</MetaText>
+                      {asset.signedUrl ? (
+                        <a
+                          href={asset.signedUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-block text-xs font-medium text-slate-700 underline"
+                        >
+                          Open file
+                        </a>
+                      ) : null}
+                      {canEdit ? (
+                        <button
+                          type="button"
+                          className="mt-2 ml-3 inline-block text-xs font-medium text-rose-700 underline"
+                          onClick={() => deleteAsset(asset.path)}
+                        >
+                          Delete
+                        </button>
+                      ) : null}
                     </div>
                   </li>
                 ))}
@@ -882,7 +755,7 @@ export default function BrandGuidelinesPage() {
 
           <Card id="typography" className="p-5">
             <SectionTitle as="h3" className="text-lg">Typography</SectionTitle>
-            <BodyText muted className="mt-1">Document the approved heading and body fonts so staff know what to use before building flyers, decks, or pages.</BodyText>
+            <BodyText muted className="mt-1">List approved heading/body fonts and usage rules.</BodyText>
             <textarea
               className="mt-3 w-full rounded-md border border-slate-300 bg-white p-2 text-sm text-slate-800 outline-none focus:border-slate-900 disabled:bg-slate-50"
               rows={3}
@@ -903,11 +776,8 @@ export default function BrandGuidelinesPage() {
           <Card id="iconography" className="p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <SectionTitle as="h3" className="text-lg">Iconography</SectionTitle>
-                  <Badge>{icons.length} assets</Badge>
-                </div>
-                <BodyText muted className="mt-1">Store approved icon packs and usage rules so interfaces and collateral stay visually consistent.</BodyText>
+                <SectionTitle as="h3" className="text-lg">Iconography</SectionTitle>
+                <BodyText muted className="mt-1">Store approved icon packs and guidance for usage style.</BodyText>
               </div>
               <label className={`${buttonClass("secondary", "sm")} ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                 <input
@@ -1030,11 +900,8 @@ export default function BrandGuidelinesPage() {
           <Card id="templates-social" className="p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <SectionTitle as="h3" className="text-lg">Approved Templates & Documents</SectionTitle>
-                  <Badge>{documents.length} files</Badge>
-                </div>
-                <BodyText muted className="mt-1">Publish the working files, social templates, PDFs, and reference docs staff should actually download and reuse.</BodyText>
+                <SectionTitle as="h3" className="text-lg">Templates / Social</SectionTitle>
+                <BodyText muted className="mt-1">Store social templates, print-ready files, and reference docs.</BodyText>
               </div>
               <label className={`${buttonClass("secondary", "sm")} ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                 <input
@@ -1056,74 +923,37 @@ export default function BrandGuidelinesPage() {
             />
 
             {documents.length === 0 ? (
-              <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-                <BodyText muted>No Brand Portal documents yet. Add a downloadable guide, social templates, or print-ready files so staff can self-serve.</BodyText>
-              </div>
+              <BodyText muted className="mt-4">No Brand Portal documents yet.</BodyText>
             ) : (
-              <>
-                {featuredGuide ? (
-                  <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <ul className="mt-4 space-y-2">
+                {documents.map((asset) => (
+                  <li key={asset.path} className="rounded-md border border-slate-200 bg-white px-3 py-2">
+                    <div className="flex items-center justify-between gap-3">
                       <div>
-                        <Eyebrow>Featured Download</Eyebrow>
-                        <SectionTitle as="h4" className="mt-1 text-base">{featuredGuide.name}</SectionTitle>
-                        <MetaText className="mt-1">
-                          {formatSize(featuredGuide.sizeBytes)}
-                          {featuredGuide.updatedAt ? ` • updated ${formatDateMDY(featuredGuide.updatedAt)}` : ""}
+                        <LabelText>{asset.name}</LabelText>
+                        <MetaText>
+                          {formatSize(asset.sizeBytes)}
+                          {asset.updatedAt ? ` • updated ${formatDateMDY(asset.updatedAt)}` : ""}
                         </MetaText>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {featuredGuide.signedUrl ? (
-                          <>
-                            <a href={featuredGuide.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("secondary", "sm")}>
-                              Open
-                            </a>
-                            <a href={featuredGuide.signedUrl} download={featuredGuide.name} className={buttonClass("primary", "sm")}>
-                              Download
-                            </a>
-                          </>
-                        ) : null}
-                      </div>
+                      {asset.signedUrl ? (
+                        <a href={asset.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("secondary", "sm")}>
+                          Open
+                        </a>
+                      ) : null}
+                      {canEdit ? (
+                        <button
+                          type="button"
+                          className={buttonClass("danger", "sm")}
+                          onClick={() => deleteAsset(asset.path)}
+                        >
+                          Delete
+                        </button>
+                      ) : null}
                     </div>
-                  </div>
-                ) : null}
-                <ul className="mt-4 space-y-2">
-                  {documents.map((asset) => (
-                    <li key={asset.path} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <LabelText>{asset.name}</LabelText>
-                          <MetaText>
-                            {formatSize(asset.sizeBytes)}
-                            {asset.updatedAt ? ` • updated ${formatDateMDY(asset.updatedAt)}` : ""}
-                          </MetaText>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          {asset.signedUrl ? (
-                            <>
-                              <a href={asset.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("secondary", "sm")}>
-                                Open
-                              </a>
-                              <a href={asset.signedUrl} download={asset.name} className={buttonClass("primary", "sm")}>
-                                Download
-                              </a>
-                            </>
-                          ) : null}
-                          {canEdit ? (
-                            <button
-                              type="button"
-                              className={buttonClass("danger", "sm")}
-                              onClick={() => deleteAsset(asset.path)}
-                            >
-                              Delete
-                            </button>
-                          ) : null}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </>
+                  </li>
+                ))}
+              </ul>
             )}
           </Card>
 
