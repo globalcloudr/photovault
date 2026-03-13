@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { BodyText, PageTitle } from "@/components/ui/typography";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -52,15 +53,15 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    setStatus("✅ Password updated. Redirecting…");
+    setStatus("Password updated. Redirecting…");
     setTimeout(() => router.replace("/login"), 800);
   }
 
   return (
     <main className="mx-auto max-w-md p-8">
-      <h1 className="text-2xl font-semibold">Reset password</h1>
+      <PageTitle className="text-2xl">Reset password</PageTitle>
 
-      {status && <p className="mt-4 text-sm text-gray-700">{status}</p>}
+      {status && <BodyText className="mt-4 text-gray-700">{status}</BodyText>}
 
       {ready && (
         <form onSubmit={updatePassword} className="mt-6 space-y-3">

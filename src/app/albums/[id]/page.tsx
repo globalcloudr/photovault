@@ -9,6 +9,7 @@ import { Button, buttonClass } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { BodyText, Eyebrow, FieldLabel, LabelText, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { IconDelete, IconDownload, IconEdit, IconGrid, IconList, IconMore, IconOpen, IconView } from "@/components/ui/icons";
 import { logAuditEventClient } from "@/lib/audit-client";
@@ -1033,13 +1034,13 @@ async function load() {
       sidebarContent={
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Album Stats</p>
-            <p className="mt-1.5 text-sm text-slate-700">{assets.length} total photos</p>
-            <p className="text-sm text-slate-700">{filteredAssets.length} matching search</p>
+            <Eyebrow>Album Stats</Eyebrow>
+            <BodyText muted className="mt-1.5">{assets.length} total photos</BodyText>
+            <BodyText muted>{filteredAssets.length} matching search</BodyText>
           </div>
           {album ? (
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Rights</p>
+              <Eyebrow>Rights</Eyebrow>
               <Badge className="mt-1.5">{formatRights(album.rights_status)}</Badge>
             </div>
           ) : null}
@@ -1057,16 +1058,16 @@ async function load() {
         )}
 
         {loading ? (
-          <p className="text-slate-600">Loading…</p>
+          <BodyText muted>Loading…</BodyText>
         ) : status ? (
-          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{status}</p>
+          <BodyText className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-red-700">{status}</BodyText>
         ) : null}
 
         {uploadQueue.length > 0 ? (
           <Card className="mt-3 border-slate-200 p-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900">Upload Queue</h3>
-              <p className="text-xs text-slate-500">{uploadQueue.length} files</p>
+              <LabelText>Upload Queue</LabelText>
+              <MetaText>{uploadQueue.length} files</MetaText>
             </div>
             <ul className="mt-3 space-y-2">
               {uploadQueue.map((item) => (
@@ -1075,21 +1076,21 @@ async function load() {
                     <p className="truncate text-sm text-slate-800" title={item.filename}>
                       {item.filename}
                     </p>
-                    <span className="text-xs font-medium text-slate-600">{item.status}</span>
+                    <LabelText as="span" className="text-slate-600">{item.status}</LabelText>
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <MetaText className="mt-1">
                     {(item.sizeBytes / 1024).toFixed(0)} KB
                     {item.message ? ` • ${item.message}` : ""}
-                  </p>
+                  </MetaText>
                 </li>
               ))}
             </ul>
           </Card>
         ) : null}
 
-        <p className="mt-3 text-xs text-slate-500">
+        <MetaText className="mt-3">
           Upload policy: Photos supports image files only. Beta max file size is {BETA_MAX_UPLOAD_SIZE_LABEL} per image. Upload PDFs and other documents in Brand Portal.
-        </p>
+        </MetaText>
 
         {album && (
           <Card className="overflow-hidden">
@@ -1104,8 +1105,8 @@ async function load() {
               ) : null}
               <div className={`absolute inset-0 ${heroCoverUrl ? "bg-slate-900/45" : "bg-gradient-to-r from-slate-900 to-slate-700"}`} />
               <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">Date: {formatDateMDY(album.event_date)}</p>
-                <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">{album.event_name}</h2>
+                <Eyebrow className="text-slate-100">Date: {formatDateMDY(album.event_date)}</Eyebrow>
+                <SectionTitle as="h2" className="mt-1 text-white">{album.event_name}</SectionTitle>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 px-4 py-3">
@@ -1172,18 +1173,18 @@ async function load() {
 
         <section className="mt-4">
           <div>
-            <h3 className="text-xl font-semibold text-slate-900">Photos</h3>
-            <p className="mt-1 text-xs text-slate-400">
+            <SectionTitle as="h3">Photos</SectionTitle>
+            <MetaText className="mt-1 text-slate-400">
               {assets.length} total{query ? ` • ${sortedAssets.length} matching` : ""}
-            </p>
+            </MetaText>
           </div>
 
           {selectedAssetIds.length > 0 ? (
             <Card className="mt-3 border-slate-200 p-3">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm text-slate-700">
+                <BodyText>
                   {selectedAssetIds.length} selected
-                </p>
+                </BodyText>
                 <Button size="sm" variant="secondary" onClick={selectAllFilteredAssets}>
                   Select all shown
                 </Button>
@@ -1262,7 +1263,7 @@ async function load() {
                   <IconDelete className="mr-1 h-3.5 w-3.5" />
                   {bulkDeleting ? "Deleting…" : "Delete selected"}
                 </Button>
-                {bulkStatus ? <p className="text-xs text-slate-600">{bulkStatus}</p> : null}
+                {bulkStatus ? <MetaText>{bulkStatus}</MetaText> : null}
               </div>
             </Card>
           ) : null}
@@ -1271,8 +1272,8 @@ async function load() {
             <p className="mt-4 text-slate-600">Loading photos…</p>
           ) : sortedAssets.length === 0 ? (
             <div className="mt-5 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
-              <p className="text-sm font-medium text-slate-800">No photos uploaded yet</p>
-              <p className="mt-2 text-sm text-slate-600">Drag files into this area, or upload from your computer.</p>
+              <LabelText className="text-slate-800">No photos uploaded yet</LabelText>
+              <BodyText muted className="mt-2">Drag files into this area, or upload from your computer.</BodyText>
               <label className={`${buttonClass("primary", "sm")} mt-5 inline-flex cursor-pointer`}>
                 <input
                   type="file"
@@ -1405,16 +1406,16 @@ async function load() {
                   </div>
 
                   <div className="space-y-2 border-t border-slate-200 p-3">
-                    <p className="truncate text-sm font-medium text-slate-800" title={a.original_filename}>
+                    <LabelText className="truncate text-slate-800" title={a.original_filename}>
                       {a.original_filename}
-                    </p>
-                    <p className="text-xs text-slate-500">
+                    </LabelText>
+                    <MetaText>
                       #{a.sequence_number} • {(a.size_bytes / 1024).toFixed(0)} KB
-                    </p>
+                    </MetaText>
                     {(a.tags?.length || a.event_type || a.campus || a.photographer) ? (
-                      <p className="line-clamp-1 text-xs text-slate-500">
+                      <MetaText className="line-clamp-1">
                         {[a.event_type, a.campus, a.photographer, ...(a.tags ?? [])].filter(Boolean).join(" • ")}
-                      </p>
+                      </MetaText>
                     ) : null}
                   </div>
                 </div>
@@ -1449,14 +1450,14 @@ async function load() {
                         />
                         Select
                       </label>
-                      <p className="truncate text-sm font-medium text-slate-800" title={a.original_filename}>{a.original_filename}</p>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <LabelText className="truncate text-slate-800" title={a.original_filename}>{a.original_filename}</LabelText>
+                      <MetaText className="mt-1">
                         #{a.sequence_number} • {(a.size_bytes / 1024).toFixed(0)} KB
-                      </p>
+                      </MetaText>
                       {(a.tags?.length || a.event_type || a.campus || a.photographer) ? (
-                        <p className="mt-1 line-clamp-1 text-xs text-slate-500">
+                        <MetaText className="mt-1 line-clamp-1">
                           {[a.event_type, a.campus, a.photographer, ...(a.tags ?? [])].filter(Boolean).join(" • ")}
-                        </p>
+                        </MetaText>
                       ) : null}
                     </div>
 
@@ -1504,7 +1505,7 @@ async function load() {
             />
             <aside className="absolute inset-y-0 right-0 w-full overflow-y-auto overscroll-contain bg-white shadow-2xl sm:max-w-xl sm:border-l sm:border-slate-200">
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-5">
-                <h3 className="text-2xl font-semibold tracking-tight text-slate-950">Asset Details</h3>
+                <SectionTitle as="h3" className="text-2xl text-slate-950">Asset Details</SectionTitle>
                 <Button size="sm" variant="ghost" onClick={closeAssetEditor} disabled={assetEditorSaving}>
                   Close
                 </Button>
@@ -1512,7 +1513,7 @@ async function load() {
 
               <div className="space-y-5 px-4 py-4 pb-28 sm:px-5 sm:py-5 sm:pb-24">
                 <div>
-                  <p className="mb-2 text-sm font-semibold text-slate-900">Preview</p>
+                  <LabelText className="mb-2">Preview</LabelText>
                   <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                     {editingAsset.thumbUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -1528,7 +1529,7 @@ async function load() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-semibold text-slate-900">Asset name</label>
+                  <FieldLabel className="mb-1 block">Asset name</FieldLabel>
                   <Input
                     value={assetEditorName}
                     onChange={(e) => setAssetEditorName(e.target.value)}
@@ -1537,7 +1538,7 @@ async function load() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-semibold text-slate-900">Tags</label>
+                  <FieldLabel className="mb-1 block">Tags</FieldLabel>
                   <div className="rounded-lg border border-slate-200 px-3 py-2">
                     {assetEditorTags.length > 0 ? (
                       <div className="mb-2 flex flex-wrap gap-2">
@@ -1582,7 +1583,7 @@ async function load() {
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-semibold text-slate-900">Event type</label>
+                    <FieldLabel className="mb-1 block">Event type</FieldLabel>
                     <Input
                       value={assetEditorEventType}
                       onChange={(e) => setAssetEditorEventType(e.target.value)}
@@ -1590,7 +1591,7 @@ async function load() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-semibold text-slate-900">Campus</label>
+                    <FieldLabel className="mb-1 block">Campus</FieldLabel>
                     <Input
                       value={assetEditorCampus}
                       onChange={(e) => setAssetEditorCampus(e.target.value)}
@@ -1598,7 +1599,7 @@ async function load() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="mb-1 block text-sm font-semibold text-slate-900">Photographer</label>
+                    <FieldLabel className="mb-1 block">Photographer</FieldLabel>
                     <Input
                       value={assetEditorPhotographer}
                       onChange={(e) => setAssetEditorPhotographer(e.target.value)}
@@ -1608,7 +1609,7 @@ async function load() {
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold text-slate-900">Asset details</p>
+                  <LabelText className="mb-2">Asset details</LabelText>
                   <div className="overflow-hidden rounded-lg border border-slate-200">
                     <dl className="divide-y divide-slate-200 text-sm">
                       <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">

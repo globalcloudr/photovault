@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IconDownload, IconView } from "@/components/ui/icons";
+import { BodyText, CardTitle, MetaText, SectionTitle, typography } from "@/components/ui/typography";
+import { cn } from "@/lib/cn";
 import { formatDateMDY } from "@/lib/date-format";
 
 type SharedAsset = {
@@ -78,8 +80,8 @@ export default function PublicSharePage() {
     <main className="min-h-screen bg-slate-100 px-4 py-8">
       <div className="mx-auto max-w-6xl space-y-4">
         <Card className="p-5 sm:p-6">
-          <h1 className="text-2xl font-semibold text-slate-900">Shared Album</h1>
-          <p className="mt-1 text-sm text-slate-600">Use the link owner’s password if prompted.</p>
+          <SectionTitle as="h1">Shared Album</SectionTitle>
+          <BodyText muted className="mt-1">Use the link owner’s password if prompted.</BodyText>
 
           {!album ? (
             <div className="mt-4 space-y-3">
@@ -99,14 +101,14 @@ export default function PublicSharePage() {
                   Sign in
                 </Link>
               </div>
-              {status ? <p className="text-sm text-slate-700">{status}</p> : null}
+              {status ? <BodyText muted>{status}</BodyText> : null}
             </div>
           ) : (
             <div className="mt-4">
-              <p className="text-sm font-medium text-slate-800">{album.event_name}</p>
-              <p className="text-xs text-slate-500">Event date: {formatDateMDY(album.event_date)} • {assets.length} photos</p>
+              <CardTitle as="h2" className="text-slate-900">{album.event_name}</CardTitle>
+              <MetaText>Event date: {formatDateMDY(album.event_date)} • {assets.length} photos</MetaText>
               {!allowDownload ? (
-                <p className="mt-2 text-xs text-slate-500">Download is disabled for this share link.</p>
+                <MetaText className="mt-2">Download is disabled for this share link.</MetaText>
               ) : null}
             </div>
           )}
@@ -125,12 +127,12 @@ export default function PublicSharePage() {
                   )}
                 </div>
                 <div className="space-y-2 border-t border-slate-200 p-3">
-                  <p className="truncate text-sm font-medium text-slate-800" title={asset.original_filename}>
+                  <p className={cn(typography.label, "truncate text-slate-800")} title={asset.original_filename}>
                     {asset.original_filename}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <MetaText>
                     #{asset.sequence_number} • {(asset.size_bytes / 1024).toFixed(0)} KB
-                  </p>
+                  </MetaText>
                   <div className="flex items-center gap-2">
                     {asset.url ? (
                       <a href={asset.url} target="_blank" rel="noreferrer" className={buttonClass("secondary", "sm")}>

@@ -8,6 +8,7 @@ import { useOrg } from "@/components/org/org-provider";
 import { OrgBrandLockup } from "@/components/layout/org-brand-lockup";
 import { cn } from "@/lib/cn";
 import { parseStorageRef } from "@/lib/theme";
+import { BodyText, Eyebrow, MetaText, PageTitle, typography } from "@/components/ui/typography";
 import {
   IconAlbums,
   IconAppearance,
@@ -41,7 +42,7 @@ type MediaWorkspaceShellProps = {
 
 function navClass(active: boolean) {
   return cn(
-    "flex items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium transition",
+    "flex items-center gap-2 rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] transition",
     active
       ? "bg-[var(--surface)] text-[var(--foreground)] ring-1 ring-[var(--border)]"
       : "text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]"
@@ -202,20 +203,20 @@ export function MediaWorkspaceShell({
     <main className="min-h-screen bg-[var(--background)]">
       <div className="border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-6">
-          <p className="text-sm font-semibold tracking-tight text-[var(--foreground)]">PhotoVault</p>
+          <p className={cn(typography.label, "text-[15px] font-semibold text-[var(--foreground)]")}>PhotoVault</p>
           <div className="flex items-center gap-2 sm:gap-3">
             {utilityActions.length > 0 &&
               utilityActions.map((action) => <div key={action.key}>{action.node}</div>)}
             <a
               href="mailto:support@photovault.app"
-              className="text-sm font-medium text-[var(--text-muted)] transition hover:text-[var(--foreground)]"
+              className="font-outfit text-sm font-medium tracking-[-0.01em] text-[var(--text-muted)] transition hover:text-[var(--foreground)]"
             >
               Support
             </a>
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-muted)] text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)]"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-muted)] font-outfit text-sm font-semibold text-[var(--foreground)] transition hover:bg-[var(--surface)]"
                 onClick={() => setMenuOpen((prev) => !prev)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
@@ -228,12 +229,12 @@ export function MediaWorkspaceShell({
                 <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-lg">
                   <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] px-4 py-3">
                     <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-[var(--foreground)]">{displayName}</p>
+                      <p className={cn(typography.cardTitle, "truncate text-base")}>{displayName}</p>
                       {userName ? (
-                        <p className="truncate text-xs text-[var(--text-muted)]">{userEmail}</p>
+                        <MetaText className="truncate">{userEmail}</MetaText>
                       ) : null}
                     </div>
-                    <p className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2 py-0.5 text-xs font-medium text-[var(--text-muted)]">
+                    <p className="shrink-0 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-2 py-0.5 font-outfit text-xs font-medium text-[var(--text-muted)]">
                       {userRole}
                     </p>
                   </div>
@@ -241,14 +242,14 @@ export function MediaWorkspaceShell({
                   <div className="space-y-0.5 px-2 py-2">
                     <a
                       href="mailto:info@akkedisdigital.com"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 font-outfit text-sm tracking-[-0.01em] text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                     >
                       <IconHelp className="h-4 w-4" />
                       Help
                     </a>
                     <a
                       href="mailto:info@akkedisdigital.com?subject=PhotoVault%20Question%20%2F%20Feedback"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 font-outfit text-sm tracking-[-0.01em] text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                     >
                       <IconFeedback className="h-4 w-4" />
                       Questions / feedback
@@ -256,7 +257,7 @@ export function MediaWorkspaceShell({
                     <button
                       type="button"
                       disabled
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[var(--text-muted)] opacity-60"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left font-outfit text-sm tracking-[-0.01em] text-[var(--text-muted)] opacity-60"
                       title="Billing dashboard coming soon"
                     >
                       <IconBilling className="h-4 w-4" />
@@ -264,7 +265,7 @@ export function MediaWorkspaceShell({
                     </button>
                     <Link
                       href="/settings/profile"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 font-outfit text-sm tracking-[-0.01em] text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                       onClick={() => setMenuOpen(false)}
                     >
                       <IconAppearance className="h-4 w-4" />
@@ -273,7 +274,7 @@ export function MediaWorkspaceShell({
                     {isSuperAdmin ? (
                       <Link
                         href="/super-admin"
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
+                        className="flex items-center gap-2 rounded-md px-2 py-2 font-outfit text-sm tracking-[-0.01em] text-[var(--foreground)] transition hover:bg-[var(--surface-muted)]"
                         onClick={() => setMenuOpen(false)}
                       >
                         <IconSuperAdmin className="h-4 w-4" />
@@ -286,7 +287,7 @@ export function MediaWorkspaceShell({
                     <button
                       type="button"
                       disabled={signingOut}
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[var(--foreground)] transition hover:bg-[var(--surface-muted)] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left font-outfit text-sm tracking-[-0.01em] text-[var(--foreground)] transition hover:bg-[var(--surface-muted)] disabled:cursor-not-allowed disabled:opacity-60"
                       onClick={() => {
                         setMenuOpen(false);
                         void signOut();
@@ -315,15 +316,15 @@ export function MediaWorkspaceShell({
                   logoUrl={displayedLogoUrl}
                   showName={!sidebarLogoOnly}
                   className="items-start gap-2"
-                  textClassName="text-lg font-semibold tracking-tight text-[var(--foreground)]"
+                  textClassName="font-outfit text-lg font-semibold tracking-[-0.03em] text-[var(--foreground)]"
                   logoFrameClassName={sidebarLogoOnly ? "h-14 w-44" : "h-12 w-32"}
                   logoImageClassName={sidebarLogoOnly ? "h-10" : "h-9"}
                 />
-                <p className="mt-2 text-xs text-[var(--text-muted)]">{activeOrg?.slug ?? "No active org"}</p>
+                <MetaText className="mt-2">{activeOrg?.slug ?? "No active org"}</MetaText>
               </section>
 
               <nav className="mt-2 border-t border-[var(--border)] pt-3">
-                <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">Collections</p>
+                <Eyebrow className="px-2 pb-2">Collections</Eyebrow>
                 <Link href="/albums" className={navClass(pathname.startsWith("/albums"))}>
                   <IconAlbums className="h-4 w-4" />
                   Albums
@@ -367,8 +368,8 @@ export function MediaWorkspaceShell({
               <header>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)]">{title}</h1>
-                    {subtitle ? <p className="mt-1.5 text-sm text-[var(--text-muted)]">{subtitle}</p> : null}
+                    <PageTitle>{title}</PageTitle>
+                    {subtitle ? <BodyText muted className="mt-1.5 max-w-3xl">{subtitle}</BodyText> : null}
                   </div>
 
                   {actions.length > 0 ? (

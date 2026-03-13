@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { BodyText, Eyebrow, PageTitle } from "@/components/ui/typography";
 
 type Action = {
   key: string;
@@ -22,12 +23,12 @@ export function PageHeader({ eyebrow, title, subtitle, actions = [], className }
         <div>
           {eyebrow &&
             (eyebrowIsSimpleText ? (
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{eyebrow}</p>
+              <Eyebrow>{eyebrow}</Eyebrow>
             ) : (
               <div>{eyebrow}</div>
             ))}
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">{title}</h1>
-          {subtitle && <p className="mt-1 text-sm text-slate-600">{subtitle}</p>}
+          <PageTitle className="mt-1 text-slate-900">{title}</PageTitle>
+          {subtitle && <BodyText muted className="mt-1">{subtitle}</BodyText>}
         </div>
 
         {actions.length > 0 && (

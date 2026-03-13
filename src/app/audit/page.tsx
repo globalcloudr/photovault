@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MediaWorkspaceShell } from "@/components/layout/media-workspace-shell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BodyText, CardTitle, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { supabase } from "@/lib/supabaseClient";
 import { formatDateTimeMDY } from "@/lib/date-format";
@@ -94,22 +95,27 @@ export default function AuditLogPage() {
           <Badge>{activeOrg?.slug ?? "no-org"}</Badge>
         </div>
 
-        {loading ? <p className="text-sm text-slate-500">Loading audit events…</p> : null}
-        {noActiveOrg ? <p className="text-sm text-slate-700">No active organization selected.</p> : null}
-        {!noActiveOrg && status ? <p className="text-sm text-slate-700">{status}</p> : null}
+        <div className="space-y-1">
+          <SectionTitle as="h2">Recent Activity</SectionTitle>
+          <BodyText muted>Track changes, access, and admin actions for the active organization.</BodyText>
+        </div>
+
+        {loading ? <BodyText muted>Loading audit events…</BodyText> : null}
+        {noActiveOrg ? <BodyText>No active organization selected.</BodyText> : null}
+        {!noActiveOrg && status ? <BodyText>{status}</BodyText> : null}
 
         {!loading && !noActiveOrg && !status ? (
           events.length > 0 ? (
             <div className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white">
               {events.map((event) => (
                 <div key={event.id} className="grid gap-2 p-3 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-4">
-                  <div className="text-xs text-slate-500">{formatDateTimeMDY(event.created_at)}</div>
+                  <MetaText>{formatDateTimeMDY(event.created_at)}</MetaText>
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold text-slate-900">{event.event_type}</p>
-                    <p className="text-xs text-slate-600">
+                    <CardTitle as="h3" className="text-base">{event.event_type}</CardTitle>
+                    <MetaText>
                       Actor: {event.actor_email ?? event.actor_user_id ?? "system"} • Entity: {event.entity_type ?? "n/a"} /{" "}
                       {event.entity_id ?? "n/a"}
-                    </p>
+                    </MetaText>
                     {event.metadata && Object.keys(event.metadata).length > 0 ? (
                       <pre className="overflow-x-auto rounded-lg bg-slate-50 p-2 text-[11px] text-slate-700">
                         {JSON.stringify(event.metadata, null, 2)}
@@ -120,7 +126,7 @@ export default function AuditLogPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">No audit events yet.</p>
+            <BodyText muted>No audit events yet.</BodyText>
           )
         ) : null}
       </Card>

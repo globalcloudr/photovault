@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { BodyText, FieldLabel, LabelText, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { supabase } from "@/lib/supabaseClient";
 import { formatDateMDY } from "@/lib/date-format";
@@ -166,9 +167,14 @@ export default function StaffSettingsPage() {
           <Badge>{activeOrg?.slug ?? "no-org"}</Badge>
         </div>
 
+        <div className="space-y-1">
+          <SectionTitle as="h2">Invite Staff</SectionTitle>
+          <BodyText muted>Add uploaders and viewers without leaving the current workspace.</BodyText>
+        </div>
+
         <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto] lg:items-end" onSubmit={onInvite}>
           <div className="space-y-1">
-            <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Staff Email</label>
+            <FieldLabel>Staff Email</FieldLabel>
             <Input
               type="email"
               placeholder="staff@school.edu"
@@ -180,7 +186,7 @@ export default function StaffSettingsPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Role</label>
+            <FieldLabel>Role</FieldLabel>
             <select
               className="h-11 w-full rounded-full border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-900"
               value={inviteRole}
@@ -197,24 +203,24 @@ export default function StaffSettingsPage() {
           </Button>
         </form>
 
-        {status ? <p className="text-sm text-slate-700">{status}</p> : null}
+        {status ? <BodyText>{status}</BodyText> : null}
       </Card>
 
       <Card className="overflow-hidden p-0">
         {loading ? (
-          <p className="p-4 text-sm text-slate-500">Loading staff…</p>
+          <BodyText muted className="p-4">Loading staff…</BodyText>
         ) : staff.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">No staff memberships found for this organization.</p>
+          <BodyText muted className="p-4">No staff memberships found for this organization.</BodyText>
         ) : (
           <div className="divide-y divide-slate-200">
             {staff.map((row) => (
               <div key={row.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">{row.email ?? row.user_id}</p>
-                  <p className="text-xs text-slate-500">
+                  <LabelText>{row.email ?? row.user_id}</LabelText>
+                  <MetaText>
                     role: {row.role} • {row.accepted ? "accepted" : "invite pending"} • added{" "}
                     {formatDateMDY(row.created_at)}
-                  </p>
+                  </MetaText>
                 </div>
                 <div className="flex items-center gap-2">
                   {row.role === "owner" ? <Badge>Owner</Badge> : null}

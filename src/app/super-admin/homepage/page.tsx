@@ -7,6 +7,7 @@ import { MediaWorkspaceShell } from "@/components/layout/media-workspace-shell";
 import { Card } from "@/components/ui/card";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BodyText, Eyebrow, FieldLabel, LabelText, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { supabase } from "@/lib/supabaseClient";
 import { defaultMarketingHomepageContent, MarketingHomepageContent, normalizeMarketingHomepageContent } from "@/lib/marketing-homepage-content";
@@ -302,48 +303,48 @@ export default function SuperAdminHomepageCmsPage() {
       ]}
     >
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Hero</h2>
+        <SectionTitle as="h2">Hero</SectionTitle>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Book demo URL (Calendly)</label>
+            <FieldLabel>Book demo URL (Calendly)</FieldLabel>
             <Input
               className="mt-1.5"
               value={content.nav.bookDemoUrl}
               onChange={(e) => setPath("nav.bookDemoUrl", e.target.value)}
               placeholder="https://calendly.com/your-handle/your-event"
             />
-            <p className="mt-1 text-xs text-slate-500">Used by the top nav and hero Book demo buttons.</p>
+            <MetaText className="mt-1">Used by the top nav and hero Book demo buttons.</MetaText>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Badge</label>
+            <FieldLabel>Badge</FieldLabel>
             <Input className="mt-1.5" value={content.hero.badge} onChange={(e) => setPath("hero.badge", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Trust line</label>
+            <FieldLabel>Trust line</FieldLabel>
             <Input className="mt-1.5" value={content.hero.trust} onChange={(e) => setPath("hero.trust", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Title</label>
+            <FieldLabel>Title</FieldLabel>
             <Input className="mt-1.5" value={content.hero.title} onChange={(e) => setPath("hero.title", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Title emphasis</label>
+            <FieldLabel>Title emphasis</FieldLabel>
             <Input className="mt-1.5" value={content.hero.emphasis} onChange={(e) => setPath("hero.emphasis", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Subtitle</label>
+            <FieldLabel>Subtitle</FieldLabel>
             <textarea className={`${textAreaClass()} mt-1.5`} rows={3} value={content.hero.subtitle} onChange={(e) => setPath("hero.subtitle", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Primary CTA</label>
+            <FieldLabel>Primary CTA</FieldLabel>
             <Input className="mt-1.5" value={content.hero.primaryCta} onChange={(e) => setPath("hero.primaryCta", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Secondary CTA</label>
+            <FieldLabel>Secondary CTA</FieldLabel>
             <Input className="mt-1.5" value={content.hero.secondaryCta} onChange={(e) => setPath("hero.secondaryCta", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Hero image URL</label>
+            <FieldLabel>Hero image URL</FieldLabel>
             <Input
               className="mt-1.5"
               value={content.hero.imageUrl}
@@ -361,31 +362,31 @@ export default function SuperAdminHomepageCmsPage() {
                 }}
                 className="text-xs text-slate-600"
               />
-              {uploadingSlot === "hero" ? <span className="text-xs text-slate-500">Uploading…</span> : null}
+              {uploadingSlot === "hero" ? <MetaText as="span">Uploading…</MetaText> : null}
             </div>
-            <p className="mt-1 text-xs text-slate-500">If empty, the current mockup illustration remains in place.</p>
+            <MetaText className="mt-1">If empty, the current mockup illustration remains in place.</MetaText>
           </div>
         </div>
       </Card>
 
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Trusted Logos + Metrics + How It Works</h2>
+        <SectionTitle as="h2">Trusted Logos + Metrics + How It Works</SectionTitle>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Trusted by label</label>
+            <FieldLabel>Trusted by label</FieldLabel>
             <Input className="mt-1.5" value={content.trusted.label} onChange={(e) => setPath("trusted.label", e.target.value)} />
           </div>
           {content.trusted.logos.slice(0, 6).map((logo, index) => (
             <div key={`trusted-logo-${index}`} className="rounded-lg border border-slate-200 p-3 sm:col-span-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Trusted logo {index + 1}</p>
+              <Eyebrow>{`Trusted logo ${index + 1}`}</Eyebrow>
               <div className="mt-2 grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Name (alt text)</label>
+                  <FieldLabel>Name (alt text)</FieldLabel>
                   <Input className="mt-1.5" value={logo.name} onChange={(e) => setPath(`trusted.logos.${index}.name`, e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Logo URL</label>
+                  <FieldLabel>Logo URL</FieldLabel>
                   <Input
                     className="mt-1.5"
                     value={logo.logoUrl}
@@ -401,18 +402,18 @@ export default function SuperAdminHomepageCmsPage() {
         <div className="mt-6 grid gap-4">
           {content.metrics.items.slice(0, 3).map((metric, index) => (
             <div key={`metric-${index}`} className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Metric {index + 1}</p>
+              <Eyebrow>{`Metric ${index + 1}`}</Eyebrow>
               <div className="mt-2 grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Value</label>
+                  <FieldLabel>Value</FieldLabel>
                   <Input className="mt-1.5" value={metric.value} onChange={(e) => setPath(`metrics.items.${index}.value`, e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Label</label>
+                  <FieldLabel>Label</FieldLabel>
                   <Input className="mt-1.5" value={metric.label} onChange={(e) => setPath(`metrics.items.${index}.label`, e.target.value)} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-800">Detail</label>
+                  <FieldLabel>Detail</FieldLabel>
                   <textarea
                     className={`${textAreaClass()} mt-1.5`}
                     rows={2}
@@ -427,25 +428,25 @@ export default function SuperAdminHomepageCmsPage() {
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-slate-800">How it works label</label>
+            <FieldLabel>How it works label</FieldLabel>
             <Input className="mt-1.5" value={content.howItWorks.label} onChange={(e) => setPath("howItWorks.label", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">How it works title</label>
+            <FieldLabel>How it works title</FieldLabel>
             <Input className="mt-1.5" value={content.howItWorks.title} onChange={(e) => setPath("howItWorks.title", e.target.value)} />
           </div>
         </div>
         <div className="mt-4 grid gap-4">
           {content.howItWorks.steps.slice(0, 3).map((step, index) => (
             <div key={`how-step-${index}`} className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Step {index + 1}</p>
+              <Eyebrow>{`Step ${index + 1}`}</Eyebrow>
               <div className="mt-2 grid gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Title</label>
+                  <FieldLabel>Title</FieldLabel>
                   <Input className="mt-1.5" value={step.title} onChange={(e) => setPath(`howItWorks.steps.${index}.title`, e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Body</label>
+                  <FieldLabel>Body</FieldLabel>
                   <textarea
                     className={`${textAreaClass()} mt-1.5`}
                     rows={2}
@@ -460,46 +461,46 @@ export default function SuperAdminHomepageCmsPage() {
       </Card>
 
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Why + Testimonials</h2>
+        <SectionTitle as="h2">Why + Testimonials</SectionTitle>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-slate-800">Why label</label>
+            <FieldLabel>Why label</FieldLabel>
             <Input className="mt-1.5" value={content.why.label} onChange={(e) => setPath("why.label", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Testimonials label</label>
+            <FieldLabel>Testimonials label</FieldLabel>
             <Input className="mt-1.5" value={content.testimonials.label} onChange={(e) => setPath("testimonials.label", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Why title</label>
+            <FieldLabel>Why title</FieldLabel>
             <Input className="mt-1.5" value={content.why.title} onChange={(e) => setPath("why.title", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Testimonials title</label>
+            <FieldLabel>Testimonials title</FieldLabel>
             <Input className="mt-1.5" value={content.testimonials.title} onChange={(e) => setPath("testimonials.title", e.target.value)} />
           </div>
         </div>
       </Card>
 
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Security Highlights</h2>
+        <SectionTitle as="h2">Security Highlights</SectionTitle>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-slate-800">Section label</label>
+            <FieldLabel>Section label</FieldLabel>
             <Input className="mt-1.5" value={content.security.label} onChange={(e) => setPath("security.label", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">Section title</label>
+            <FieldLabel>Section title</FieldLabel>
             <Input className="mt-1.5" value={content.security.title} onChange={(e) => setPath("security.title", e.target.value)} />
           </div>
         </div>
         <div className="mt-4 grid gap-4">
           {content.security.items.slice(0, 6).map((item, index) => (
             <div key={`${index}-${item.title}`} className="rounded-lg border border-slate-200 p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Item {index + 1}</p>
+              <Eyebrow>{`Item ${index + 1}`}</Eyebrow>
               <div className="mt-2 grid gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Title</label>
+                  <FieldLabel>Title</FieldLabel>
                   <Input
                     className="mt-1.5"
                     value={item.title}
@@ -507,7 +508,7 @@ export default function SuperAdminHomepageCmsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Body</label>
+                  <FieldLabel>Body</FieldLabel>
                   <textarea
                     className={`${textAreaClass()} mt-1.5`}
                     rows={2}
@@ -522,19 +523,19 @@ export default function SuperAdminHomepageCmsPage() {
       </Card>
 
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Feature Sections</h2>
-        <p className="mt-1 text-sm text-slate-600">Add an image URL or upload directly from your computer.</p>
+        <SectionTitle as="h2">Feature Sections</SectionTitle>
+        <BodyText muted className="mt-1">Add an image URL or upload directly from your computer.</BodyText>
         <div className="mt-4 grid gap-6">
           {content.features.items.slice(0, 2).map((feature, featureIndex) => (
             <div key={featureIndex} className="rounded-lg border border-slate-200 p-4">
-              <p className="text-sm font-semibold text-slate-900">Feature {featureIndex + 1}</p>
+              <LabelText>{`Feature ${featureIndex + 1}`}</LabelText>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Label</label>
+                  <FieldLabel>Label</FieldLabel>
                   <Input className="mt-1.5" value={feature.label} onChange={(e) => setPath(`features.items.${featureIndex}.label`, e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Image URL</label>
+                  <FieldLabel>Image URL</FieldLabel>
                   <Input className="mt-1.5" value={feature.imageUrl} onChange={(e) => setPath(`features.items.${featureIndex}.imageUrl`, e.target.value)} placeholder="/images/home/feature-1.jpg" />
                   <div className="mt-2 flex items-center gap-2">
                     <input
@@ -547,27 +548,27 @@ export default function SuperAdminHomepageCmsPage() {
                       }}
                       className="text-xs text-slate-600"
                     />
-                    {uploadingSlot === `feature-${featureIndex + 1}` ? <span className="text-xs text-slate-500">Uploading…</span> : null}
+                    {uploadingSlot === `feature-${featureIndex + 1}` ? <MetaText as="span">Uploading…</MetaText> : null}
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-800">Title</label>
+                  <FieldLabel>Title</FieldLabel>
                   <Input className="mt-1.5" value={feature.title} onChange={(e) => setPath(`features.items.${featureIndex}.title`, e.target.value)} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-800">Body</label>
+                  <FieldLabel>Body</FieldLabel>
                   <textarea className={`${textAreaClass()} mt-1.5`} rows={3} value={feature.body} onChange={(e) => setPath(`features.items.${featureIndex}.body`, e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Bullet 1</label>
+                  <FieldLabel>Bullet 1</FieldLabel>
                   <Input className="mt-1.5" value={feature.bullets[0] ?? ""} onChange={(e) => setBullet(featureIndex, 0, e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Bullet 2</label>
+                  <FieldLabel>Bullet 2</FieldLabel>
                   <Input className="mt-1.5" value={feature.bullets[1] ?? ""} onChange={(e) => setBullet(featureIndex, 1, e.target.value)} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-800">Bullet 3</label>
+                  <FieldLabel>Bullet 3</FieldLabel>
                   <Input className="mt-1.5" value={feature.bullets[2] ?? ""} onChange={(e) => setBullet(featureIndex, 2, e.target.value)} />
                 </div>
               </div>
@@ -577,19 +578,19 @@ export default function SuperAdminHomepageCmsPage() {
       </Card>
 
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Version History</h2>
-        <p className="mt-1 text-sm text-slate-600">Each save stores the previous homepage version. Restore at any time.</p>
+        <SectionTitle as="h2">Version History</SectionTitle>
+        <BodyText muted className="mt-1">Each save stores the previous homepage version. Restore at any time.</BodyText>
         {historyBusy ? (
-          <p className="mt-3 text-sm text-slate-600">Loading history…</p>
+          <BodyText muted className="mt-3">Loading history…</BodyText>
         ) : historyRows.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-600">No previous versions yet.</p>
+          <BodyText muted className="mt-3">No previous versions yet.</BodyText>
         ) : (
           <ul className="mt-3 space-y-2">
             {historyRows.map((row) => (
               <li key={row.id} className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Version #{row.id}</p>
-                  <p className="text-xs text-slate-500">{formatDateTimeMDY(row.updated_at)}</p>
+                  <LabelText>{`Version #${row.id}`}</LabelText>
+                  <MetaText>{formatDateTimeMDY(row.updated_at)}</MetaText>
                 </div>
                 <Button type="button" size="sm" variant="secondary" onClick={() => restoreVersion(row.id)}>
                   Restore
@@ -601,32 +602,32 @@ export default function SuperAdminHomepageCmsPage() {
       </Card>
 
       <Card className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">CTA + Footer</h2>
+        <SectionTitle as="h2">CTA + Footer</SectionTitle>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-slate-800">CTA label</label>
+            <FieldLabel>CTA label</FieldLabel>
             <Input className="mt-1.5" value={content.cta.label} onChange={(e) => setPath("cta.label", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">Contact email</label>
+            <FieldLabel>Contact email</FieldLabel>
             <Input className="mt-1.5" value={content.footer.contactEmail} onChange={(e) => setPath("footer.contactEmail", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">CTA title</label>
+            <FieldLabel>CTA title</FieldLabel>
             <Input className="mt-1.5" value={content.cta.title} onChange={(e) => setPath("cta.title", e.target.value)} />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-sm font-medium text-slate-800">CTA body</label>
+            <FieldLabel>CTA body</FieldLabel>
             <textarea className={`${textAreaClass()} mt-1.5`} rows={3} value={content.cta.body} onChange={(e) => setPath("cta.body", e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-800">CTA primary button</label>
+            <FieldLabel>CTA primary button</FieldLabel>
             <Input className="mt-1.5" value={content.cta.primaryCta} onChange={(e) => setPath("cta.primaryCta", e.target.value)} />
           </div>
         </div>
       </Card>
 
-      {status ? <p className="text-sm text-slate-700">{status}</p> : null}
+      {status ? <BodyText>{status}</BodyText> : null}
     </MediaWorkspaceShell>
   );
 }

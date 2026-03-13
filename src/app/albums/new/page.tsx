@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { BodyText, FieldLabel, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 
 type Dept = { id: string; code: string; name: string };
@@ -117,82 +118,87 @@ export default function NewAlbumPage() {
 
         <Card className="mt-6 p-5 sm:p-6">
           <form onSubmit={createAlbum}>
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-800">Event name</label>
-              <Input
-                className="mt-1.5"
-                placeholder="e.g., Spring Graduation"
-                value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
-                required
-              />
+            <div className="space-y-5">
+              <div className="space-y-1">
+                <SectionTitle as="h2">Event Details</SectionTitle>
+                <BodyText muted>Start with the essentials. Photos and finer metadata can be added after the album exists.</BodyText>
+              </div>
+
+              <div>
+                <FieldLabel>Event name</FieldLabel>
+                <Input
+                  className="mt-1.5"
+                  placeholder="e.g., Spring Graduation"
+                  value={eventName}
+                  onChange={(e) => setEventName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <FieldLabel>Event date</FieldLabel>
+                <Input
+                  className="mt-1.5"
+                  type={eventDateInputType}
+                  placeholder="Event Date"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  onFocus={() => setEventDateInputType("date")}
+                  onBlur={() => {
+                    if (!eventDate) setEventDateInputType("text");
+                  }}
+                  required
+                />
+              </div>
+
+              <div>
+                <FieldLabel>Rights status</FieldLabel>
+                <select
+                  className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+                  value={rightsStatus}
+                  onChange={(e) => setRightsStatus(e.target.value as RightsStatus)}
+                >
+                  <option value="unknown">Unknown</option>
+                  <option value="ok_for_marketing">OK for marketing</option>
+                  <option value="internal_only">Internal only</option>
+                  <option value="do_not_use">Do not use</option>
+                </select>
+              </div>
+
+              <div>
+                <FieldLabel>Program / Department (optional)</FieldLabel>
+                <select
+                  className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+                  value={departmentId}
+                  onChange={(e) => setDepartmentId(e.target.value)}
+                >
+                  <option value="">No program / department</option>
+                  {departments.length === 0 ? (
+                    <option value="" disabled>No programs / departments yet</option>
+                  ) : (
+                    departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.code} — {d.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                <MetaText className="mt-1.5">
+                  Use this to group albums by school program area. You can update it later in Album Details.
+                </MetaText>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-800">Event date</label>
-              <Input
-                className="mt-1.5"
-                type={eventDateInputType}
-                placeholder="Event Date"
-                value={eventDate}
-                onChange={(e) => setEventDate(e.target.value)}
-                onFocus={() => setEventDateInputType("date")}
-                onBlur={() => {
-                  if (!eventDate) setEventDateInputType("text");
-                }}
-                required
-              />
+            <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-200 pt-4">
+              <Link href="/albums" className={buttonClass("secondary")}>
+                Cancel
+              </Link>
+              <Button variant="primary" type="submit" disabled={busy}>
+                {busy ? "Creating…" : "Create album"}
+              </Button>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-800">Rights status</label>
-              <select
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
-                value={rightsStatus}
-                onChange={(e) => setRightsStatus(e.target.value as RightsStatus)}
-              >
-                <option value="unknown">Unknown</option>
-                <option value="ok_for_marketing">OK for marketing</option>
-                <option value="internal_only">Internal only</option>
-                <option value="do_not_use">Do not use</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-800">Program / Department (optional)</label>
-              <select
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
-                value={departmentId}
-                onChange={(e) => setDepartmentId(e.target.value)}
-              >
-                <option value="">No program / department</option>
-                {departments.length === 0 ? (
-                  <option value="" disabled>No programs / departments yet</option>
-                ) : (
-                  departments.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.code} — {d.name}
-                    </option>
-                  ))
-                )}
-              </select>
-              <p className="mt-1.5 text-xs text-slate-500">
-                Use this to group albums by school program area. You can update it later in Album Details.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-200 pt-4">
-            <Link href="/albums" className={buttonClass("secondary")}>
-              Cancel
-            </Link>
-            <Button variant="primary" type="submit" disabled={busy}>
-              {busy ? "Creating…" : "Create album"}
-            </Button>
-          </div>
-
-          {status && <p className="mt-4 text-sm text-red-700">{status}</p>}
+            {status && <BodyText className="mt-4 text-red-700">{status}</BodyText>}
           </form>
         </Card>
       </div>

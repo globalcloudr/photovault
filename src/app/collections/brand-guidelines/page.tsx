@@ -6,6 +6,7 @@ import { MediaWorkspaceShell } from "@/components/layout/media-workspace-shell";
 import { Card } from "@/components/ui/card";
 import { buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BodyText, Eyebrow, LabelText, MetaText, PageTitle, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { supabase } from "@/lib/supabaseClient";
 import { canEditOrgAppearance } from "@/lib/roles";
@@ -515,13 +516,13 @@ export default function BrandGuidelinesPage() {
       sidebarContent={
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Quick Jump</p>
+            <Eyebrow>Quick Jump</Eyebrow>
             <div className="mt-1.5 space-y-1">
               {guidelineSections.map((section) => (
                 <a
                   key={section.id}
                   href={`#${section.id}`}
-                  className="block rounded-md px-2 py-1 text-sm text-slate-700 hover:bg-slate-100"
+                  className="block rounded-md px-2 py-1 font-outfit text-sm tracking-[-0.01em] text-slate-700 hover:bg-slate-100"
                 >
                   {section.label}
                 </a>
@@ -530,20 +531,20 @@ export default function BrandGuidelinesPage() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Guidelines Checklist</p>
+            <Eyebrow>Guidelines Checklist</Eyebrow>
             <ul className="mt-1.5 space-y-1 text-sm text-slate-700">
               <li>Primary + alternate logos</li>
               <li>Color standards</li>
               <li>Typography standards</li>
               <li>Approved usage notes</li>
             </ul>
-            <p className="mt-2 text-xs text-slate-500">{canEdit ? "Edit enabled (owner/super admin)." : "View mode."}</p>
+            <MetaText className="mt-2">{canEdit ? "Edit enabled (owner/super admin)." : "View mode."}</MetaText>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Library Counts</p>
-            <p className="mt-1.5 text-sm text-slate-700">{logos.length} logo files</p>
-            <p className="text-sm text-slate-700">{icons.length} icon files</p>
-            <p className="text-sm text-slate-700">{documents.length} portal files</p>
+            <Eyebrow>Library Counts</Eyebrow>
+            <BodyText muted className="mt-1.5">{logos.length} logo files</BodyText>
+            <BodyText muted>{icons.length} icon files</BodyText>
+            <BodyText muted>{documents.length} portal files</BodyText>
           </div>
         </div>
       }
@@ -551,13 +552,13 @@ export default function BrandGuidelinesPage() {
       <Card className="p-5 sm:p-6">
         <div className="grid gap-5 lg:grid-cols-2 lg:items-stretch">
           <div className="space-y-4">
-            <h2 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">Brand Portal</h2>
-            <p className="max-w-2xl text-lg text-slate-700">
+            <PageTitle className="text-slate-900 sm:text-5xl">Brand Portal</PageTitle>
+            <BodyText muted className="max-w-2xl text-lg">
               Keep your school brand consistent with shared standards, approved assets, and practical usage guidance.
-            </p>
-            <p className="max-w-2xl text-lg text-slate-700">
+            </BodyText>
+            <BodyText muted className="max-w-2xl text-lg">
               This page gives staff one place to access logos, templates, and the most important rules to follow.
-            </p>
+            </BodyText>
 
             {featuredGuide?.signedUrl ? (
               <a href={featuredGuide.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("primary")}>
@@ -628,11 +629,11 @@ export default function BrandGuidelinesPage() {
         </div>
       </Card>
 
-      {loading ? <p className="text-slate-600">Loading Brand Portal…</p> : null}
-      {status ? <p className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">{status}</p> : null}
+      {loading ? <BodyText muted>Loading Brand Portal…</BodyText> : null}
+      {status ? <BodyText className="rounded-md border border-slate-200 bg-white px-3 py-2">{status}</BodyText> : null}
       {noActiveOrg ? (
         <Card className="p-5">
-          <p className="text-sm text-slate-700">No active organization selected.</p>
+          <BodyText>No active organization selected.</BodyText>
         </Card>
       ) : null}
 
@@ -641,8 +642,8 @@ export default function BrandGuidelinesPage() {
           <Card id="logos" className="p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Logo Library</h3>
-                <p className="mt-1 text-sm text-slate-600">Upload primary, alternate, and monochrome logo versions.</p>
+                <SectionTitle as="h3" className="text-lg">Logo Library</SectionTitle>
+                <BodyText muted className="mt-1">Upload primary, alternate, and monochrome logo versions.</BodyText>
               </div>
               <label className={`${buttonClass("primary", "sm")} ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                 <input
@@ -658,7 +659,7 @@ export default function BrandGuidelinesPage() {
             </div>
 
             {logos.length === 0 ? (
-              <p className="mt-4 text-sm text-slate-600">No logo files yet.</p>
+              <BodyText muted className="mt-4">No logo files yet.</BodyText>
             ) : (
               <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {logos.map((asset) => (
@@ -668,14 +669,12 @@ export default function BrandGuidelinesPage() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={asset.signedUrl} alt={asset.name} className="max-h-full max-w-full object-contain" />
                       ) : (
-                        <p className="text-xs text-slate-500">Preview unavailable</p>
+                        <MetaText>Preview unavailable</MetaText>
                       )}
                     </div>
                     <div className="border-t border-slate-200 p-3">
-                      <p className="truncate text-sm font-medium text-slate-800" title={asset.name}>
-                        {asset.name}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">{formatSize(asset.sizeBytes)}</p>
+                      <LabelText as="p" className="truncate text-slate-800" title={asset.name}>{asset.name}</LabelText>
+                      <MetaText className="mt-1">{formatSize(asset.sizeBytes)}</MetaText>
                       {asset.signedUrl ? (
                         <a
                           href={asset.signedUrl}
@@ -703,8 +702,8 @@ export default function BrandGuidelinesPage() {
           </Card>
 
           <Card id="colors" className="p-5">
-            <h3 className="text-lg font-semibold text-slate-900">Colors</h3>
-            <p className="mt-1 text-sm text-slate-600">Document approved primary, secondary, and accent colors for school use.</p>
+            <SectionTitle as="h3" className="text-lg">Colors</SectionTitle>
+            <BodyText muted className="mt-1">Document approved primary, secondary, and accent colors for school use.</BodyText>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
               {(
                 [
@@ -725,11 +724,11 @@ export default function BrandGuidelinesPage() {
                       onChange={(e) => setConfig((prev) => ({ ...prev, [colorKey]: e.target.value }))}
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-800">{label}</p>
-                      <p className="truncate text-xs text-slate-500">{config[colorKey]}</p>
+                      <LabelText as="p" className="text-slate-800">{label}</LabelText>
+                      <MetaText className="truncate">{config[colorKey]}</MetaText>
                     </div>
                   </div>
-                  <p className="mt-3 text-xs text-slate-600">{config.colorsNotes}</p>
+                  <MetaText className="mt-3">{config.colorsNotes}</MetaText>
                   <textarea
                     className="mt-2 w-full rounded-md border border-slate-300 bg-white p-2 text-xs text-slate-800 outline-none focus:border-slate-900 disabled:bg-slate-50"
                     rows={6}
@@ -743,8 +742,8 @@ export default function BrandGuidelinesPage() {
           </Card>
 
           <Card id="typography" className="p-5">
-            <h3 className="text-lg font-semibold text-slate-900">Typography</h3>
-            <p className="mt-1 text-sm text-slate-600">List approved heading/body fonts and usage rules.</p>
+            <SectionTitle as="h3" className="text-lg">Typography</SectionTitle>
+            <BodyText muted className="mt-1">List approved heading/body fonts and usage rules.</BodyText>
             <textarea
               className="mt-3 w-full rounded-md border border-slate-300 bg-white p-2 text-sm text-slate-800 outline-none focus:border-slate-900 disabled:bg-slate-50"
               rows={3}
@@ -753,7 +752,7 @@ export default function BrandGuidelinesPage() {
               onChange={(e) => setConfig((prev) => ({ ...prev, typographyNotes: e.target.value }))}
             />
             <div className="mt-4 rounded-lg border border-slate-200 p-3">
-              <p className="text-sm text-slate-700">Recommended structure:</p>
+              <LabelText>Recommended structure:</LabelText>
               <ul className="mt-1.5 space-y-1 text-sm text-slate-600">
                 <li>Heading font (campaign headers, page titles)</li>
                 <li>Body font (documents, website body copy)</li>
@@ -765,8 +764,8 @@ export default function BrandGuidelinesPage() {
           <Card id="iconography" className="p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Iconography</h3>
-                <p className="mt-1 text-sm text-slate-600">Store approved icon packs and guidance for usage style.</p>
+                <SectionTitle as="h3" className="text-lg">Iconography</SectionTitle>
+                <BodyText muted className="mt-1">Store approved icon packs and guidance for usage style.</BodyText>
               </div>
               <label className={`${buttonClass("secondary", "sm")} ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                 <input
@@ -812,7 +811,7 @@ export default function BrandGuidelinesPage() {
             </div>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3">
-                <p className="text-sm font-medium text-emerald-800">Do</p>
+                <LabelText className="text-emerald-800">Do</LabelText>
                 <textarea
                   className="mt-2 w-full rounded-md border border-emerald-300 bg-emerald-100/70 p-2 text-xs text-emerald-900 outline-none disabled:bg-emerald-100/70"
                   rows={2}
@@ -822,7 +821,7 @@ export default function BrandGuidelinesPage() {
                 />
               </div>
               <div className="rounded-lg border border-rose-300 bg-rose-50 p-3">
-                <p className="text-sm font-medium text-rose-800">Don&apos;t</p>
+                <LabelText className="text-rose-800">Don&apos;t</LabelText>
                 <textarea
                   className="mt-2 w-full rounded-md border border-rose-300 bg-rose-100/70 p-2 text-xs text-rose-900 outline-none disabled:bg-rose-100/70"
                   rows={2}
@@ -842,7 +841,7 @@ export default function BrandGuidelinesPage() {
                   <button type="button" className={buttonClass("primary", "sm")} onClick={downloadIconSet}>
                     Download icons
                   </button>
-                  <p className="text-xs text-slate-500">Org-specific icon set for this school.</p>
+                  <MetaText>Org-specific icon set for this school.</MetaText>
                 </div>
                 <div className="mt-4 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 p-4">
                   <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
@@ -889,8 +888,8 @@ export default function BrandGuidelinesPage() {
           <Card id="templates-social" className="p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Templates / Social</h3>
-                <p className="mt-1 text-sm text-slate-600">Store social templates, print-ready files, and reference docs.</p>
+                <SectionTitle as="h3" className="text-lg">Templates / Social</SectionTitle>
+                <BodyText muted className="mt-1">Store social templates, print-ready files, and reference docs.</BodyText>
               </div>
               <label className={`${buttonClass("secondary", "sm")} ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}>
                 <input
@@ -912,18 +911,18 @@ export default function BrandGuidelinesPage() {
             />
 
             {documents.length === 0 ? (
-              <p className="mt-4 text-sm text-slate-600">No Brand Portal documents yet.</p>
+              <BodyText muted className="mt-4">No Brand Portal documents yet.</BodyText>
             ) : (
               <ul className="mt-4 space-y-2">
                 {documents.map((asset) => (
                   <li key={asset.path} className="rounded-md border border-slate-200 bg-white px-3 py-2">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium text-slate-800">{asset.name}</p>
-                        <p className="text-xs text-slate-500">
+                        <LabelText>{asset.name}</LabelText>
+                        <MetaText>
                           {formatSize(asset.sizeBytes)}
                           {asset.updatedAt ? ` • updated ${formatDateMDY(asset.updatedAt)}` : ""}
-                        </p>
+                        </MetaText>
                       </div>
                       {asset.signedUrl ? (
                         <a href={asset.signedUrl} target="_blank" rel="noreferrer" className={buttonClass("secondary", "sm")}>
@@ -947,11 +946,11 @@ export default function BrandGuidelinesPage() {
           </Card>
 
           <Card id="do-dont-examples" className="p-5">
-            <h3 className="text-lg font-semibold text-slate-900">Do/Don&apos;t examples</h3>
-            <p className="mt-1 text-sm text-slate-600">Show staff what approved and non-approved brand usage looks like.</p>
+            <SectionTitle as="h3" className="text-lg">Do/Don&apos;t examples</SectionTitle>
+            <BodyText muted className="mt-1">Show staff what approved and non-approved brand usage looks like.</BodyText>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3">
-                <p className="text-sm font-medium text-emerald-800">Do</p>
+                <LabelText className="text-emerald-800">Do</LabelText>
                 <textarea
                   className="mt-2 w-full rounded-md border border-emerald-300 bg-emerald-100/70 p-2 text-xs text-emerald-900 outline-none disabled:bg-emerald-100/70"
                   rows={3}
@@ -961,7 +960,7 @@ export default function BrandGuidelinesPage() {
                 />
               </div>
               <div className="rounded-lg border border-rose-300 bg-rose-50 p-3">
-                <p className="text-sm font-medium text-rose-800">Don&apos;t</p>
+                <LabelText className="text-rose-800">Don&apos;t</LabelText>
                 <textarea
                   className="mt-2 w-full rounded-md border border-rose-300 bg-rose-100/70 p-2 text-xs text-rose-900 outline-none disabled:bg-rose-100/70"
                   rows={3}

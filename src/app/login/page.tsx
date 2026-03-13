@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { BodyText, FieldLabel, LabelText, MetaText, PageTitle, SectionTitle } from "@/components/ui/typography";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -72,22 +73,22 @@ export default function LoginPage() {
           <div className="relative mx-auto flex h-full max-w-2xl flex-col justify-between gap-8">
             <div>
               <Link href="/" className="inline-flex items-center gap-3 text-slate-900">
-                <span className="text-3xl font-semibold tracking-tight">PhotoVault</span>
+                <span className="font-outfit text-3xl font-semibold tracking-[-0.04em]">PhotoVault</span>
               </Link>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-emerald-600">
+                <LabelText as="p" className="text-emerald-600 tracking-[0.28em]">
                   Built for adult schools
-                </p>
-                <h2 className="max-w-xl text-4xl font-medium tracking-tight text-slate-950 sm:text-[3.2rem] sm:leading-[1.04]">
+                </LabelText>
+                <SectionTitle as="h2" className="max-w-xl text-4xl font-medium text-slate-950 sm:text-[3.2rem] sm:leading-[1.04]">
                   Log in to the system built for approved school photos and brand assets.
-                </h2>
-                <p className="max-w-xl text-lg leading-7 text-slate-600">
+                </SectionTitle>
+                <BodyText muted className="max-w-xl text-lg">
                   Organize campaign-ready media, keep branding consistent, and share approved assets without
                   relying on scattered folders and email threads.
-                </p>
+                </BodyText>
               </div>
 
               <div className="rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur">
@@ -101,7 +102,7 @@ export default function LoginPage() {
                       <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-600">
                         ✓
                       </span>
-                      <span className="text-base leading-7">{item}</span>
+                      <BodyText as="span" className="text-base">{item}</BodyText>
                     </li>
                   ))}
                 </ul>
@@ -110,10 +111,10 @@ export default function LoginPage() {
 
             <div className="space-y-4">
               <div>
-                <p className="text-2xl font-semibold tracking-tight text-slate-950">Trusted by adult education teams</p>
-                <p className="mt-2 text-base text-slate-600">
+                <SectionTitle as="h3" className="text-2xl text-slate-950">Trusted by adult education teams</SectionTitle>
+                <BodyText muted className="mt-2 text-base">
                   Built for marketing, communications, enrollment, and district reporting workflows.
-                </p>
+                </BodyText>
               </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {[
@@ -126,7 +127,7 @@ export default function LoginPage() {
                 ].map((name) => (
                   <div
                     key={name}
-                    className="rounded-2xl border border-white/70 bg-white/75 px-4 py-4 text-sm font-medium text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.05)] backdrop-blur"
+                    className="rounded-2xl border border-white/70 bg-white/75 px-4 py-4 font-outfit text-sm font-medium tracking-[-0.01em] text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.05)] backdrop-blur"
                   >
                     {name}
                   </div>
@@ -139,22 +140,20 @@ export default function LoginPage() {
         <section className="flex min-h-[100svh] items-center justify-center bg-white px-6 py-10 lg:h-full lg:min-h-0 lg:px-14 lg:py-10">
           <div className="w-full max-w-xl">
             <div className="mx-auto w-full max-w-md">
-              <h1 className="text-5xl font-semibold tracking-tight text-slate-950">Log in</h1>
-              <p className="mt-4 text-lg leading-8 text-slate-600">Sign in to your school PhotoVault.</p>
-              <p className="mt-4 text-sm text-slate-500">
+              <PageTitle className="text-5xl text-slate-950">Log in</PageTitle>
+              <BodyText muted className="mt-4 text-lg">Sign in to your school PhotoVault.</BodyText>
+              <MetaText className="mt-4">
                 <Link
                   href="/"
                   className="font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
                 >
                   Back to homepage
                 </Link>
-              </p>
+              </MetaText>
 
               <form onSubmit={signIn} className="mt-8 space-y-5">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700" htmlFor="email">
-                    Email address
-                  </label>
+                  <FieldLabel htmlFor="email">Email address</FieldLabel>
                   <input
                     id="email"
                     className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-lg text-slate-900 outline-none transition focus:border-slate-500 focus:ring-4 focus:ring-slate-200"
@@ -168,9 +167,7 @@ export default function LoginPage() {
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-4">
-                    <label className="text-sm font-medium text-slate-700" htmlFor="password">
-                      Password
-                    </label>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
                     <button
                       type="button"
                       className="text-sm font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
@@ -198,7 +195,7 @@ export default function LoginPage() {
                   {busy ? "Working..." : "Log in"}
                 </button>
 
-                {status && <p className="text-sm text-slate-700">{status}</p>}
+                {status && <BodyText>{status}</BodyText>}
               </form>
             </div>
           </div>

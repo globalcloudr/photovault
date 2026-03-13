@@ -8,6 +8,7 @@ import { buttonClass, Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { BodyText, CardTitle, Eyebrow, FieldLabel, LabelText, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { IconDelete, IconEdit, IconGrid, IconList, IconMore, IconOpen, IconShare } from "@/components/ui/icons";
 import { formatDateMDY, formatDateTimeMDY } from "@/lib/date-format";
@@ -690,7 +691,7 @@ export default function AlbumsPage() {
       sidebarContent={
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Rights Filter</p>
+            <Eyebrow>Rights Filter</Eyebrow>
             <div className="mt-1.5 space-y-1">
               {(
                 [
@@ -731,10 +732,10 @@ export default function AlbumsPage() {
           ) : null}
           <div className={`absolute inset-0 ${heroCoverUrl ? "bg-slate-900/45" : "bg-gradient-to-r from-slate-900 to-slate-700"}`} />
           <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">School Library</p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
+            <Eyebrow className="text-slate-100">School Library</Eyebrow>
+            <SectionTitle as="h2" className="mt-1 text-white">
               {activeOrg?.name ?? "Organization"}
-            </h2>
+            </SectionTitle>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 px-4 py-3">
@@ -807,11 +808,11 @@ export default function AlbumsPage() {
 
       <section>
         {orgLoading || loading ? (
-          <p className="mt-6 text-slate-600">Loading albums…</p>
+          <BodyText muted className="mt-6">Loading albums…</BodyText>
         ) : noActiveOrg ? (
           <section className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center">
-            <h2 className="text-xl font-semibold text-slate-900">No active organization selected</h2>
-            <p className="mt-2 text-sm text-slate-600">Choose an organization in Super Admin to load albums.</p>
+            <SectionTitle as="h2">No active organization selected</SectionTitle>
+            <BodyText muted className="mt-2">Choose an organization in Super Admin to load albums.</BodyText>
             {isSuperAdmin && (
               <Link className={`${buttonClass("secondary")} mt-5`} href="/super-admin">
                 Open Super Admin
@@ -820,12 +821,12 @@ export default function AlbumsPage() {
           </section>
         ) : sortedAlbums.length === 0 ? (
           <section className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center">
-            <h2 className="text-xl font-semibold text-slate-900">{albums.length === 0 ? "No albums yet" : "No albums match filters"}</h2>
-            <p className="mt-2 text-sm text-slate-600">
+            <SectionTitle as="h2">{albums.length === 0 ? "No albums yet" : "No albums match filters"}</SectionTitle>
+            <BodyText muted className="mt-2">
               {albums.length === 0
                 ? "Create your first album to start uploading and organizing photos."
                 : "Try a different search term or rights filter."}
-            </p>
+            </BodyText>
             <Link className={`${buttonClass("primary")} mt-5`} href="/albums/new">
               {albums.length === 0 ? "Create first album" : "Create new album"}
             </Link>
@@ -932,20 +933,20 @@ export default function AlbumsPage() {
 
                   <div className="space-y-2.5 p-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{formatDateMDY(a.event_date)}</p>
-                      <p className="text-xs text-slate-500">
+                      <MetaText className="uppercase tracking-[0.12em]">{formatDateMDY(a.event_date)}</MetaText>
+                      <MetaText>
                         Updated {formatDateMDY(a.created_at)}
-                      </p>
+                      </MetaText>
                     </div>
-                    <h2 className="line-clamp-2 text-lg font-semibold text-slate-900">{a.event_name}</h2>
-                    <p className="text-xs text-slate-600">
-                      Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
-                    </p>
+                    <CardTitle as="h2" className="line-clamp-2 text-slate-900">{a.event_name}</CardTitle>
+                    <MetaText>
+                      Rights: <LabelText as="span" className="text-slate-800">{formatRightsLabel(a.rights_status)}</LabelText>
+                    </MetaText>
                     {a.department_id && departmentLabelById[a.department_id] ? (
-                      <p className="text-xs text-slate-600">
+                      <MetaText>
                         Program / Department:{" "}
-                        <span className="font-medium text-slate-800">{departmentLabelById[a.department_id]}</span>
-                      </p>
+                        <LabelText as="span" className="text-slate-800">{departmentLabelById[a.department_id]}</LabelText>
+                      </MetaText>
                     ) : null}
                   </div>
                 </Card>
@@ -987,19 +988,19 @@ export default function AlbumsPage() {
                           <IconEdit className="h-4 w-4" />
                           Select
                         </button>
-                        <h2 className="truncate text-base font-semibold text-slate-900">{a.event_name}</h2>
+                        <CardTitle as="h2" className="truncate text-base text-slate-900">{a.event_name}</CardTitle>
                       </div>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <MetaText className="mt-1">
                         {formatDateMDY(a.event_date)} • Updated {formatDateMDY(a.created_at)}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-600">
-                        Rights: <span className="font-medium text-slate-800">{formatRightsLabel(a.rights_status)}</span>
-                      </p>
+                      </MetaText>
+                      <MetaText className="mt-1">
+                        Rights: <LabelText as="span" className="text-slate-800">{formatRightsLabel(a.rights_status)}</LabelText>
+                      </MetaText>
                       {a.department_id && departmentLabelById[a.department_id] ? (
-                        <p className="mt-1 text-xs text-slate-600">
+                        <MetaText className="mt-1">
                           Program / Department:{" "}
-                          <span className="font-medium text-slate-800">{departmentLabelById[a.department_id]}</span>
-                        </p>
+                          <LabelText as="span" className="text-slate-800">{departmentLabelById[a.department_id]}</LabelText>
+                        </MetaText>
                       ) : null}
                     </div>
 
@@ -1077,8 +1078,8 @@ export default function AlbumsPage() {
           >
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Choose cover photo</h2>
-                <p className="text-sm text-slate-600">Pick one image to represent this album in the grid.</p>
+                <SectionTitle as="h2" className="text-lg">Choose cover photo</SectionTitle>
+                <BodyText muted>Pick one image to represent this album in the grid.</BodyText>
               </div>
               <Button size="sm" variant="secondary" onClick={() => setPickerAlbumId(null)}>
                 Close
@@ -1086,9 +1087,9 @@ export default function AlbumsPage() {
             </div>
 
             {pickerAssets.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+              <BodyText muted className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6">
                 No photos in this album yet.
-              </p>
+              </BodyText>
             ) : (
               <div
                 className="grid gap-3"
@@ -1151,10 +1152,10 @@ export default function AlbumsPage() {
           >
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Share Album</h2>
-                <p className="text-sm text-slate-600">
+                <SectionTitle as="h2" className="text-lg">Share Album</SectionTitle>
+                <BodyText muted>
                   {shareAlbum ? `Create secure links for ${shareAlbum.event_name}.` : "Create secure links for this album."}
-                </p>
+                </BodyText>
               </div>
               <Button size="sm" variant="secondary" onClick={() => setShareAlbumId(null)}>
                 Close
@@ -1201,10 +1202,10 @@ export default function AlbumsPage() {
               </Button>
             </div>
 
-            <p className="mt-2 text-xs text-slate-500">
+            <MetaText className="mt-2">
               Revoked/expired links are retained for audit for up to 1 year.
-            </p>
-            {shareStatus ? <p className="mt-2 text-xs text-slate-600">{shareStatus}</p> : null}
+            </MetaText>
+            {shareStatus ? <MetaText className="mt-2">{shareStatus}</MetaText> : null}
 
             <div className="mt-3 space-y-2">
               {activeShareLinks.length === 0 ? (
@@ -1213,16 +1214,16 @@ export default function AlbumsPage() {
                 activeShareLinks.map((link) => (
                   <div key={link.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-slate-200 px-3 py-2">
                     <div>
-                      <p className="text-xs font-medium text-slate-700">
+                      <LabelText className="text-slate-700">
                         {link.expires_at ? `Expires ${formatDateMDY(link.expires_at)}` : "No expiry"}
                         {" • "}
                         {link.allow_download ? "Download enabled" : "Download disabled"}
                         {" • "}
                         {link.password_hash ? "Password protected" : "No password"}
-                      </p>
-                      <p className="text-xs text-slate-500">
+                      </LabelText>
+                      <MetaText>
                         Created {formatDateTimeMDY(link.created_at)}
-                      </p>
+                      </MetaText>
                     </div>
                     <div className="flex items-center gap-2">
                       {link.token ? (
@@ -1238,9 +1239,9 @@ export default function AlbumsPage() {
                 ))
               )}
               {revokedShareLinksCount > 0 ? (
-                <p className="text-xs text-slate-400">
+                <MetaText className="text-slate-400">
                   {revokedShareLinksCount} revoked {revokedShareLinksCount === 1 ? "link is" : "links are"} hidden.
-                </p>
+                </MetaText>
               ) : null}
             </div>
           </div>
@@ -1257,7 +1258,7 @@ export default function AlbumsPage() {
           />
           <aside className="absolute inset-y-0 right-0 w-full overflow-y-auto overscroll-contain bg-white shadow-2xl sm:max-w-xl sm:border-l sm:border-slate-200">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-5">
-              <h3 className="text-2xl font-semibold tracking-tight text-slate-950">Album Details</h3>
+              <SectionTitle as="h3" className="text-2xl text-slate-950">Album Details</SectionTitle>
               <Button size="sm" variant="ghost" onClick={closeAlbumEditor} disabled={albumEditorSaving}>
                 Close
               </Button>
@@ -1265,7 +1266,7 @@ export default function AlbumsPage() {
 
             <div className="space-y-5 px-4 py-4 pb-28 sm:px-5 sm:py-5 sm:pb-24">
               <div>
-                <p className="mb-2 text-sm font-semibold text-slate-900">Preview</p>
+                <LabelText className="mb-2">Preview</LabelText>
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                   {editingAlbumCover?.thumbUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -1283,7 +1284,7 @@ export default function AlbumsPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">Album name</label>
+                <FieldLabel className="mb-1 block">Album name</FieldLabel>
                 <Input
                   value={albumEditorName}
                   onChange={(e) => setAlbumEditorName(e.target.value)}
@@ -1293,7 +1294,7 @@ export default function AlbumsPage() {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-semibold text-slate-900">Date</label>
+                  <FieldLabel className="mb-1 block">Date</FieldLabel>
                   <Input
                     type="date"
                     value={albumEditorEventDate}
@@ -1301,7 +1302,7 @@ export default function AlbumsPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-semibold text-slate-900">Rights</label>
+                  <FieldLabel className="mb-1 block">Rights</FieldLabel>
                   <select
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                     value={albumEditorRights}
@@ -1316,7 +1317,7 @@ export default function AlbumsPage() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-900">Program / Department</label>
+                <FieldLabel className="mb-1 block">Program / Department</FieldLabel>
                 <select
                   className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                   value={albumEditorDepartmentId}
@@ -1329,13 +1330,13 @@ export default function AlbumsPage() {
                     </option>
                   ))}
                 </select>
-                <p className="mt-1.5 text-xs text-slate-500">
+                <MetaText className="mt-1.5">
                   Use this to group albums by school program area, such as Career Education, ESL, GED, or Active Adults.
-                </p>
+                </MetaText>
               </div>
 
               <div>
-                <p className="mb-2 text-sm font-semibold text-slate-900">Album details</p>
+                <LabelText className="mb-2">Album details</LabelText>
                 <div className="overflow-hidden rounded-lg border border-slate-200">
                   <dl className="divide-y divide-slate-200 text-sm">
                     <div className="grid grid-cols-[140px_1fr] gap-3 px-3 py-2">

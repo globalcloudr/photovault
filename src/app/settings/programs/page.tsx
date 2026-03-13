@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { BodyText, FieldLabel, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -185,14 +186,15 @@ export default function ProgramsSettingsPage() {
           <Badge>{activeOrg?.slug ?? "no-org"}</Badge>
         </div>
 
-        <div className="max-w-4xl space-y-1 text-sm text-slate-600">
-          <p>Albums use this org-level list for their Program / Department field.</p>
-          <p>Rename with care. Existing albums will immediately display the updated label for the selected program.</p>
+        <div className="space-y-1">
+          <SectionTitle as="h2">Program Directory</SectionTitle>
+          <BodyText muted>Albums use this org-level list for their Program / Department field.</BodyText>
+          <BodyText muted>Rename with care. Existing albums will immediately display the updated label for the selected program.</BodyText>
         </div>
 
         <form className="grid gap-3 lg:grid-cols-[140px_minmax(0,1fr)_auto] lg:items-end" onSubmit={createProgram}>
           <div className="space-y-1">
-            <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Code</label>
+            <FieldLabel>Code</FieldLabel>
             <Input
               placeholder="e.g., ESL"
               value={newCode}
@@ -202,7 +204,7 @@ export default function ProgramsSettingsPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Program / Department</label>
+            <FieldLabel>Program / Department</FieldLabel>
             <Input
               placeholder="e.g., English as a Second Language"
               value={newName}
@@ -216,20 +218,20 @@ export default function ProgramsSettingsPage() {
           </Button>
         </form>
 
-        {status ? <p className="text-sm text-slate-700">{status}</p> : null}
+        {status ? <BodyText>{status}</BodyText> : null}
       </Card>
 
       <Card className="overflow-hidden p-0">
         {loading ? (
-          <p className="p-4 text-sm text-slate-500">Loading programs…</p>
+          <BodyText muted className="p-4">Loading programs…</BodyText>
         ) : programs.length === 0 ? (
-          <p className="p-4 text-sm text-slate-500">No programs found for this school yet.</p>
+          <BodyText muted className="p-4">No programs found for this school yet.</BodyText>
         ) : (
           <div className="divide-y divide-slate-200">
             {programs.map((program) => (
               <div key={program.id} className="grid gap-3 p-4 lg:grid-cols-[140px_minmax(0,1fr)_160px_auto] lg:items-center">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Code</label>
+                  <FieldLabel>Code</FieldLabel>
                   <Input
                     value={program.code}
                     onChange={(e) => updateDraft(program.id, { code: e.target.value })}
@@ -238,7 +240,7 @@ export default function ProgramsSettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Program / Department</label>
+                  <FieldLabel>Program / Department</FieldLabel>
                   <Input
                     value={program.name}
                     onChange={(e) => updateDraft(program.id, { name: e.target.value })}
@@ -247,7 +249,7 @@ export default function ProgramsSettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Status</label>
+                  <FieldLabel>Status</FieldLabel>
                   <select
                     className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                     value={program.is_active === false ? "archived" : "active"}

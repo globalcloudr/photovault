@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { BodyText, Eyebrow, FieldLabel, LabelText, MetaText, SectionTitle, typography } from "@/components/ui/typography";
 import { supabase } from "@/lib/supabaseClient";
 import { MEMBERSHIP_ROLES, MembershipRole } from "@/lib/roles";
 import { parseStorageRef } from "@/lib/theme";
@@ -456,48 +457,48 @@ export default function SuperAdminPage() {
       customSidebar={
         <div className="flex h-full flex-col">
           <div>
-            <p className="text-sm font-semibold tracking-tight text-slate-900">Super Admin</p>
-            <p className="mt-1 text-xs text-slate-500">Platform controls and client portals</p>
+            <LabelText>Super Admin</LabelText>
+            <MetaText className="mt-1">Platform controls and client portals</MetaText>
           </div>
 
           <nav className="mt-4 border-t border-slate-200 pt-3">
-            <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Admin Nav</p>
-            <a href="#client-portals" className="block rounded-md px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+            <Eyebrow className="px-2 pb-2">Admin Nav</Eyebrow>
+            <a href="#client-portals" className="block rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
               Client Portals
             </a>
-            <a href="#school-ops" className="block rounded-md px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+            <a href="#school-ops" className="block rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
               School Ops
             </a>
-            <Link href="/super-admin/homepage" className="block rounded-md px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+            <Link href="/super-admin/homepage" className="block rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
               Homepage CMS
             </Link>
-            <Link href="/collections/brand-guidelines" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+            <Link href="/collections/brand-guidelines" className="flex items-center gap-2 rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
               <IconGuidelines className="h-4 w-4" />
               Open Active Brand Portal
             </Link>
-            <Link href="/albums" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+            <Link href="/albums" className="flex items-center gap-2 rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
               <IconAlbums className="h-4 w-4" />
               Open Active Workspace
             </Link>
-            <Link href="/audit" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
+            <Link href="/audit" className="flex items-center gap-2 rounded-md px-3 py-2.5 font-outfit text-[15px] font-medium tracking-[-0.015em] text-slate-700 transition hover:bg-slate-100 hover:text-slate-900">
               <IconAudit className="h-4 w-4" />
               Open Active Audit Log
             </Link>
           </nav>
 
           <section className="mt-4 border-t border-slate-200 pt-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Platform Snapshot</p>
-            <p className="mt-1.5 text-sm text-slate-700">{orgs.length} organizations</p>
-            <p className="text-sm text-slate-700">{platformTotals.albums} albums</p>
-            <p className="text-sm text-slate-700">{platformTotals.photos} photos</p>
-            <p className="text-sm text-slate-700">{formatBytes(platformTotals.storageBytes)} storage used</p>
-            <p className="text-xs text-slate-500">
+            <Eyebrow>Platform Snapshot</Eyebrow>
+            <BodyText muted className="mt-1.5">{orgs.length} organizations</BodyText>
+            <BodyText muted>{platformTotals.albums} albums</BodyText>
+            <BodyText muted>{platformTotals.photos} photos</BodyText>
+            <BodyText muted>{formatBytes(platformTotals.storageBytes)} storage used</BodyText>
+            <MetaText>
               Current org: {activeOrg ? `${activeOrg.name} (${activeOrg.slug})` : activeOrgId ?? "none"}
-            </p>
+            </MetaText>
           </section>
 
           <section className="mt-auto border-t border-slate-200 pt-4">
-            <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Support</p>
+            <Eyebrow className="px-2 pb-2">Support</Eyebrow>
             <a href="#school-ops" className="block rounded-md px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100">
               Access Management
             </a>
@@ -512,8 +513,8 @@ export default function SuperAdminPage() {
           <div className="relative h-36 border-b border-slate-200 bg-gradient-to-r from-slate-900 to-slate-700 sm:h-44">
             <div className="absolute inset-0 bg-slate-900/25" />
             <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">Platform Control</p>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">Super Admin Workspace</h2>
+              <Eyebrow className="text-slate-100">Platform Control</Eyebrow>
+              <SectionTitle as="h2" className="mt-1 text-white">Super Admin Workspace</SectionTitle>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 px-4 py-3">
@@ -524,15 +525,15 @@ export default function SuperAdminPage() {
         </Card>
 
         <Card id="client-portals" className="mt-4 p-5 sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Client Brand Portals</h2>
-          <p className="mt-1 text-sm text-slate-600">
+          <SectionTitle as="h2">Client Brand Portals</SectionTitle>
+          <BodyText muted className="mt-1">
             Default view is privacy-first: portal identity and counts only. Open workspace only when you need support/testing access.
-          </p>
+          </BodyText>
 
           {orgs.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-600">No organizations found.</p>
+            <BodyText muted className="mt-4">No organizations found.</BodyText>
           ) : portalLoading ? (
-            <p className="mt-4 text-sm text-slate-600">Loading client portal data…</p>
+            <BodyText muted className="mt-4">Loading client portal data…</BodyText>
           ) : (
             <ul className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {orgs.map((org) => {
@@ -556,7 +557,7 @@ export default function SuperAdminPage() {
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={summary.logoUrl} alt={`${org.name} logo`} className="h-12 w-12 object-contain" />
                           ) : (
-                            <span className="text-xs font-semibold text-slate-500">{org.name.slice(0, 2).toUpperCase()}</span>
+                            <span className={typography.eyebrow}>{org.name.slice(0, 2).toUpperCase()}</span>
                           )}
                         </div>
 
@@ -616,27 +617,27 @@ export default function SuperAdminPage() {
                         className="w-full text-left"
                         onClick={() => openOrgRoute(org.id, "/collections/brand-guidelines")}
                       >
-                        <p className="truncate text-2xl font-semibold tracking-tight text-slate-900">{org.name}</p>
+                        <SectionTitle as="h3" className="truncate text-slate-900">{org.name}</SectionTitle>
                       </button>
-                      <p className="mt-1 text-sm text-slate-600">{org.slug}</p>
-                      <p className="mt-1 text-xs text-slate-500">{org.id}</p>
+                      <BodyText muted className="mt-1">{org.slug}</BodyText>
+                      <MetaText className="mt-1">{org.id}</MetaText>
                     </div>
 
                     <div className="grid grid-cols-4 border-t border-slate-200 bg-slate-50 px-3 py-2 text-center text-xs text-slate-600">
                       <div>
-                        <p className="font-semibold text-slate-900">{summary?.guidelinesCount ?? 1}</p>
+                        <LabelText>{summary?.guidelinesCount ?? 1}</LabelText>
                         <p>portal</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{summary?.albumsCount ?? 0}</p>
+                        <LabelText>{summary?.albumsCount ?? 0}</LabelText>
                         <p>albums</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{summary?.photosCount ?? 0}</p>
+                        <LabelText>{summary?.photosCount ?? 0}</LabelText>
                         <p>photos</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">{formatBytes(summary?.storageBytes ?? 0)}</p>
+                        <LabelText>{formatBytes(summary?.storageBytes ?? 0)}</LabelText>
                         <p>storage</p>
                       </div>
                     </div>
@@ -685,23 +686,23 @@ export default function SuperAdminPage() {
         </Card>
 
         <Card id="school-ops" className="mt-4 p-5 sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-900">School Operations</h2>
-          <p className="mt-1 text-sm text-slate-600">
+          <SectionTitle as="h2">School Operations</SectionTitle>
+          <BodyText muted className="mt-1">
             Create schools and invite school admins from one place.
-          </p>
+          </BodyText>
 
           <div className="mt-4 grid gap-4 xl:grid-cols-2">
             <Card className="p-5 sm:p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Create School</h3>
-              <p className="mt-1 text-sm text-slate-600">Create a new school organization and make it available immediately.</p>
-              <p className="mt-1 text-xs text-slate-500">
+              <SectionTitle as="h3" className="text-lg">Create School</SectionTitle>
+              <BodyText muted className="mt-1">Create a new school organization and make it available immediately.</BodyText>
+              <MetaText className="mt-1">
                 Next step: use <span className="font-medium">Invite School Admin</span> to send access. Planned update PV-023
                 will personalize invite acceptance and workspace setup UX.
-              </p>
+              </MetaText>
 
               <form className="mt-4 space-y-4" onSubmit={submitCreateOrg}>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">School name</label>
+                  <FieldLabel>School name</FieldLabel>
                   <Input
                     className="mt-1.5"
                     type="text"
@@ -716,7 +717,7 @@ export default function SuperAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Slug</label>
+                  <FieldLabel>Slug</FieldLabel>
                   <Input
                     className="mt-1.5"
                     type="text"
@@ -731,20 +732,20 @@ export default function SuperAdminPage() {
                   <Button type="submit" variant="primary" disabled={createBusy}>
                     {createBusy ? "Creating school…" : "Create school"}
                   </Button>
-                  {createStatus && <p className="text-sm text-slate-700">{createStatus}</p>}
+                  {createStatus && <BodyText>{createStatus}</BodyText>}
                 </div>
               </form>
             </Card>
 
             <Card className="p-5 sm:p-6">
-              <h3 className="text-lg font-semibold text-slate-900">Invite School Admin</h3>
-              <p className="mt-1 text-sm text-slate-600">
+              <SectionTitle as="h3" className="text-lg">Invite School Admin</SectionTitle>
+              <BodyText muted className="mt-1">
                 Send an invite and assign org role for the selected organization.
-              </p>
+              </BodyText>
 
               <form className="mt-4 space-y-4" onSubmit={submitInvite}>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Organization</label>
+                  <FieldLabel>Organization</FieldLabel>
                   <select
                     className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                     value={inviteOrgId}
@@ -759,13 +760,13 @@ export default function SuperAdminPage() {
                       </option>
                     ))}
                   </select>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <MetaText className="mt-1">
                     Schools with an accepted admin are hidden from this list.
-                  </p>
+                  </MetaText>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">User email</label>
+                  <FieldLabel>User email</FieldLabel>
                   <Input
                     className="mt-1.5"
                     type="email"
@@ -777,7 +778,7 @@ export default function SuperAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Role</label>
+                  <FieldLabel>Role</FieldLabel>
                   <select
                     className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                     value={inviteRole}
@@ -795,20 +796,20 @@ export default function SuperAdminPage() {
                   <Button type="submit" variant="primary" disabled={inviteBusy || inviteableOrgs.length === 0}>
                     {inviteBusy ? "Sending invite…" : "Send invite"}
                   </Button>
-                  {inviteStatus && <p className="text-sm text-slate-700">{inviteStatus}</p>}
+                  {inviteStatus && <BodyText>{inviteStatus}</BodyText>}
                 </div>
               </form>
 
               <form className="mt-6 space-y-4 border-t border-slate-200 pt-4" onSubmit={saveInviteTemplate}>
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-slate-900">Invite Message Template</p>
-                  <p className="text-xs text-slate-500">
+                  <LabelText>Invite Message Template</LabelText>
+                  <MetaText>
                     Placeholders: {"{{school_name}}"}, {"{{invitee_email}}"}, {"{{sender_name}}"}
-                  </p>
+                  </MetaText>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Subject</label>
+                  <FieldLabel>Subject</FieldLabel>
                   <Input
                     className="mt-1.5"
                     type="text"
@@ -819,7 +820,7 @@ export default function SuperAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Body</label>
+                  <FieldLabel>Body</FieldLabel>
                   <textarea
                     className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
                     rows={5}
@@ -830,7 +831,7 @@ export default function SuperAdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Signature</label>
+                  <FieldLabel>Signature</FieldLabel>
                   <Input
                     className="mt-1.5"
                     type="text"
@@ -841,8 +842,8 @@ export default function SuperAdminPage() {
                 </div>
 
                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Preview</p>
-                  <p className="mt-2 text-sm font-semibold text-slate-900">
+                  <Eyebrow>Preview</Eyebrow>
+                  <LabelText className="mt-2">
                     {
                       renderInviteTemplate(
                         { subject: templateSubject, body: templateBody, signature: templateSignature },
@@ -853,8 +854,8 @@ export default function SuperAdminPage() {
                         }
                       ).subject
                     }
-                  </p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
+                  </LabelText>
+                  <BodyText className="mt-2 whitespace-pre-wrap">
                     {
                       renderInviteTemplate(
                         { subject: templateSubject, body: templateBody, signature: templateSignature },
@@ -865,7 +866,7 @@ export default function SuperAdminPage() {
                         }
                       ).body
                     }
-                  </p>
+                  </BodyText>
                   <p className="mt-3 text-sm text-slate-800">
                     {
                       renderInviteTemplate(

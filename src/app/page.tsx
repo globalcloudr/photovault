@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { buttonClass } from "@/components/ui/button";
+import { BodyText, Eyebrow, LabelText, SectionTitle } from "@/components/ui/typography";
 import { supabase } from "@/lib/supabaseClient";
 import { useOrg } from "@/components/org/org-provider";
 import { parseStorageRef } from "@/lib/theme";
@@ -174,14 +175,14 @@ export default function Home() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={orgLogoUrl} alt={`${orgName} logo`} className="h-10 w-16 object-contain" />
                   ) : (
-                    <span className="text-xs font-semibold tracking-wide text-slate-700">PV</span>
+                    <span className="font-outfit text-xs font-semibold tracking-wide text-slate-700">PV</span>
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">PhotoVault Setup</p>
-                  <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                  <Eyebrow className="text-slate-200">PhotoVault Setup</Eyebrow>
+                  <SectionTitle as="h1" className="mt-1 text-white sm:text-3xl">
                     Setting up {orgName}
-                  </h1>
+                  </SectionTitle>
                 </div>
               </div>
             </div>
@@ -225,28 +226,28 @@ export default function Home() {
               {inviteMessageSubject || inviteMessageBody ? (
                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                   {inviteMessageSubject ? (
-                    <p className="text-sm font-semibold text-slate-900">{inviteMessageSubject}</p>
+                    <LabelText>{inviteMessageSubject}</LabelText>
                   ) : null}
                   {inviteMessageBody ? (
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{inviteMessageBody}</p>
+                    <BodyText className="mt-1 whitespace-pre-wrap">{inviteMessageBody}</BodyText>
                   ) : null}
                   {inviteMessageSignature ? (
-                    <p className="mt-2 text-sm text-slate-800">{inviteMessageSignature}</p>
+                    <BodyText className="mt-2">{inviteMessageSignature}</BodyText>
                   ) : null}
                 </div>
               ) : null}
 
               {showFallback ? (
-                <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                <BodyText className="rounded-lg bg-slate-50 px-3 py-2">
                   Still setting things up. This can take up to 20 seconds on first access. Please keep this tab open.
-                </p>
+                </BodyText>
               ) : null}
 
-              {stage === "complete" ? <p className="text-sm text-slate-700">Setup complete. Redirecting you…</p> : null}
+              {stage === "complete" ? <BodyText>Setup complete. Redirecting you…</BodyText> : null}
 
               {stage === "error" || errorMessage ? (
                 <div className="space-y-2 rounded-lg bg-red-50 px-3 py-2">
-                  <p className="text-sm text-red-700">{errorMessage ?? "Failed to set up workspace."}</p>
+                  <BodyText className="text-red-700">{errorMessage ?? "Failed to set up workspace."}</BodyText>
                   <div className="flex gap-2">
                     <Link href="/login" className={buttonClass("secondary", "sm")}>
                       Back to login

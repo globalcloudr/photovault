@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BodyText, Eyebrow, FieldLabel, MetaText, SectionTitle } from "@/components/ui/typography";
 import { useOrg } from "@/components/org/org-provider";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -82,14 +83,14 @@ export default function ProfileSettingsPage() {
       sidebarContent={
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Profile</p>
-            <p className="mt-1.5 text-sm text-slate-700">Your name appears in the account menu.</p>
-            <p className="text-sm text-slate-700">Email is managed by authentication.</p>
+            <Eyebrow>Profile</Eyebrow>
+            <BodyText muted className="mt-1.5">Your name appears in the account menu.</BodyText>
+            <BodyText muted>Email is managed by authentication.</BodyText>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Active Org</p>
-            <p className="mt-1.5 text-sm text-slate-700">{activeOrg?.name ?? "No active organization"}</p>
-            <p className="text-xs text-slate-500">{activeOrg?.slug ?? ""}</p>
+            <Eyebrow>Active Org</Eyebrow>
+            <BodyText muted className="mt-1.5">{activeOrg?.name ?? "No active organization"}</BodyText>
+            <MetaText>{activeOrg?.slug ?? ""}</MetaText>
           </div>
         </div>
       }
@@ -100,12 +101,17 @@ export default function ProfileSettingsPage() {
           <Badge>{activeOrg?.slug ?? "no-org"}</Badge>
         </div>
 
+        <div className="space-y-1">
+          <SectionTitle as="h2">Account Details</SectionTitle>
+          <BodyText muted>Use one display name everywhere in the workspace. Login email stays read-only.</BodyText>
+        </div>
+
         {loading ? (
-          <p className="text-sm text-slate-600">Loading profile…</p>
+          <BodyText muted>Loading profile…</BodyText>
         ) : (
           <form className="space-y-4" onSubmit={saveProfile}>
             <div>
-              <label className="block text-sm font-medium text-slate-800">Display name</label>
+              <FieldLabel>Display name</FieldLabel>
               <Input
                 className="mt-1.5"
                 type="text"
@@ -116,7 +122,7 @@ export default function ProfileSettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-800">Email</label>
+              <FieldLabel>Email</FieldLabel>
               <Input className="mt-1.5" type="email" value={email} disabled />
             </div>
 
@@ -124,7 +130,7 @@ export default function ProfileSettingsPage() {
               <Button type="submit" variant="primary" disabled={saving}>
                 {saving ? "Saving…" : "Save profile"}
               </Button>
-              {status ? <p className="text-sm text-slate-700">{status}</p> : null}
+              {status ? <BodyText muted>{status}</BodyText> : null}
             </div>
           </form>
         )}

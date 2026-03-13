@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { BodyText, Eyebrow, FieldLabel, MetaText, SectionTitle } from "@/components/ui/typography";
 import { supabase } from "@/lib/supabaseClient";
 import { canEditOrgAppearance } from "@/lib/roles";
 import {
@@ -259,18 +260,18 @@ export default function BrandingSettingsPage() {
       sidebarContent={
         <div className="space-y-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Live Preview</p>
+            <Eyebrow>Live Preview</Eyebrow>
             <div className="mt-1.5 rounded-md border border-slate-200 bg-white p-2">
               <div className="h-8 rounded" style={{ background: form.brand }} />
-              <p className="mt-2 text-xs text-slate-600">Brand: {form.brand}</p>
+              <MetaText className="mt-2">Brand: {form.brand}</MetaText>
               <div className="mt-1 h-8 rounded border" style={{ background: form.background }} />
-              <p className="mt-2 text-xs text-slate-600">Background: {form.background}</p>
+              <MetaText className="mt-2">Background: {form.background}</MetaText>
             </div>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Organization</p>
-            <p className="mt-1.5 text-sm text-slate-700">{activeOrg?.name ?? "No active org"}</p>
-            <p className="text-xs text-slate-500">{activeOrg?.slug ?? ""}</p>
+            <Eyebrow>Organization</Eyebrow>
+            <BodyText muted className="mt-1.5">{activeOrg?.name ?? "No active org"}</BodyText>
+            <MetaText>{activeOrg?.slug ?? ""}</MetaText>
           </div>
         </div>
       }
@@ -279,8 +280,8 @@ export default function BrandingSettingsPage() {
           <div className="relative h-36 border-b border-slate-200 bg-gradient-to-r from-slate-900 to-slate-700 sm:h-44">
             <div className="absolute inset-0 bg-slate-900/30" />
             <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-100">School Appearance</p>
-              <h2 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">{activeOrg?.name ?? "Organization Appearance"}</h2>
+              <Eyebrow className="text-slate-100">School Appearance</Eyebrow>
+              <SectionTitle as="h2" className="mt-1 text-white">{activeOrg?.name ?? "Organization Appearance"}</SectionTitle>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 px-4 py-3">
@@ -291,14 +292,14 @@ export default function BrandingSettingsPage() {
         </Card>
 
         {loading ? (
-          <p className="text-slate-600">Loading appearance settings…</p>
+          <BodyText muted>Loading appearance settings…</BodyText>
         ) : noActiveOrg ? (
           <Card className="p-5">
-            <p className="text-sm text-slate-700">No active organization selected.</p>
+            <BodyText>No active organization selected.</BodyText>
           </Card>
         ) : !allowed ? (
           <Card className="p-5">
-            <p className="text-sm text-slate-700">{status ?? "You do not have access to appearance settings."}</p>
+            <BodyText>{status ?? "You do not have access to appearance settings."}</BodyText>
           </Card>
         ) : (
           <Card className="p-5 sm:p-6">
@@ -323,7 +324,7 @@ export default function BrandingSettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-800">Album Shell (rgba or hex)</label>
+                <FieldLabel>Album Shell (rgba or hex)</FieldLabel>
                 <Input
                   className="mt-1.5"
                   value={form.album_shell}
@@ -334,7 +335,7 @@ export default function BrandingSettingsPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">School Logo (optional)</label>
+                  <FieldLabel>School Logo (optional)</FieldLabel>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <label className={`${buttonClass("secondary", "sm")} cursor-pointer`}>
                       <input
@@ -358,12 +359,12 @@ export default function BrandingSettingsPage() {
                     onChange={(e) => updateField("logo_url", e.target.value)}
                     placeholder="https://... (optional if uploading file)"
                   />
-                  <p className="mt-1 text-xs text-slate-500">
+                  <MetaText className="mt-1">
                     Upload a logo file or paste a URL. Uploaded files are stored in your organization space.
-                  </p>
+                  </MetaText>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-800">Heading Font (optional)</label>
+                  <FieldLabel>Heading Font (optional)</FieldLabel>
                   <Input
                     className="mt-1.5"
                     value={form.font_heading}
@@ -374,7 +375,7 @@ export default function BrandingSettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-800">Body Font (optional)</label>
+                <FieldLabel>Body Font (optional)</FieldLabel>
                 <Input
                   className="mt-1.5"
                   value={form.font_body}
@@ -390,7 +391,7 @@ export default function BrandingSettingsPage() {
                 <Button type="button" variant="secondary" onClick={onReset} disabled={saving}>
                   Reset preview
                 </Button>
-                {status && <p className="text-sm text-slate-700">{status}</p>}
+                {status && <BodyText>{status}</BodyText>}
               </div>
             </form>
           </Card>
@@ -412,7 +413,7 @@ function ColorField({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-800">{label}</label>
+      <FieldLabel>{label}</FieldLabel>
       <div className="mt-1.5 flex items-center gap-2">
         <input
           type="color"

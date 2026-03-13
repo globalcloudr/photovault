@@ -54,11 +54,30 @@ Defined in [src/app/globals.css](/Users/zylstra/Documents/photovault/src/app/glo
 - `--space-1` to `--space-6`: spacing scale.
 
 ## Typography
-- Eyebrow labels: uppercase, small, tracked (`text-xs`, `tracking-[0.14em]`).
-- Page title: `text-4xl` + `font-semibold` (Media Workspace header).
-- Section title: `text-xl` + `font-semibold`.
-- Body text: `text-sm`.
-- Metadata text: `text-xs`.
+Canonical typography primitives live in [src/components/ui/typography.tsx](/Users/zylstra/Documents/photovault/src/components/ui/typography.tsx).
+
+- `Eyebrow`
+  - small uppercase section labels
+  - use for sidebar groups, overlines, and compact context labels
+- `PageTitle`
+  - default page-level heading for shell headers and primary cards
+  - uses `Outfit` for a cleaner, more intentional hierarchy
+- `SectionTitle`
+  - use for section and panel headings
+- `CardTitle`
+  - use for compact card titles and dense detail blocks
+- `BodyText`
+  - default paragraph copy
+  - use `muted` for supporting descriptions
+- `MetaText`
+  - supporting metadata, timestamps, captions, helper copy
+- `FieldLabel`
+  - standard form label treatment
+
+Rules:
+- Do not hand-author new heading styles in page files unless the pattern is truly unique.
+- Default app UI uses `Geist` for body copy and `Outfit` for heading/label hierarchy.
+- Reserve `DM Serif Display` for marketing or explicitly branded editorial surfaces.
 
 ## Component Primitives
 Use shared primitives instead of hand-writing new utility strings:
@@ -73,6 +92,8 @@ Use shared primitives instead of hand-writing new utility strings:
   - Tones: `neutral`, `dark`, `light`.
 - [Input](/Users/zylstra/Documents/photovault/src/components/ui/input.tsx)
   - Base text/date/search input styles.
+- [Typography](/Users/zylstra/Documents/photovault/src/components/ui/typography.tsx)
+  - Shared primitives for headings, labels, body copy, and metadata.
 - [PageHeader](/Users/zylstra/Documents/photovault/src/components/layout/page-header.tsx)
   - Standard top-of-page title area with optional actions.
 - [MediaWorkspaceShell](/Users/zylstra/Documents/photovault/src/components/layout/media-workspace-shell.tsx)
@@ -112,5 +133,6 @@ When building or editing a page:
 4. Add hero context card when the page represents a collection/workspace.
 5. Use `Card` for major sections and `Badge` for counts/status.
 6. Use `Button`/`buttonClass` + `Input` for all controls.
+7. Use typography primitives instead of raw text utility strings for headings, labels, and helper copy.
 
 If you need a new pattern, add it as a shared primitive first, then use it in pages.
