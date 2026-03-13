@@ -60,6 +60,18 @@ type UploadQueueItem = {
   message?: string;
 };
 
+type BulkAssetUpdateSuccess = {
+  assetId: string;
+  rowPayload: Record<string, unknown>;
+};
+
+type BulkAssetUpdateFailure = {
+  assetId: string;
+  error: string;
+};
+
+type BulkAssetUpdateResult = BulkAssetUpdateSuccess | BulkAssetUpdateFailure;
+
 const BETA_MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024;
 const BETA_MAX_UPLOAD_SIZE_LABEL = "5 MB";
 
@@ -611,7 +623,7 @@ async function load() {
     try {
       const selectedSet = new Set(selectedAssetIds);
       const assetsById = new Map(assets.map((asset) => [asset.id, asset]));
-      const updates = selectedAssetIds.map(async (assetId) => {
+      const updates = selectedAssetIds.map(async (assetId): Promise<BulkAssetUpdateResult> => {
         const asset = assetsById.get(assetId);
         if (!asset) return { assetId, error: "Asset not found." };
 
@@ -639,17 +651,18 @@ async function load() {
       });
 
       const results = await Promise.all(updates);
-      const failed = results.filter((result) => "error" in result);
+      const failed = results.filter((result): result is BulkAssetUpdateFailure => "error" in result);
       if (failed.length > 0) {
         setBulkStatus(`Bulk update failed: ${failed[0].error}`);
         return;
       }
+      const successful = results as BulkAssetUpdateSuccess[];
 
       setAssets((prev) =>
         prev.map((asset) => {
           if (!selectedSet.has(asset.id)) return asset;
-          const result = results.find((entry) => entry.assetId === asset.id);
-          if (!result || !("rowPayload" in result)) return asset;
+          const result = successful.find((entry) => entry.assetId === asset.id);
+          if (!result) return asset;
           const rowPayload = result.rowPayload;
 
           return {
