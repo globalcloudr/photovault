@@ -129,6 +129,7 @@ export default function AlbumsPage() {
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">(readInitialAlbumsSortMode);
   const [viewMode, setViewMode] = useState<"grid" | "list">(readInitialAlbumsViewMode);
   const [rightsFilter, setRightsFilter] = useState<"all" | "ok_for_marketing" | "internal_only" | "do_not_use" | "unknown">("all");
+  const [albumStateFilter, setAlbumStateFilter] = useState<"all" | "with_photos" | "empty">("all");
   const [departments, setDepartments] = useState<OrgDepartment[]>([]);
   const [creatorLabelByUserId, setCreatorLabelByUserId] = useState<Record<string, string>>({});
   const [shareAlbumId, setShareAlbumId] = useState<string | null>(null);
@@ -311,14 +312,24 @@ export default function AlbumsPage() {
   const revokedShareLinksCount = useMemo(() => shareLinks.filter((link) => Boolean(link.revoked_at)).length, [shareLinks]);
   const shareAlbum = useMemo(() => (shareAlbumId ? albums.find((a) => a.id === shareAlbumId) ?? null : null), [albums, shareAlbumId]);
   const noActiveOrg = !orgLoading && !activeOrgId;
+  const albumStateCounts = useMemo(
+    () => ({
+      all: albums.length,
+      with_photos: albums.filter((album) => (assetsByAlbumId[album.id] ?? []).length > 0).length,
+      empty: albums.filter((album) => (assetsByAlbumId[album.id] ?? []).length === 0).length,
+    }),
+    [albums, assetsByAlbumId]
+  );
   const filteredAlbums = useMemo(() => {
     const q = search.trim().toLowerCase();
     return albums.filter((album) => {
       if (rightsFilter !== "all" && album.rights_status !== rightsFilter) return false;
+      if (albumStateFilter === "with_photos" && (assetsByAlbumId[album.id] ?? []).length === 0) return false;
+      if (albumStateFilter === "empty" && (assetsByAlbumId[album.id] ?? []).length > 0) return false;
       if (!q) return true;
       return album.event_name.toLowerCase().includes(q) || album.event_date.toLowerCase().includes(q);
     });
-  }, [albums, rightsFilter, search]);
+  }, [albumStateFilter, albums, assetsByAlbumId, rightsFilter, search]);
   const sortedAlbums = useMemo(() => {
     const items = [...filteredAlbums];
     if (sortBy === "oldest") {
@@ -673,6 +684,14 @@ export default function AlbumsPage() {
     }
   }
 
+  const hasActiveAlbumFilters = search.trim().length > 0 || rightsFilter !== "all" || albumStateFilter !== "all";
+
+  function clearAlbumFilters() {
+    setSearch("");
+    setRightsFilter("all");
+    setAlbumStateFilter("all");
+  }
+
   return (
     <MediaWorkspaceShell
       title="Albums"
@@ -747,61 +766,105 @@ export default function AlbumsPage() {
       </Card>
 
       <Card className="p-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="w-full sm:max-w-md">
-            <Input
-              placeholder="Search albums"
-              value={search}
-              name="album-search"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="w-full sm:max-w-md">
+              <Input
+                placeholder="Search albums by name or date"
+                value={search}
+                name="album-search"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <label className="sr-only" htmlFor="album-sort">Sort albums</label>
+              <select
+                id="album-sort"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              >
+                <option value="newest">Sort by Newest</option>
+                <option value="oldest">Sort by Oldest</option>
+                <option value="name_asc">Sort by Name (A-Z)</option>
+                <option value="name_desc">Sort by Name (Z-A)</option>
+              </select>
+              <button
+                type="button"
+                className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
+                  viewMode === "grid"
+                    ? "border-slate-300 bg-slate-100 text-slate-900"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+                title="Grid view"
+                aria-label="Grid view"
+                onClick={() => setViewMode("grid")}
+              >
+                <IconGrid className="h-3.5 w-3.5" />
+                Grid
+              </button>
+              <button
+                type="button"
+                className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
+                  viewMode === "list"
+                    ? "border-slate-300 bg-slate-100 text-slate-900"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+                title="List view"
+                aria-label="List view"
+                onClick={() => setViewMode("list")}
+              >
+                <IconList className="h-3.5 w-3.5" />
+                List
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <label className="sr-only" htmlFor="album-sort">Sort albums</label>
-            <select
-              id="album-sort"
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            >
-              <option value="newest">Sort by Newest</option>
-              <option value="oldest">Sort by Oldest</option>
-              <option value="name_asc">Sort by Name (A-Z)</option>
-              <option value="name_desc">Sort by Name (Z-A)</option>
-            </select>
-            <button
-              type="button"
-              className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
-                viewMode === "grid"
-                  ? "border-slate-300 bg-slate-100 text-slate-900"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-              }`}
-              title="Grid view"
-              aria-label="Grid view"
-              onClick={() => setViewMode("grid")}
-            >
-              <IconGrid className="h-3.5 w-3.5" />
-              Grid
-            </button>
-            <button
-              type="button"
-              className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
-                viewMode === "list"
-                  ? "border-slate-300 bg-slate-100 text-slate-900"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-              }`}
-              title="List view"
-              aria-label="List view"
-              onClick={() => setViewMode("list")}
-            >
-              <IconList className="h-3.5 w-3.5" />
-              List
-            </button>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-center gap-2">
+              {(
+                [
+                  ["all", `All albums (${albumStateCounts.all})`],
+                  ["with_photos", `With photos (${albumStateCounts.with_photos})`],
+                  ["empty", `Empty albums (${albumStateCounts.empty})`],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                    albumStateFilter === value
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                  onClick={() => setAlbumStateFilter(value)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <MetaText as="span">
+                Showing {sortedAlbums.length} of {albums.length} albums
+              </MetaText>
+              {hasActiveAlbumFilters ? (
+                <Button size="sm" variant="ghost" onClick={clearAlbumFilters}>
+                  Clear filters
+                </Button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <MetaText as="span">
+              Search by album name or event date, then narrow the list to albums that already have photos or still need uploads.
+            </MetaText>
           </div>
         </div>
       </Card>
@@ -825,11 +888,18 @@ export default function AlbumsPage() {
             <BodyText muted className="mt-2">
               {albums.length === 0
                 ? "Create your first album to start uploading and organizing photos."
-                : "Try a different search term or rights filter."}
+                : "Try a different search term, switch the workflow filter, or clear your current filters."}
             </BodyText>
-            <Link className={`${buttonClass("primary")} mt-5`} href="/albums/new">
-              {albums.length === 0 ? "Create first album" : "Create new album"}
-            </Link>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <Link className={buttonClass("primary")} href="/albums/new">
+                {albums.length === 0 ? "Create first album" : "Create new album"}
+              </Link>
+              {albums.length > 0 ? (
+                <Button variant="secondary" onClick={clearAlbumFilters}>
+                  Reset filters
+                </Button>
+              ) : null}
+            </div>
           </section>
         ) : viewMode === "grid" ? (
           <ul className="mt-3 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

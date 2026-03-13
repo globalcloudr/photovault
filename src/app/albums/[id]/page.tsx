@@ -122,14 +122,38 @@ export default function AlbumDetailPage() {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "name_desc">("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [reviewFilter, setReviewFilter] = useState<"all" | "needs_metadata" | "with_metadata">("all");
   const viewPrefKey = useMemo(() => `photos_view_mode_v1:${albumId}`, [albumId]);
   const sortPrefKey = useMemo(() => `photos_sort_mode_v1:${albumId}`, [albumId]);
+  const assetsNeedingMetadata = useMemo(
+    () =>
+      assets.filter(
+        (asset) =>
+          !(asset.tags?.length ?? 0) &&
+          !asset.event_type?.trim() &&
+          !asset.campus?.trim() &&
+          !asset.photographer?.trim()
+      ),
+    [assets]
+  );
+  const assetsWithMetadataCount = assets.length - assetsNeedingMetadata.length;
 
   const filteredAssets = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return assets;
+    const reviewFiltered = assets.filter((asset) => {
+      const needsMetadata =
+        !(asset.tags?.length ?? 0) &&
+        !asset.event_type?.trim() &&
+        !asset.campus?.trim() &&
+        !asset.photographer?.trim();
 
-    return assets.filter((a) => {
+      if (reviewFilter === "needs_metadata") return needsMetadata;
+      if (reviewFilter === "with_metadata") return !needsMetadata;
+      return true;
+    });
+    if (!q) return reviewFiltered;
+
+    return reviewFiltered.filter((a) => {
       const hay = [
         a.canonical_filename,
         a.original_filename,
@@ -145,7 +169,7 @@ export default function AlbumDetailPage() {
 
       return hay.includes(q);
     });
-  }, [assets, query]);
+  }, [assets, query, reviewFilter]);
   const sortedAssets = useMemo(() => {
     const items = [...filteredAssets];
     if (sortBy === "oldest") {
@@ -198,6 +222,15 @@ export default function AlbumDetailPage() {
   const [assetEditorSaving, setAssetEditorSaving] = useState(false);
   const [assetEditorStatus, setAssetEditorStatus] = useState<string | null>(null);
   const dragDepthRef = useRef(0);
+  const uploadQueueSummary = useMemo(
+    () => ({
+      total: uploadQueue.length,
+      done: uploadQueue.filter((item) => item.status === "done").length,
+      duplicate: uploadQueue.filter((item) => item.status === "duplicate").length,
+      failed: uploadQueue.filter((item) => item.status === "error").length,
+    }),
+    [uploadQueue]
+  );
 
   function hasFilePayload(e: React.DragEvent) {
     return Array.from(e.dataTransfer?.types ?? []).includes("Files");
@@ -242,6 +275,11 @@ export default function AlbumDetailPage() {
 
   function clearSelectedAssets() {
     setSelectedAssetIds([]);
+  }
+
+  function clearPhotoFilters() {
+    setQuery("");
+    setReviewFilter("all");
   }
 
   const hasAssetEditorChanges = useMemo(() => {
@@ -953,6 +991,8 @@ async function load() {
     }
   }
 
+  const hasActivePhotoFilters = query.trim().length > 0 || reviewFilter !== "all";
+
   function moveLightbox(delta: number) {
     if (!lightbox || assets.length === 0) return;
 
@@ -1063,6 +1103,68 @@ async function load() {
           <BodyText className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-red-700">{status}</BodyText>
         ) : null}
 
+        <Card className="mt-4 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-1">
+              <SectionTitle as="h3" className="text-lg">Album Workflow</SectionTitle>
+              <BodyText muted>
+                Upload new photos, focus on files that still need metadata, and use bulk edit before you share or download.
+              </BodyText>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <label className={`${buttonClass("primary", "sm")} cursor-pointer`}>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  multiple
+                  disabled={uploading}
+                  onChange={(e) => handleUpload(e.target.files)}
+                />
+                {uploading ? "Uploading…" : "Upload more photos"}
+              </label>
+              {hasActivePhotoFilters ? (
+                <Button size="sm" variant="secondary" onClick={clearPhotoFilters}>
+                  Clear filters
+                </Button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <Eyebrow>Library</Eyebrow>
+              <SectionTitle as="h4" className="mt-1 text-lg">{assets.length}</SectionTitle>
+              <MetaText>{assets.length === 1 ? "photo in this album" : "photos in this album"}</MetaText>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <Eyebrow>Needs Review</Eyebrow>
+              <SectionTitle as="h4" className="mt-1 text-lg">{assetsNeedingMetadata.length}</SectionTitle>
+              <MetaText>photos still missing tags or descriptive metadata</MetaText>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <Eyebrow>Ready</Eyebrow>
+              <SectionTitle as="h4" className="mt-1 text-lg">{assetsWithMetadataCount}</SectionTitle>
+              <MetaText>photos already carrying at least one metadata field</MetaText>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <Eyebrow>Selection</Eyebrow>
+              <SectionTitle as="h4" className="mt-1 text-lg">{selectedAssetIds.length}</SectionTitle>
+              <MetaText>{selectedAssetIds.length === 0 ? "select photos to bulk update" : "photos currently selected"}</MetaText>
+            </div>
+          </div>
+
+          {uploadQueueSummary.total > 0 ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Badge>{uploadQueueSummary.total} queued</Badge>
+              <Badge>{uploadQueueSummary.done} uploaded</Badge>
+              <Badge>{uploadQueueSummary.duplicate} duplicate</Badge>
+              <Badge>{uploadQueueSummary.failed} failed</Badge>
+            </div>
+          ) : null}
+        </Card>
+
         {uploadQueue.length > 0 ? (
           <Card className="mt-3 border-slate-200 p-4">
             <div className="flex items-center justify-between">
@@ -1118,55 +1220,99 @@ async function load() {
         )}
 
         <Card className="mt-4 p-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="w-full sm:max-w-md">
-              <Input
-                placeholder="Search photos"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="w-full sm:max-w-md">
+                <Input
+                  placeholder="Search photos by filename, tag, event type, campus, or photographer"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <label className="sr-only" htmlFor="photo-sort">Sort photos</label>
+                <select
+                  id="photo-sort"
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                >
+                  <option value="newest">Sort by Newest</option>
+                  <option value="oldest">Sort by Oldest</option>
+                  <option value="name_asc">Sort by Name (A-Z)</option>
+                  <option value="name_desc">Sort by Name (Z-A)</option>
+                </select>
+                <button
+                  type="button"
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
+                    viewMode === "grid"
+                      ? "border-slate-300 bg-slate-100 text-slate-900"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                  title="Grid view"
+                  aria-label="Grid view"
+                  onClick={() => setViewMode("grid")}
+                >
+                  <IconGrid className="h-3.5 w-3.5" />
+                  Grid
+                </button>
+                <button
+                  type="button"
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
+                    viewMode === "list"
+                      ? "border-slate-300 bg-slate-100 text-slate-900"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                  title="List view"
+                  aria-label="List view"
+                  onClick={() => setViewMode("list")}
+                >
+                  <IconList className="h-3.5 w-3.5" />
+                  List
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2 self-end sm:self-auto">
-              <label className="sr-only" htmlFor="photo-sort">Sort photos</label>
-              <select
-                id="photo-sort"
-                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-900"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              >
-                <option value="newest">Sort by Newest</option>
-                <option value="oldest">Sort by Oldest</option>
-                <option value="name_asc">Sort by Name (A-Z)</option>
-                <option value="name_desc">Sort by Name (Z-A)</option>
-              </select>
-              <button
-                type="button"
-                className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
-                  viewMode === "grid"
-                    ? "border-slate-300 bg-slate-100 text-slate-900"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                }`}
-                title="Grid view"
-                aria-label="Grid view"
-                onClick={() => setViewMode("grid")}
-              >
-                <IconGrid className="h-3.5 w-3.5" />
-                Grid
-              </button>
-              <button
-                type="button"
-                className={`inline-flex items-center gap-1 rounded-md border px-2 py-2 text-xs ${
-                  viewMode === "list"
-                    ? "border-slate-300 bg-slate-100 text-slate-900"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                }`}
-                title="List view"
-                aria-label="List view"
-                onClick={() => setViewMode("list")}
-              >
-                <IconList className="h-3.5 w-3.5" />
-                List
-              </button>
+
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-wrap items-center gap-2">
+                {(
+                  [
+                    ["all", `All photos (${assets.length})`],
+                    ["needs_metadata", `Needs review (${assetsNeedingMetadata.length})`],
+                    ["with_metadata", `With metadata (${assetsWithMetadataCount})`],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                      reviewFilter === value
+                        ? "border-slate-900 bg-slate-900 text-white"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                    onClick={() => setReviewFilter(value)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <MetaText as="span">
+                  Showing {sortedAssets.length} of {assets.length} photos
+                </MetaText>
+                {hasActivePhotoFilters ? (
+                  <Button size="sm" variant="ghost" onClick={clearPhotoFilters}>
+                    Clear filters
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <MetaText as="span">
+                Use “Needs review” to find photos missing metadata, then select several photos and bulk-apply tags or common fields in one pass.
+              </MetaText>
             </div>
           </div>
         </Card>
@@ -1266,10 +1412,26 @@ async function load() {
                 {bulkStatus ? <MetaText>{bulkStatus}</MetaText> : null}
               </div>
             </Card>
+          ) : assets.length > 0 ? (
+            <Card className="mt-3 border-slate-200 bg-slate-50/70 p-3">
+              <BodyText muted>
+                Select multiple photos to batch-apply tags, event type, campus, or photographer without opening each file one at a time.
+              </BodyText>
+            </Card>
           ) : null}
 
           {loading ? (
-            <p className="mt-4 text-slate-600">Loading photos…</p>
+            <BodyText muted className="mt-4">Loading photos…</BodyText>
+          ) : assets.length > 0 && sortedAssets.length === 0 ? (
+            <div className="mt-5 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
+              <LabelText className="text-slate-800">No photos match your current filters</LabelText>
+              <BodyText muted className="mt-2">Try a different search term or reset the review filter to return to the full album.</BodyText>
+              <div className="mt-5">
+                <Button variant="secondary" onClick={clearPhotoFilters}>
+                  Clear filters
+                </Button>
+              </div>
+            </div>
           ) : sortedAssets.length === 0 ? (
             <div className="mt-5 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center">
               <LabelText className="text-slate-800">No photos uploaded yet</LabelText>
