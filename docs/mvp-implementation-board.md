@@ -186,6 +186,8 @@ Stack: Next.js App Router + Supabase Auth/DB/Storage
   - implemented direct logo upload in `Appearance`
   - `logo_url` now supports storage-backed references
   - sidebar lockup resolves storage refs and renders signed URLs
+  - removed unused org-level heading/body font fields from the app and database
+  - added user-controlled workspace text size options (`Small`, `Medium`, `Large`) for readability
 
 ### PV-016: UI Stabilization + Usability Validation (Post-Modernization)
 - Goal: Lock the new Media Workspace design into repeatable page patterns and validate with real school users.

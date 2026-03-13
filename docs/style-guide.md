@@ -78,6 +78,8 @@ Rules:
 - Do not hand-author new heading styles in page files unless the pattern is truly unique.
 - Default app UI uses `Geist` for body copy and `Outfit` for heading/label hierarchy.
 - Reserve `DM Serif Display` for marketing or explicitly branded editorial surfaces.
+- Workspace typography uses app-defined built-in fonts; org appearance settings should not introduce custom font-family controls unless the fonts are actually implemented end-to-end.
+- Readability can be adjusted with the user-facing workspace text-size preference (`Small`, `Medium`, `Large`).
 
 ## Component Primitives
 Use shared primitives instead of hand-writing new utility strings:
