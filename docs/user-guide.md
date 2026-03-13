@@ -94,7 +94,8 @@ From the Albums page:
 Some users (school owners/admins) can open `Appearance` to update:
 - colors
 - logo (upload file directly, or provide URL)
-- font fields (if used by your org)
+
+The workspace uses built-in fonts. Users can also adjust workspace text size in the app to make reading more comfortable.
 
 Appearance applies to your school’s active PhotoVault organization.
 
@@ -134,7 +135,7 @@ To update your displayed name:
 
 Note:
 - Name changes are account-level (user profile), not organization appearance settings.
-- `Appearance` is for school branding (colors, logos, fonts).
+- `Appearance` is for school branding (colors, logos) and workspace readability controls.
 
 ## Switching Organizations
 If you have access to multiple organizations, use the active org controls in the app (Super Admin flow) before creating albums or editing appearance settings.

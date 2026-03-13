@@ -14,12 +14,16 @@ import { supabase } from "@/lib/supabaseClient";
 import { canEditOrgAppearance } from "@/lib/roles";
 import {
   applyTheme,
+  applyWorkspaceFontSize,
   fetchOrgThemeSettings,
   makeStorageRef,
   OrgThemeSettings,
   OrgThemeUpdate,
   parseStorageRef,
+  persistWorkspaceFontSize,
+  readStoredWorkspaceFontSize,
   updateOrgThemeSettings,
+  WorkspaceFontSize,
 } from "@/lib/theme";
 import { logAuditEventClient } from "@/lib/audit-client";
 
@@ -34,8 +38,6 @@ type FormState = {
   brand_contrast: string;
   album_shell: string;
   logo_url: string;
-  font_heading: string;
-  font_body: string;
 };
 
 const DEFAULTS: FormState = {
@@ -49,8 +51,6 @@ const DEFAULTS: FormState = {
   brand_contrast: "#FFFFFF",
   album_shell: "rgba(15,23,42,0.95)",
   logo_url: "",
-  font_heading: "",
-  font_body: "",
 };
 
 const LOGO_BUCKET = "originals";
@@ -71,10 +71,14 @@ function toFormState(theme: OrgThemeSettings): FormState {
     brand_contrast: theme.brand_contrast,
     album_shell: theme.album_shell,
     logo_url: theme.logo_url ?? "",
-    font_heading: theme.font_heading ?? "",
-    font_body: theme.font_body ?? "",
   };
 }
+
+const WORKSPACE_FONT_SIZE_OPTIONS: Array<{ value: WorkspaceFontSize; label: string; description: string }> = [
+  { value: "small", label: "Small", description: "Default workspace text size." },
+  { value: "medium", label: "Medium", description: "A little easier on the eyes." },
+  { value: "large", label: "Large", description: "Best for maximum readability." },
+];
 
 export default function BrandingSettingsPage() {
   const router = useRouter();
@@ -88,8 +92,14 @@ export default function BrandingSettingsPage() {
   const [allowed, setAllowed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(DEFAULTS);
+  const [workspaceFontSize, setWorkspaceFontSize] = useState<WorkspaceFontSize>("small");
   const hasLogo = Boolean(form.logo_url);
-  const hasCustomFonts = Boolean(form.font_heading || form.font_body);
+
+  useEffect(() => {
+    const storedSize = readStoredWorkspaceFontSize();
+    setWorkspaceFontSize(storedSize);
+    applyWorkspaceFontSize(storedSize);
+  }, []);
 
   useEffect(() => {
     if (orgLoading) return;
@@ -167,8 +177,6 @@ export default function BrandingSettingsPage() {
         brand_contrast: form.brand_contrast,
         album_shell: form.album_shell,
         logo_url: form.logo_url || null,
-        font_heading: form.font_heading || null,
-        font_body: form.font_body || null,
       };
 
       const updated = await updateOrgThemeSettings(activeOrgId, patch);
@@ -181,7 +189,7 @@ export default function BrandingSettingsPage() {
         entityId: activeOrgId,
         metadata: {
           hasLogo: Boolean(patch.logo_url),
-          hasCustomFonts: Boolean(patch.font_heading || patch.font_body),
+          workspaceFontSize,
         },
       });
     } catch (error) {
@@ -288,7 +296,8 @@ export default function BrandingSettingsPage() {
           <div className="flex flex-wrap items-center gap-2 px-4 py-3">
             <Badge>Theme tokens</Badge>
             <Badge>{hasLogo ? "Logo set" : "No logo yet"}</Badge>
-            <Badge>{hasCustomFonts ? "Custom fonts" : "Default fonts"}</Badge>
+            <Badge>Built-in fonts</Badge>
+            <Badge>Workspace text: {workspaceFontSize}</Badge>
           </div>
         </Card>
 
@@ -334,6 +343,45 @@ export default function BrandingSettingsPage() {
                 />
               </div>
 
+              <div className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
+                <div className="space-y-1">
+                  <FieldLabel>Workspace Text Size</FieldLabel>
+                  <MetaText>
+                    Adjust text size in your workspace. This preference is saved in this browser for your account.
+                  </MetaText>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {WORKSPACE_FONT_SIZE_OPTIONS.map((option) => {
+                    const selected = workspaceFontSize === option.value;
+
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`rounded-xl border p-3 text-left transition ${
+                          selected
+                            ? "border-[var(--foreground)] bg-[var(--surface)] shadow-sm"
+                            : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--foreground)]"
+                        }`}
+                        onClick={() => {
+                          setWorkspaceFontSize(option.value);
+                          persistWorkspaceFontSize(option.value);
+                          setStatus("Workspace text size updated for this browser.");
+                        }}
+                        aria-pressed={selected}
+                      >
+                        <p className="font-outfit text-[length:var(--workspace-label-size)] font-semibold text-[var(--foreground)]">
+                          {option.label}
+                          {option.value === "small" ? " (Default)" : ""}
+                        </p>
+                        <MetaText className="mt-1">{option.description}</MetaText>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <FieldLabel>School Logo (optional)</FieldLabel>
@@ -364,25 +412,6 @@ export default function BrandingSettingsPage() {
                     Upload a logo file or paste a URL. Uploaded files are stored in your organization space.
                   </MetaText>
                 </div>
-                <div>
-                  <FieldLabel>Heading Font (optional)</FieldLabel>
-                  <Input
-                    className="mt-1.5"
-                    value={form.font_heading}
-                    onChange={(e) => updateField("font_heading", e.target.value)}
-                    placeholder="e.g. Montserrat"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <FieldLabel>Body Font (optional)</FieldLabel>
-                <Input
-                  className="mt-1.5"
-                  value={form.font_body}
-                  onChange={(e) => updateField("font_body", e.target.value)}
-                  placeholder="e.g. Inter"
-                />
               </div>
 
               <div className="flex items-center gap-2 pt-2">

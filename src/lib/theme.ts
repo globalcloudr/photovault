@@ -12,8 +12,6 @@ export type OrgThemeSettings = {
   brand_contrast: string;
   album_shell: string;
   logo_url: string | null;
-  font_heading: string | null;
-  font_body: string | null;
   updated_at: string;
 };
 
@@ -30,10 +28,12 @@ export type OrgThemeUpdate = Partial<
     | "brand_contrast"
     | "album_shell"
     | "logo_url"
-    | "font_heading"
-    | "font_body"
   >
 >;
+
+export type WorkspaceFontSize = "small" | "medium" | "large";
+
+export const WORKSPACE_FONT_SIZE_STORAGE_KEY = "pv_workspace_font_size_v1";
 
 const STORAGE_REF_PREFIX = "storage://";
 
@@ -49,8 +49,6 @@ const THEME_SELECT = [
   "brand_contrast",
   "album_shell",
   "logo_url",
-  "font_heading",
-  "font_body",
   "updated_at",
 ].join(",");
 
@@ -75,6 +73,37 @@ export function applyTheme(theme: Partial<OrgThemeSettings> | null | undefined) 
     if (typeof value === "string" && value.trim()) {
       root.style.setProperty(cssVar, value);
     }
+  }
+}
+
+export function readStoredWorkspaceFontSize(): WorkspaceFontSize {
+  if (typeof window === "undefined") return "small";
+
+  try {
+    const value = window.localStorage.getItem(WORKSPACE_FONT_SIZE_STORAGE_KEY);
+    if (value === "medium" || value === "large") return value;
+  } catch {
+    // ignore localStorage errors
+  }
+
+  return "small";
+}
+
+export function applyWorkspaceFontSize(size: WorkspaceFontSize) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.workspaceFontSize = size;
+}
+
+export function persistWorkspaceFontSize(size: WorkspaceFontSize) {
+  applyWorkspaceFontSize(size);
+
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(WORKSPACE_FONT_SIZE_STORAGE_KEY, size);
+    window.dispatchEvent(new CustomEvent("pv:workspace-font-size", { detail: size }));
+  } catch {
+    // ignore localStorage errors
   }
 }
 
