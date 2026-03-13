@@ -24,7 +24,7 @@ export function OrgBrandLockup({
       {logoUrl ? (
         <div
           className={cn(
-            "flex h-14 w-44 items-center rounded-md border border-slate-200 bg-white px-2",
+            "flex h-16 w-48 items-center justify-center overflow-hidden rounded-md border border-slate-200 bg-white px-3 py-2",
             logoFrameClassName
           )}
         >
@@ -32,7 +32,7 @@ export function OrgBrandLockup({
           <img
             src={logoUrl}
             alt={orgName ? `${orgName} logo` : "Organization logo"}
-            className={cn("h-10 w-full object-contain object-left", logoImageClassName)}
+            className={cn("h-full w-full object-contain object-center", logoImageClassName)}
           />
         </div>
       ) : null}

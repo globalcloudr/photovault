@@ -38,6 +38,7 @@ type MediaWorkspaceShellProps = {
   customSidebar?: React.ReactNode;
   hidePageHeader?: boolean;
   sidebarLogoOnly?: boolean;
+  orgLogoUrlOverride?: string | null;
 };
 
 function navClass(active: boolean) {
@@ -59,6 +60,7 @@ export function MediaWorkspaceShell({
   customSidebar,
   hidePageHeader = false,
   sidebarLogoOnly = true,
+  orgLogoUrlOverride = null,
 }: MediaWorkspaceShellProps) {
   const pathname = usePathname();
   const { activeOrgId, isSuperAdmin, orgs } = useOrg();
@@ -98,19 +100,25 @@ export function MediaWorkspaceShell({
   useEffect(() => {
     if (!activeOrgId) return;
 
+    let cancelled = false;
+
     (async () => {
-      const { data, error } = await supabase
-        .from("org_theme_settings")
-        .select("logo_url")
-        .eq("org_id", activeOrgId)
-        .single();
+      const rawLogoUrl =
+        orgLogoUrlOverride !== null
+          ? orgLogoUrlOverride
+          : await (async () => {
+              const { data, error } = await supabase
+                .from("org_theme_settings")
+                .select("logo_url")
+                .eq("org_id", activeOrgId)
+                .single();
 
-      if (error) {
-        setOrgLogoUrl(null);
-        return;
-      }
+              if (cancelled || error) return null;
+              return (data?.logo_url as string | null) ?? null;
+            })();
 
-      const rawLogoUrl = (data?.logo_url as string | null) ?? null;
+      if (cancelled) return;
+
       const storageRef = parseStorageRef(rawLogoUrl);
 
       if (!storageRef) {
@@ -122,6 +130,8 @@ export function MediaWorkspaceShell({
         .from(storageRef.bucket)
         .createSignedUrl(storageRef.path, 60 * 60 * 24);
 
+      if (cancelled) return;
+
       if (signedError) {
         setOrgLogoUrl(null);
         return;
@@ -129,7 +139,11 @@ export function MediaWorkspaceShell({
 
       setOrgLogoUrl(signedData?.signedUrl ?? null);
     })();
-  }, [activeOrgId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeOrgId, orgLogoUrlOverride]);
 
   useEffect(() => {
     (async () => {

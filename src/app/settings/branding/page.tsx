@@ -227,7 +227,7 @@ export default function BrandingSettingsPage() {
       }
 
       updateField("logo_url", makeStorageRef(LOGO_BUCKET, newPath));
-      setStatus("Logo uploaded. Save appearance to apply it.");
+      setStatus("Logo uploaded. Save appearance to keep it.");
       void logAuditEventClient({
         orgId: activeOrgId,
         eventType: "appearance_logo_uploaded",
@@ -247,6 +247,7 @@ export default function BrandingSettingsPage() {
       title="Appearance Settings"
       subtitle={`Customize colors and identity for ${activeOrg?.name ?? "the active organization"}.`}
       sidebarLogoOnly
+      orgLogoUrlOverride={form.logo_url || null}
       actions={[
         {
           key: "albums",
