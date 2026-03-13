@@ -1329,6 +1329,12 @@ async function load() {
 
           {selectedAssetIds.length > 0 ? (
             <Card className="mt-3 border-slate-200 p-3">
+              <div className="mb-3">
+                <SectionTitle>Bulk edit selected photos</SectionTitle>
+                <MetaText className="mt-1 text-slate-500">
+                  Add metadata to all selected photos at once. To remove a single existing tag, open that photo&apos;s Asset Details drawer.
+                </MetaText>
+              </div>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <BodyText>
@@ -1347,14 +1353,24 @@ async function load() {
                 <Input
                   placeholder="Tags (comma separated)"
                   value={bulkTagsText}
-                  onChange={(e) => setBulkTagsText(e.target.value)}
+                  onChange={(e) => {
+                    setBulkTagsText(e.target.value);
+                    if (e.target.value.trim()) {
+                      setBulkClearTags(false);
+                    }
+                  }}
                   disabled={bulkClearTags}
                 />
                 <label className="flex items-center gap-2 text-xs text-slate-600">
                   <input
                     type="checkbox"
                     checked={bulkClearTags}
-                    onChange={(e) => setBulkClearTags(e.target.checked)}
+                    onChange={(e) => {
+                      setBulkClearTags(e.target.checked);
+                      if (e.target.checked) {
+                        setBulkTagsText("");
+                      }
+                    }}
                   />
                   Clear tags
                 </label>
